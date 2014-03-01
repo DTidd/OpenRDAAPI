@@ -1,0 +1,479 @@
+for arg
+do
+if
+	grep -s ")()" $arg
+then
+	sed "s/)()/)(...)/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "OPART" $arg
+then
+	sed "s/OPART/CPP_OPART/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "app.h" $arg
+then
+	sed "s/app.h/app.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "stdlib.h" $arg
+then
+	sed "s/stdlib.h/cstdlib/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "mix.h" $arg
+then
+	sed "s/mix.h/mix.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "doheader.h" $arg
+then
+	sed "s/doheader.h/doheader.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "gui.h" $arg
+then
+	sed "s/gui.h/gui.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "mkmsc.h" $arg
+then
+	sed "s/mkmsc.h/mkmsc.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "powadd.h" $arg
+then
+	sed "s/powadd.h/powadd.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "nrd.h" $arg
+then
+	sed "s/nrd.h/nrd.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "ldval.h" $arg
+then
+	sed "s/ldval.h/ldval.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "olh.h" $arg
+then
+	sed "s/olh.h/olh.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "miscfunc.h" $arg
+then
+	sed "s/miscfunc.h/misc.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "stdio.h" $arg
+then
+	sed "s/stdio.h/cstdio/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "mkvir.h" $arg
+then
+	sed "s/mkvir.h/mkvir.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "rptgen.h" $arg
+then
+	sed "s/rptgen.h/rptgen.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "guip.h" $arg
+then
+	sed "s/guip.h/guip.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "fin.h" $arg
+then
+	sed "s/fin.h/fin.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "pay.h" $arg
+then
+	sed "s/pay.h/pay.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "errno.h" $arg
+then
+	sed "s/errno.h/cerrno/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "impexp.h" $arg
+then
+	sed "s/impexp.h/impexp.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "mknrd.h" $arg
+then
+	sed "s/mknrd.h/mknrd.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "cnvscn.h" $arg
+then
+	sed "s/cnvscn.h/cnvscn.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "void c_main(" $arg
+then
+	sed "s/void c_main(/int c_main(/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "void main(" $arg
+then
+	sed "s/void main(/int main(/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "mkadd.h" $arg
+then
+	sed "s/mkadd.h/mkadd.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "dfchg.h" $arg
+then
+	sed "s/dfchg.h/dfchg.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "trans.h" $arg
+then
+	sed "s/trans.h/trans.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "#include <rdaglob.h>" $arg
+then
+	sed "s/#include <rdaglob.h>//g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "#include<rdaglob.h>" $arg
+then
+	sed "s/#include<rdaglob.h>//g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "#include <rdaflds.h>" $arg
+then
+	sed "s/#include <rdaflds.h>//g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "#include<rdaflds.h>" $arg
+then
+	sed "s/#include<rdaflds.h>//g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "#include <bin.h>" $arg
+then
+	sed "s/#include <bin.h>//g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "#include<bin.h>" $arg
+then
+	sed "s/#include<bin.h>//g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "#include <binlib.h>" $arg
+then
+	sed "s/#include <binlib.h>//g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "#include<binlib.h>" $arg
+then
+	sed "s/#include<binlib.h>//g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "#include <prterr.h>" $arg
+then
+	sed "s/#include <prterr.h>//g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "#include<prterr.h>" $arg
+then
+	sed "s/#include<prterr.h>//g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "#include <glogin.h>" $arg
+then
+	sed "s/#include <glogin.h>//g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "#include<glogin.h>" $arg
+then
+	sed "s/#include<glogin.h>//g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "#include <gcwd.h>" $arg
+then
+	sed "s/#include <gcwd.h>//g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "#include<gcwd.h>" $arg
+then
+	sed "s/#include<gcwd.h>//g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "#include <mtn.h>" $arg
+then
+	sed "s/#include <mtn.h>//g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "#include<mtn.h>" $arg
+then
+	sed "s/#include<mtn.h>//g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "mkmtn.h" $arg
+then
+	sed "s/mkmtn.h/mkmtn.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "mkdef.h" $arg
+then
+	sed "s/mkdef.h/mkdef.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "mkez.h" $arg
+then
+	sed "s/mkez.h/mkez.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "mkimp.h" $arg
+then
+	sed "s/mkimp.h/mkimp.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "mksecs.h" $arg
+then
+	sed "s/mksecs.h/mksecs.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "curver.h" $arg
+then
+	sed "s/curver.h/curver.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "#include <exeprog.h>" $arg
+then
+	sed "s/#include <exeprog.h>//g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "time.h" $arg
+then
+	sed "s/time.h/ctime/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "#include <alloc.h>" $arg
+then
+	sed "s/#include <alloc.h>//g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "#include<rdadiag.h>" $arg
+then
+	sed "s/#include<rdadiag.h>//g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "rdalic.h" $arg
+then
+	sed "s/rdalic.h/rdalic.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "<sec.h>" $arg
+then
+	sed "s/<sec.h>/<sec.hpp>/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "getenv" $arg
+then
+	sed "s/getenv/RDA_GetEnv/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "putenv" $arg
+then
+	sed "s/putenv/RDA_PutEnv/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "postrk.h" $arg
+then
+	sed "s/postrk.h/postrk.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "purord.h" $arg
+then
+	sed "s/purord.h/purord.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "reqmgt.h" $arg
+then
+	sed "s/reqmgt.h/reqmgt.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "appmgt.h" $arg
+then
+	sed "s/appmgt.h/appmgt.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "venpmt.h" $arg
+then
+	sed "s/venpmt.h/venpmt.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "\->virtual" $arg
+then
+	sed "s/\->virtual/\->virflds/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "hpppp" $arg
+then
+	sed "s/hpppp/hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "CPP_CPP_OPART" $arg
+then
+	sed "s/CPP_CPP_OPART/CPP_OPART/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "packlib.h" $arg
+then
+	sed "s/packlib.h/packlib.hpp/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+if
+	grep -s "ywlabel" $arg
+then
+	sed "s/ywlabel/XHTML_Label/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+done

@@ -1,0 +1,6 @@
+echo searching for \"$*\"
+for xxx in `ls -d /dctidd/localc/*/`
+do
+ cd $xxx
+ grep \"$*\" *.[ch]
+done

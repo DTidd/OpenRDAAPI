@@ -1,0 +1,6 @@
+echo searching for $1
+for xxx in `ls -d /rdadev/localc++/*/`
+do
+ cd $xxx
+ grep -l "$1" *.cpp *.hpp
+done

@@ -1,0 +1,826 @@
+/* OpenRDA Current Primary Colors */
+/* standard background light purple-gray #d5d2d5 try #efefef instead */
+/* background yellow for buttons, etc #ebebc8 #feffb6 # dbdc7e */
+/* dark purple #4f2d7f */
+/* Website dark purple #401a6b */
+/* dark green #004e00 */
+/* save green #5a601d */
+/* fast save green #8e9300 */
+/* quit bright yellow #f7fc6c */
+/* select rust color #cb792d */
+/* white input field background color #fff2e6 */
+/* website white #ffffff */
+
+html {
+	color: #401a6b; 
+	background-color: #efefef;
+}
+html.Wt-layout {
+	color: #401a6b; 
+	background-color: #efefef;
+}
+//Wt-domRoot {
+//	color: #401a6b; 
+//	background-color: #efefef;
+//}
+
+div {
+	padding: 0px 0px 0px 0px;
+	border-spacing: 0px 0px;
+}
+span {
+	padding: 0px 0px 0px 0px;
+	border-spacing: 0px 0px;
+}
+body {
+	color: #401a6b; 
+	background-color: #efefef;
+}
+body.Wt-layout {
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+	border-spacing: 0px 0px;
+}
+
+Screen-Title-Box {
+}
+Screen-Title {
+}
+Wt-input {
+	color: black;
+	background-color: #fff2e6;
+}
+select {
+	border-radius: 6px; 
+	color: #401a6b; 
+	background-color: white;
+}
+.Wt-icon {
+}
+.Wt-chkbox {
+}
+.Wt-closable {
+}
+.Wt-outset {
+}
+.Wt-striped {
+}
+.Wt-datepicker {
+	color: #401a6b; 
+	background-color: white;
+}
+.Wt-googlemap {
+}
+.Wt-panel {
+}
+.Wt-spinbox {
+}
+.Wt-dateedit {
+}
+.Wt-in-place-edit {
+}
+.Wt-valid {
+}
+.Wt-invalid {
+}
+.Wt-split-h {
+}
+.Wt-split-v {
+}
+.Wt-field {
+	background-color: white;
+	color: black;
+}
+.Wt-auth-icon {
+}
+.Wt-dialog {
+}
+.Wt-dialogcover {
+}
+div.Wt-dialog {
+	padding: 0px 0px 0px 0px;
+	border-spacing: 0px 0px;
+	color: #401a6b; 
+	background-color: #efefef;
+}
+div.Wt-dialogcover {
+}
+.Wt-resizable {
+}
+.Wt-layout {
+	padding: 0px 0px 0px 0px;
+	border-spacing: 0px 0px;
+	margin: 0px 0px 0px 0px;
+}
+.Wt-wrapdiv {
+	padding: 0px 0px 0px 0px;
+	border-spacing: 0px 0px;
+	margin: 0px 0px 0px 0px;
+}
+.Wt-hcenter {
+}
+.Wt-progressbar {
+}
+.Wt-disabled {
+}
+.Wt-selected {
+	background-color: #401a6b; 
+	color: white;
+}
+.Wt-unload {
+}
+.Wt-tabs {
+    	display: inline-block;
+	margin-top: 5px;
+	margin-bottom: 0px;
+}
+.Wt-tabs span {
+	color: #4f2d7f;
+}
+.Wt-tabs a {
+	text-decoration: none;
+}
+.Wt-tabs .itemselected span {
+	background-color: white;
+	color: #004e00;
+	height: 105%
+}
+.Wt-tabs .itemselected {
+	background-position: 100% - 150px;
+}
+.Wt-tabs .itemselected a {
+	background-position: 0% - 150 px;
+}
+.Wt-tabs span:hover {
+	text-decoration: none;
+}
+.Wt-timers {
+} 
+.Wt-resource {
+}
+.Wt-suggest {
+}
+.Wt-loading {
+}
+div.Wt-loading {
+}
+.Wt-padded {
+}
+.Wt-delegate-edit {
+}
+.Wt-animated {
+}
+.Wt-animated > * { 
+	background-color: #F7F7F7;
+}
+.Wt-slider-bg {
+}
+.Wt-slider- {
+}
+.Wt-w {
+}
+.Wt-e {
+}
+.Wt-stack {
+}
+.Wt-suggest-dropdown {
+}
+.Wt-suggest-onedit {
+}
+
+
+iframe.Wt-resource { 
+}
+iframe.Wt-shim {
+}
+.Wt-wrap {
+}
+div.Wt-chwrap {
+	padding: 0px 0px 0px 0px;
+	border-spacing: 0px 0px;
+}
+a.Wt-wrap {
+}
+.Wt-sbspacer {
+}
+.Wt-rr {
+}
+.Wt-cal {
+}
+.Wt-cal-navbutton {
+}
+.Wt-cal-year {
+}
+.Wt-cal-oor {
+}
+.Wt-cal-oom {
+}
+.Wt-cal-sel {
+}
+.Wt-cal-now {
+}
+.Wt-shim {
+}
+.Wt-header {
+}
+.Wt-hidden {
+}
+
+
+
+
+.Wt-itemview {
+}
+.Wt-itemview .Wt-headerdiv {
+}
+.Wt-itemview .Wt-header {
+}
+.Wt-itemview .Wt-header .Wt-label {
+}
+.Wt-itemview .Wt-tv-rh {
+}
+.Wt-itemview .Wt-tv-sh {
+}
+.Wt-itemview .Wt-tv-sh-none {
+}
+.Wt-itemview .Wt-tv-sh-down {
+}
+.Wt-itemview .Wt-tv-sh-up {
+}
+.Wt-itemview .Wt-selected {
+}
+.Wt-itemview .Wt-spacer {
+}
+.Wt-cal {
+}
+.Wt-cal table.d1 {
+}
+.Wt-cal table.d3 {
+}
+.Wt-cal table.dlong {
+}
+.Wt-cal th.caption {
+}
+.Wt-cal th {
+}
+.Wt-cal td {
+}
+.Wt-cal-oom {
+}
+.Wt-cal-sel {
+}
+.Wt-cal-now {
+}
+.Wt-dateedit {
+}
+.Wt-datepicker {
+}
+.Wt-dialog {
+}
+.Wt-dialog .closeicon {
+}
+.Wt-dialog .titlebar {
+	color: white;
+	background-color: #004e00; 
+}
+.Wt-dialog .body {
+}
+.Wt-dialog .footer {
+}
+.item.Wt-closable {
+}
+.item.Wt-separator {
+}
+.item.Wt-sectheader {
+}
+.item Wt-icon {
+}
+.item Wt-chkbox {
+}
+.Wt-panel {
+}
+.Wt-panel .titlebar {
+	color: white;
+	background-color: #004e00; 
+}
+.Wt-panel .body {
+}
+.Wt-popup {
+}
+.Wt-popupmenu {
+}
+.Wt-outset {
+}
+.Wt-progressbar {
+}
+.Wt-progressbar .Wt-pgb-bar {
+}
+.Wt-progressbar .Wt-pgb-label {
+}
+.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	border-radius: 6px; 
+	min-height: 16px;
+}
+.Wt-slider-h {
+}
+.Wt-slider-h .Wt-sliber-bg {
+}
+.Wt-slider-h .fill {
+}
+.Wt-slider-h .handle {
+}
+.Wt-slider-h .Wt-w {
+}
+.Wt-slider-h .Wt-e {
+}
+.Wt-slider-v {
+}
+.Wt-slider-v .Wt-sliber-bg {
+}
+.Wt-slider-v .fill {
+}
+.Wt-slider-v .handle {
+}
+.Wt-slider-v .Wt-w {
+}
+.Wt-slider-v .Wt-e {
+}
+.Wt-suggest {
+}
+.Wt-suggest li {
+}
+.Wt-suggest .active {
+}
+.Wt-tabs {
+}
+table.Wt-hcenter {
+}
+
+/*
+	background-color: #ebebc8;
+*/
+
+
+.OpenRDA.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	border-radius: 6px; 
+}
+.OpenRDA.h1 {
+  	font-size: 48px;
+	line-height: 40px;
+}
+.OpenRDA.h2 {
+  	font-size: 36px;
+	line-height: 30px;
+}
+.OpenRDA.h3 {
+  	font-size: 24px;
+	line-height: 20px;
+	color: #401a6b; 
+	text-shadow: 0 1px 0 #777, 0 -1px 0 #000;
+}
+.OpenRDA.h4 {
+  	font-size: 16px;
+	line-height: 12px;
+	color: #333;
+	text-shadow: 0 1px 0 #777, 0 -1px 0 #000;
+}
+.OpenRDA.Right-Arrow.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/forward.png");
+}
+.OpenRDA.Left-Arrow.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/back.png");
+}
+.OpenRDA.Up-Arrow.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/up.png");
+}
+.OpenRDA.Down-Arrow.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/down.png");
+}
+.OpenRDA.Find.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/find.png");
+}
+.OpenRDA.SaveFile.Wt-btn {
+	color: black;
+	background-color: #5a601d;
+}
+.OpenRDA.Printer.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/printer.png");
+}
+.OpenRDA.Redo.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/redo.png");
+}
+.OpenRDA.Undo.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/undo.png");
+}
+.OpenRDA.Help.Wt-btn {
+	color: white;
+	background-color: #401a6b; 
+	background-image: url("resources/OpenRDA/help.png");
+}
+.OpenRDA.SearchButton.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/search.png");
+}
+.OpenRDA.Edit.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/edit.png");
+}
+.OpenRDA.DefineList.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/definelist.png");
+}
+.OpenRDA.Add.Wt-btn {
+	color: black;
+	background-color: #95b9d6;
+	background-image: url("resources/OpenRDA/add.png");
+}
+.OpenRDA.SaveScreenDefaults.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/savedefaults.png");
+}
+.OpenRDA.ResetScreenDefaults.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/resetdefaults.png");
+}
+.OpenRDA.FilingCabinet.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/cabinet.png");
+}
+.OpenRDA.SendEmail.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/mail_send.png");
+}
+.OpenRDA.Scanner.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/scanner.png");
+}
+.OpenRDA.Wizard.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/wizard.png");
+}
+.OpenRDA.SaveFile.Wt-btn {
+	color: black;
+	background-color: #8e9300;
+	background-image: url("resources/OpenRDA/filesave.png");
+}
+.OpenRDA.FastSave.Wt-btn {
+	color: black;
+	background-color: #5a601d;
+	background-image: url("resources/OpenRDA/fastsave.png");
+}
+.OpenRDA.RunReport.Wt-btn {
+	color: black;
+	background-color: #cb792d;
+	background-image: url("resources/OpenRDA/exec.png");
+}
+.OpenRDA.Select.Wt-btn {
+	color: black;
+	background: #cb792d;
+}
+.OpenRDA.PushButton.Select.Wt-btn {
+	color: black;
+	background-color: #cb792d;
+}
+.OpenRDA.View.Select.Wt-btn {
+	color: black;
+	background-color: #cb792d;
+	background-image: url("resources/OpenRDA/view.png");
+}
+.OpenRDA.HTML.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/html.png");
+}
+.OpenRDA.PortableDocumentFormat.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/pdf.png");
+}
+.OpenRDA.Zip.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/zip.png");
+}
+.OpenRDA.Display.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/display.png");
+}
+.OpenRDA.Archive.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/archive.png");
+}
+.OpenRDA.Folder.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/folder.png");
+}
+.OpenRDA.WWW.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/www.png");
+}
+.OpenRDA.Delete.Wt-btn {
+	color: black;
+	background-color: #a52020;
+	background-image: url("resources/OpenRDA/delete.png");
+}
+.OpenRDA.Configure.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/configure.png");
+}
+.OpenRDA.LooknFeel.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/looknfeel.png");
+}
+.OpenRDA.View.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/view.png");
+}
+.OpenRDA.View.Select.Wt-btn {
+	color: black;
+	background-color: #cb792d;
+	background-image: url("resources/OpenRDA/view.png");
+}
+.OpenRDA.ViewDetails.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/view_detailed.png");
+}
+.OpenRDA.ViewDetails.Select.Wt-btn {
+	color: black;
+	background-color: #cb792d;
+	background-image: url("resources/OpenRDA/view_detailed.png");
+}
+.OpenRDA.MainMenu.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/mainmenu.png");
+}
+.OpenRDA.OpenSource.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/open_source.png");
+}
+.OpenRDA.GoogleMaps.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/GoogleMaps.png");
+}
+.OpenRDA.TopofList.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/top.png");
+}
+.OpenRDA.BottomofList.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/bottom.png");
+}
+.OpenRDA.Announcement.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/announcement.png");
+}
+.OpenRDA.Chat.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/chat.png");
+}
+.OpenRDA.Download.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/download.png");
+}
+.OpenRDA.Upload.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/upload.png");
+}
+.OpenRDA.News.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/news.png");
+}
+.OpenRDA.Documentation.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/documentation.png");
+}
+.OpenRDA.Copy.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/copy.png");
+}
+.OpenRDA.Video.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/video.png");
+}
+.OpenRDA.CyberSupport.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/cybersupport.png");
+}
+.OpenRDA.SaveandUpdate.Wt-btn {
+	color: black;
+	background-color: #5a601d;
+	background-image: url("resources/OpenRDA/saveupdate.png");
+}
+.OpenRDA.PrintErrors.Wt-btn {
+	color: black;
+	background-image: url("resources/OpenRDA/printerror.png");
+}
+.OpenRDA.PrintWarnings.Wt-btn {
+	color: black;
+	background-image: url("resources/OpenRDA/printwarning.png");
+}
+.OpenRDA.AddAbove.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/addabove.png");
+}
+.OpenRDA.AddBelow.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/addbelow.png");
+}
+.OpenRDA.DotDotDot.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/dotdotdot.png");
+}
+.OpenRDA.TuxCloud.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/tuxcloud.png");
+}
+.OpenRDA.FYDotDotDot.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/FYdotdot.png");
+}
+.OpenRDA.CSV.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/csv.png");
+}
+.OpenRDA.Paperclip.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/paperclip.png");
+}
+.OpenRDA.DeleteSmall.Wt-btn {
+	color: black;
+	background-color: #a52020;
+	background-image: url("resources/OpenRDA/delete_small.png");
+}
+.OpenRDA.UserProfile.Wt-btn {
+	color: black;
+	background-image: url("resources/OpenRDA/user.png");
+}
+.OpenRDA.Wiki.Wt-btn {
+	color: black;
+	background-color: #efefef;
+	background-image: url("resources/OpenRDA/wiki.png");
+}
+.OpenRDA.Quit.Wt-btn {
+	color: black;
+	background-color: #f7fc6c;
+	background-image: url("resources/OpenRDA/exit.png");
+}
+.OpenRDA.MainWindow {
+	line-height: 40px;
+	color: #401a6b; 
+	background-color: #efefef;
+}
+.OpenRDA.OrganizationName {
+	color: #401a6b; 
+	background-color: #efefef;
+}
+.OpenRDA.TaskBar {
+	color: #401a6b; 
+	background-color: #efefef;
+}
+.OpenRDA.ResourceBar {
+	color: #401a6b; 
+	background-color: #efefef;
+}
+.OpenRDA.MenuBar {
+	color: #401a6b; 
+	background-color: #efefef;
+}
+.OpenRDA.Workspace {
+	color: #401a6b; 
+	background-color: #efefef;
+}
+.OpenRDA.RightMenu {
+	color: #401a6b; 
+	background-color: #efefef;
+}
+.OpenRDA.OrganizationName {
+	color: #401a6b; 
+	background-color: #efefef;
+}
+.OpenRDA.MySettings.Wt-btn {
+	color: #401a6b; 
+	background-color: #ebebc8;
+}
+.OpenRDA.ModuleNaviation {
+	line-height: 40px;
+	color: #401a6b; 
+	background-color: #efefef;
+}
+.OpenRDA.ModuleNaviation.Finance.Wt-btn {
+	color: #401a6b; 
+	background-color: #ebebc8;
+}
+.OpenRDA.ModuleNaviation.Procurement.Wt-btn {
+	color: #401a6b; 
+	background-color: #ebebc8;
+}
+.OpenRDA.ModuleNaviation.HR.Wt-btn {
+	color: #401a6b; 
+	background-color: #ebebc8;
+}
+.OpenRDA.ModuleNaviation.Property.Wt-btn {
+	color: #401a6b; 
+	background-color: #ebebc8;
+}
+.OpenRDA.ModuleNaviation.PermitsLicenseMisc.Wt-btn {
+	color: #401a6b; 
+	background-color: #ebebc8;
+}
+.OpenRDA.ModuleNaviation.Enterprise.Wt-btn {
+	color: #401a6b; 
+	background-color: #ebebc8;
+}
+.OpenRDA.ModuleNaviation.Collections.Wt-btn {
+	color: #401a6b; 
+	background-color: #ebebc8;
+}
+.OpenRDA.SignOut.Wt-btn {
+	background: solid  #ff7fc6c;
+	color: red;	
+}
+.OpenRDA.ResourceBar.E-Documents.Wt-btn {
+	color: #401a6b; 
+	background-color: #ebebc8;
+}
+.OpenRDA.ResourceBar.Maintenance.Wt-btn {
+	color: #401a6b; 
+	background-color: #ebebc8;
+}
+.OpenRDA.ResourceBar.Setup.Wt-btn {
+	color: #401a6b; 
+	background-color: #ebebc8;
+}
+.OpenRDA.ResourceBar.Other.Wt-btn {
+	color: #401a6b; 
+	background-color: #ebebc8;
+}
+.OpenRDA.ResourceBar.Help.Wt-btn {
+	color: #401a6b; 
+	background: #ebebc8;
+}
+.OpenRDA.ResourceBar.SystemAdministration.Wt-btn {
+	color: #401a6b; 
+	background-color: #ebebc8;
+}
+.OpenRDA.ResourceBar.OpenSelfServe.Wt-btn {
+	color: #401a6b; 
+	background-color: #efefef;
+}

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<messages xmlns:if="Wt.WTemplate.conditions">
+  <message id="Wt.Auth.field">
+    <![CDATA[
+    ${<if:{1}>}
+      <label for="${id:{1}}">${tr:Wt.Auth.{1}}
+        ${{1}-info class="Wt-info"}
+      </label>
+      ${{1}}
+    ${</if:{1}>}
+    ]]>
+  </message>
+
+  <message id="Wt.Auth.template.login">
+    <div class="Wt-form Wt-auth-login">
+      <h2>${tr:Wt.Auth.login-form-title}</h2>
+      <p>${tr:Wt.Auth.login-form-info}</p>
+
+      <div class="Wt-fields">
+	${<if:passwords>}
+          <label for="${id:user-name}">${user-name-label}
+            ${user-name-info class="Wt-info"}
+	  </label>
+	  ${user-name}
+
+	  ${block:Wt.Auth.field password}
+	 ${</if:passwords>}
+      </div>
+
+      <div class="Wt-buttons">
+	${login}
+      </div>
+
+      <div class="Wt-buttons">
+	${lost-password} ${sep} ${register}
+      </div>
+    </div>
+  </message>
+</messages>

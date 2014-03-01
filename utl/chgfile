@@ -1,0 +1,10 @@
+for arg
+do
+if
+	grep -s "RDAAPPMAINLOOP;" $arg
+then
+	sed "s/RDAAPPMAINLOOP;/return;/g" $arg > /tmp/c.x
+	cat /tmp/c.x > $arg
+	rm /tmp/c.x
+fi
+done

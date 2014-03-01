@@ -1,0 +1,27 @@
+/*lint -library */
+/*LIBRARY for misc functions*/
+/*CPP_OPART rdaglob */
+/*CPP_OPART rdadiag */
+/*CPP_OPART rgetpid */
+/*CPP_OPART applib */
+/*CPP_OPART alloc */
+/*CPP_OPART prterr */
+/*CPP_OPART miscfunc */
+/*CPP_OPART rint */
+/*CPP_OPART round */
+/*CPP_OPART roundup */
+/*CPP_OPART rdadirec */
+/*CPP_OPART glogin */
+/*CPP_OPART devlic */
+/*CPP_OPART famtall */
+/*CPP_OPART encoding */
+/*CPP_OPART spell */
+/*CPP_OPART gcwd */
+/*CPP_OPART convneg */
+/*CPP_OPART syscom */
+/*CPP_OPART exeprog */
+/*CPP_OPART bin */
+/*CPP_OPART binlib */
+/*CPP_OPART rfile */
+/*CPP_OPART vfile */
+/*CPP_OPART prtidea */
