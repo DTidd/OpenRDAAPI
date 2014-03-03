@@ -2,6 +2,34 @@
 #include <packlib.hpp>
 #include <mkmtn.hpp>
 
+char *EscXHTMLLabel(char *s)
+{
+	char *n=NULL,*temp=NULL;
+	int l=0,x=0,len=0;
+
+	if(isEMPTY(s)) return(NULL);
+	len=RDAstrlen(s)*2+1;
+	n=Rmalloc(len);
+	memset(n,0,len);
+	l=0;
+	n[l++]='"';
+	for(x=0,temp=s;*temp && x<len;++temp,++x)
+	{
+		if(*temp=='\n')
+		{
+			sprintf(&n[l],"\\n");
+			l+=2;
+		} else if(*temp=='"')
+		{
+			sprintf(&n[l],"\\\"");
+			l+=2;
+		} else {
+			n[l++]=*temp;
+		}
+	}
+	n[l++]='"';
+	return(n);
+}
 char *fixname(char *name)
 {
 	int str_length=0,x;
@@ -449,7 +477,7 @@ short system_command_retvalue(char *command)
 void makescrncode(RDAscrn *scrn,FILE *fp,char *dirname,char *libname,char *scrnname)
 {
 	int x=0,q=0;
-	char *temp=NULL;
+	char *temp=NULL,*temp1=NULL;
 	RDAwdgt *wdgt=NULL;
 	char *dirx=NULL,*libx=NULL;
 	APPlib *tempapplib=NULL;
@@ -668,29 +696,33 @@ void makescrncode(RDAscrn *scrn,FILE *fp,char *dirname,char *libname,char *scrnn
 					}
 					freeapplib(tempapplib);
 				}
+				temp1=EscXHTMLLabel(wdgt->XHTML_Label);
 				fprintf(fp,"\t\tADVaddwdgt(scrn,%d,\"%s\",\"%s\",\"%s\",\"%s\",%d,%d,%d,temp1,temp2,temp3,temp4);\n",
 					wdgt->type,
 					(wdgt->resource_name!=NULL ? wdgt->resource_name:""),
 					(wdgt->label!=NULL ? wdgt->label:""),
 					(wdgt->pixmap!=NULL ? wdgt->pixmap:""),
-					(wdgt->XHTML_Label!=NULL ? wdgt->XHTML_Label:""),
+					(temp1!=NULL ? temp1:""),
 					wdgt->rows,
 					wdgt->cols,
 					wdgt->rtype);
+				if(temp1!=NULL) Rfree(temp1);
 				fprintf(fp,"\t\tif(temp1!=NULL) Rfree(temp1);\n");
 				fprintf(fp,"\t\tif(temp2!=NULL) Rfree(temp2);\n");
 				fprintf(fp,"\t\tif(temp3!=NULL) Rfree(temp3);\n");
 				fprintf(fp,"\t\tif(temp4!=NULL) Rfree(temp4);\n");
 			} else {
+				temp1=EscXHTMLLabel(wdgt->XHTML_Label);
 				fprintf(fp,"\t\tADVaddwdgt(scrn,%d,\"%s\",\"%s\",\"%s\",\"%s\",%d,%d,%d,NULL,NULL,NULL,NULL);\n",
 					wdgt->type,
 					(wdgt->resource_name!=NULL ? wdgt->resource_name:""),
 					(wdgt->label!=NULL ? wdgt->label:""),
 					(wdgt->pixmap!=NULL ? wdgt->pixmap:""),
-					(wdgt->XHTML_Label!=NULL ? wdgt->XHTML_Label:""),
+					(temp1!=NULL ? temp1:""),
 					wdgt->rows,
 					wdgt->cols,
 					wdgt->rtype);
+				if(temp1!=NULL) Rfree(temp1);
 			}
 		}
 		fprintf(fp,"\n");
