@@ -320,7 +320,6 @@ void quitscrncode(RDArsrc *r)
 	if(scr_libs!=NULL) freeapplib(scr_libs);
 	if(dir_libs!=NULL) freeapplib(dir_libs);
 	ShutdownSubsystems();
-	exit(0);
 }
 #ifdef CPPMAIN
 int c_main(int argc,char **argv)
@@ -351,12 +350,10 @@ int main(int argc,char **argv)
 		if(dirname!=NULL) Rfree(dirname);
 		if(libname!=NULL) Rfree(libname);
 		ShutdownSubsystems();
-		exit(0);
 	} else {
 		if(InitializeSubsystems(argc,argv,"UTILITIES","MAKE FILE CODE"))
 		{
 			ShutdownSubsystems();
-			exit(1);
 		}
 		mrsrc=RDArsrcNEW("TOOLS","MAKE FILE CODE");
 		addstdrsrc(mrsrc,"USE CARRIAGE RETURN",BOOLNS,1,&use_cr,TRUE);

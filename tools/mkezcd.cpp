@@ -430,7 +430,6 @@ void quitrptcode(RDArsrc *r)
 	if(rptavl!=NULL) freeapplib(rptavl);
 	if(module!=NULL) Rfree(module);
 	ShutdownSubsystems();
-	exit(0);
 }
 #ifdef CPPMAIN
 int c_main(int argc,char **argv)
@@ -456,22 +455,16 @@ int main(int argc,char **argv)
 			prterr("Error in permissions, users doesn't have access to read the report definition [%s][%s].  Check the permissions, and retry.",argv[1],argv[2]);
 			if(module!=NULL) Rfree(module);
 			ShutdownSubsystems();
-			exit(0);
 		} else {
 			makeezrptcode(module,report,stdout);
 			if(module!=NULL) Rfree(module);
 			ShutdownSubsystems();
-			exit(0);
 		}
 	} else {
 		if(InitializeSubsystems(argc,argv,"UTILITIES","MAKE EZRPT CODE"))
 		{
 			ShutdownSubsystems();
-			exit(1);
-/*
-			RDAAPPMAINLOOP();
 			return;
-*/
 		}
 		getmodulelist(mainrsrc);
 		mainrsrc=RDArsrcNEW("TOOLS","MAKE EZRPT CODE");

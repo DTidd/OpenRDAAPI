@@ -221,7 +221,6 @@ void quitvirfldcode(RDArsrc *r)
 	if(scr_libs!=NULL) freeapplib(scr_libs);
 	if(scr_defs!=NULL) freeapplib(scr_defs);
 	ShutdownSubsystems();
-	exit(0);
 }
 #ifdef CPPMAIN
 int c_main(int argc,char **argv)
@@ -251,16 +250,11 @@ int main(int argc,char **argv)
 		if(libname!=NULL) Rfree(libname);
 		if(virfldname!=NULL) Rfree(virfldname);
 		ShutdownSubsystems();
-		exit(0);
 	} else {
 		if(InitializeSubsystems(argc,argv,"UTILITIES","MAKE VIRTUAL FIELD CODE"))
 		{
 			ShutdownSubsystems();
-			exit(1);
-/*
-			RDAAPPMAINLOOP();
 			return;
-*/
 		}
 		mrsrc=RDArsrcNEW("TOOLS","MAKE VIRTUAL FIELD CODE");
 		scr_libs=APPlibNEW();

@@ -317,7 +317,6 @@ void quitscrncode(RDArsrc *r)
 	if(scr_libs!=NULL) freeapplib(scr_libs);
 	if(scr_defs!=NULL) freeapplib(scr_defs);
 	ShutdownSubsystems();
-	exit(0);
 }
 #ifdef CPPMAIN
 int c_main(int argc,char **argv)
@@ -360,12 +359,10 @@ int main(int argc,char **argv)
 		if(dirx!=NULL) Rfree(dirx);
 		if(libx!=NULL) Rfree(libx);
 		ShutdownSubsystems();
-		exit(0);
 	} else {
 		if(InitializeSubsystems(argc,argv,"UTILITIES","MAKE TABLE CODE"))
 		{
 			ShutdownSubsystems();
-			exit(1);
 		}
 		mrsrc=RDArsrcNEW("TOOLS","MAKE TABLE CODE");
 		scr_libs=APPlibNEW();

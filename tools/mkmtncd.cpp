@@ -349,7 +349,6 @@ void quitMaintainMastercode(RDArsrc *r)
 	if(mtnsavl!=NULL) freeapplib(mtnsavl);
 	if(dir_libs!=NULL) freeapplib(dir_libs);
 	ShutdownSubsystems();
-	exit(0);
 }
 #ifdef CPPMAIN
 int c_main(int argc,char **argv)
@@ -409,16 +408,11 @@ int main(int argc,char **argv)
 		if(libname!=NULL) Rfree(libname);
 		if(mtnname!=NULL) Rfree(mtnname);
 		ShutdownSubsystems();
-		exit(0);
 	} else {
 		if(InitializeSubsystems(argc,argv,"UTILITIES","MAKE MAINTAIN MASTER CODE"))
 		{
 			ShutdownSubsystems();
-			exit(1);
-/*
-			RDAAPPMAINLOOP();
 			return;
-*/
 		}
 		mrsrc=RDArsrcNEW("TOOLS","MAKE MAINTAIN MASTER CODE");
 		liblst=APPlibNEW();

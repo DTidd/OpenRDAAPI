@@ -352,7 +352,6 @@ void quitaddcode(RDArsrc *r)
 	if(addsavl!=NULL) freeapplib(addsavl);
 	if(dir_libs!=NULL) freeapplib(dir_libs);
 	ShutdownSubsystems();
-	exit(0);
 }
 #ifdef CPPMAIN
 int c_main(int argc,char **argv)
@@ -372,7 +371,7 @@ int main(int argc,char **argv)
 		{
 			if(InitializeSubsystems(argc,argv,argv[2],"MAKE POWER ADD CODE"))
 			{
-				RDAAPPMAINLOOP();
+				ShutdownSubsystems();
 				return;
 			}
 		}
@@ -380,7 +379,7 @@ int main(int argc,char **argv)
 		{
 			if(InitializeSubsystems(argc,argv,argv[1],"MAKE POWER ADD CODE"))
 			{
-				RDAAPPMAINLOOP();
+				ShutdownSubsystems();
 				return;
 			}
 		}
@@ -412,12 +411,10 @@ int main(int argc,char **argv)
 		if(libname!=NULL) Rfree(libname);
 		if(addname!=NULL) Rfree(addname);
 		ShutdownSubsystems();
-		exit(0);
 	} else {
 		if(InitializeSubsystems(argc,argv,"UTILITIES","MAKE POWER ADD CODE"))
 		{
 			ShutdownSubsystems();
-			exit(1);
 /*
 			RDAAPPMAINLOOP();
 			return;

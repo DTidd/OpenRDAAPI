@@ -364,7 +364,6 @@ void quitscrncode(RDArsrc *r)
 	if(scr_libs!=NULL) freeapplib(scr_libs);
 	if(scr_defs!=NULL) freeapplib(scr_defs);
 	ShutdownSubsystems();
-	exit(0);
 }
 #ifdef CPPMAIN
 int c_main(int argc,char **argv)
@@ -394,16 +393,11 @@ int main(int argc,char **argv)
 		if(libname!=NULL) Rfree(libname);
 		if(scrnname!=NULL) Rfree(scrnname);
 		ShutdownSubsystems();
-		exit(0);
 	} else {
 		if(InitializeSubsystems(argc,argv,"UTILITIES","MAKE GENERIC SETUP VARIABLE CODE"))
 		{
 			ShutdownSubsystems();
-			exit(1);
-/*
-			RDAAPPMAINLOOP();
 			return;
-*/
 		}
 		mrsrc=RDArsrcNEW("TOOLS","MAKE GENERIC SETUP VARIABLE CODE");
 		scr_libs=APPlibNEW();

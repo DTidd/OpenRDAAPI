@@ -221,7 +221,6 @@ void quitlistcode(RDArsrc *r)
 	if(scr_libs!=NULL) freeapplib(scr_libs);
 	if(scr_defs!=NULL) freeapplib(scr_defs);
 	ShutdownSubsystems();
-	exit(0);
 }
 #ifdef CPPMAIN
 int c_main(int argc,char **argv)
@@ -251,16 +250,11 @@ int main(int argc,char **argv)
 		if(libname!=NULL) Rfree(libname);
 		if(listname!=NULL) Rfree(listname);
 		ShutdownSubsystems();
-		exit(0);
 	} else {
 		if(InitializeSubsystems(argc,argv,"UTILITIES","MAKE LIST CODE"))
 		{
 			ShutdownSubsystems();
-			exit(1);
-/*
-			RDAAPPMAINLOOP();
 			return;
-*/
 		}
 		mrsrc=RDArsrcNEW("TOOLS","MAKE LIST CODE");
 		scr_libs=APPlibNEW();

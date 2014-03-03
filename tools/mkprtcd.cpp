@@ -291,7 +291,6 @@ void quitRDApdevcode(RDArsrc *r)
 	if(r!=NULL) free_rsrc(r);
 	if(scr_defs!=NULL) freeapplib(scr_defs);
 	ShutdownSubsystems();
-	exit(0);
 }
 #ifdef CPPMAIN
 int c_main(int argc,char **argv)
@@ -321,16 +320,11 @@ int main(int argc,char **argv)
 		if(libname!=NULL) Rfree(libname);
 		if(name!=NULL) Rfree(name);
 		ShutdownSubsystems();
-		exit(0);
 	} else {
 		if(InitializeSubsystems(argc,argv,"UTILITIES","MAKE PRINTER DEFINITION CODE"))
 		{
 			ShutdownSubsystems();
-			exit(1);
-/*
-			RDAAPPMAINLOOP();
 			return;
-*/
 		}
 		mrsrc=RDArsrcNEW("TOOLS","MAKE PRINTER DEFINITION CODE");
 		scr_defs=APPlibNEW();

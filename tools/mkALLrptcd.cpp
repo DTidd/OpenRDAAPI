@@ -282,7 +282,6 @@ void quitrptcode(RDArsrc *r)
 	if(modlstx!=NULL) freeapplib(modlstx);
 	if(rptavl!=NULL) freeapplib(rptavl);
 	ShutdownSubsystems();
-	exit(0);
 }
 #ifdef CPPMAIN
 int c_main(int argc,char **argv)
@@ -311,16 +310,11 @@ int main(int argc,char **argv)
 		}
 		if(module!=NULL) Rfree(module);
 		ShutdownSubsystems();
-		exit(0);
 	} else {
 		if(InitializeSubsystems(argc,argv,"UTILITIES","MAKE REPORT CODE"))
 		{
 			ShutdownSubsystems();
-			exit(1);
-/*
-			RDAAPPMAINLOOP();
 			return;
-*/
 		}
 		getmodulelist(mainrsrc);
 		mainrsrc=RDArsrcNEW("TOOLS","MAKE REPORT CODE");

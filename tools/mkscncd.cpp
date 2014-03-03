@@ -33,6 +33,7 @@ static void quit_printRDAscrncode(RDArsrc *prsrc)
                 prterr("DIAG quit_printRDAscrncode Quitting Print RDA Screen Code");
         }
         free_rsrc(prsrc);
+	ShutdownSubsystems();
 }
 static void printRDAscrncode(RDArsrc *prsrc,RDAscrn *scrn)
 {
@@ -271,7 +272,6 @@ void quitscrncode(RDArsrc *r)
 	if(scr_defs!=NULL) freeapplib(scr_defs);
 	if(dir_libs!=NULL) freeapplib(dir_libs);
 	ShutdownSubsystems();
-	exit(0);
 }
 #ifdef CPPMAIN
 int c_main(int argc,char **argv)
@@ -330,16 +330,11 @@ int main(int argc,char **argv)
 		if(libname!=NULL) Rfree(libname);
 		if(scrnname!=NULL) Rfree(scrnname);
 		ShutdownSubsystems();
-		exit(0);
 	} else {
 		if(InitializeSubsystems(argc,argv,"UTILITIES","MAKE SCREEN CODE"))
 		{
 			ShutdownSubsystems();
-			exit(1);
-/*
-			RDAAPPMAINLOOP();
 			return;
-*/
 		}
 		mrsrc=RDArsrcNEW("TOOLS","MAKE SCREEN CODE");
 		scr_libs=APPlibNEW();

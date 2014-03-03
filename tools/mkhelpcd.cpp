@@ -270,7 +270,6 @@ void quithelpcode(RDArsrc *r)
 	if(help_defs!=NULL) freeapplib(help_defs);
 	if(dir_libs!=NULL) freeapplib(dir_libs);
 	ShutdownSubsystems();
-	exit(0);
 }
 #ifdef CPPMAIN
 int c_main(int argc,char **argv)
@@ -329,16 +328,11 @@ int main(int argc,char **argv)
 		if(libname!=NULL) Rfree(libname);
 		if(scrnname!=NULL) Rfree(scrnname);
 		ShutdownSubsystems();
-		exit(0);
 	} else {
 		if(InitializeSubsystems(argc,argv,"UTILITIES","MAKE HELP CODE"))
 		{
 			ShutdownSubsystems();
-			exit(1);
-/*
-			RDAAPPMAINLOOP();
 			return;
-*/
 		}
 		mrsrc=RDArsrcNEW("TOOLS","MAKE HELP CODE");
 		help_libs=APPlibNEW();

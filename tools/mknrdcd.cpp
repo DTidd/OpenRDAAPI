@@ -330,7 +330,6 @@ void quitdbfilecode(RDArsrc *r)
 	if(db_libs!=NULL) freeapplib(db_libs);
 	if(db_defs!=NULL) freeapplib(db_defs);
 	ShutdownSubsystems();
-	exit(0);
 }
 #ifdef CPPMAIN
 int c_main(int argc,char **argv)
@@ -361,16 +360,11 @@ int main(int argc,char **argv)
 		if(libname!=NULL) Rfree(libname);
 		if(filename!=NULL) Rfree(filename);
 		ShutdownSubsystems();
-		exit(0);
 	} else {
 		if(InitializeSubsystems(argc,argv,"UTILITIES","MAKE DATABASE CODE"))
 		{
 			ShutdownSubsystems();
-			exit(1);
-/*
-			RDAAPPMAINLOOP();
 			return;
-*/
 		}
 		mrsrc=RDArsrcNEW("TOOLS","MAKE DATABASE CODE");
 		db_libs=APPlibNEW();
