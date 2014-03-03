@@ -69,7 +69,7 @@ extern void TRANSACTION_PROCESSING(void),FILE_MAINTENANCE(void);
 extern void mk_crtie(void),DOFTPZIP(void),DAT2CONV(void);
 extern void CHKTAPE(void),MTNDATLOG(void),MTNDATTRN(void);
 extern void SCRIPTconvzip(void),PURGEDATLOGTRN(void);
-extern void SCRIPTdatazip(void),IBSBACKUP(void);
+extern void SCRIPTdatazip(void),IBSBACKUP(void),LOGSTAT(void);
 extern void SCRIPTfixcdrecordlog(void),DFGSV_DATABASE(void);
 
 struct RPTSTRUCTs RptAvl[]=
@@ -85,6 +85,7 @@ struct RPTSTRUCTs RptAvl[]=
 	{"DFIE           ","Define Import/Export Screens",mk_dfie},
 	{"DOIE           ","Do Import/Export Screen",mk_doie},
 	{"PURGEDATLOGTRN ","PURGE DATLOG/TRN Report Definition",PURGEDATLOGTRN},
+	{"LOGSTAT        ","Transaction Log Statistics",LOGSTAT},
 	{"REMTRANS       ","Remove Transactions",mk_remtrans},
 	{"RNUMTRAN       ","Renumber Transactions",mk_rnumtran},
 	{"RBDFIL         ","Rebuild Database Screen",mk_rbdfil},

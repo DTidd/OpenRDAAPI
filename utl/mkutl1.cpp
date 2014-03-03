@@ -558,6 +558,7 @@ void CREATE_MENUITEM()
 		addMenuItem(fileno,"DATABASE","00002000","DATABASE","MTN DATLOG","","","","N","05","","","","","","Query Database Logs","00000000","RUNMAINTAIN","0000","00","","","","","","");
 		addMenuItem(fileno,"DATABASE","00002010","DATABASE","MTN DATLOG","","","","N","00","","","","","","Query Database Logs","00000000","RUNMAINTAIN","0000","10","","","","","","");
 		addMenuItem(fileno,"DATABASE","00002020","DATABASE","MTN DATTRN.SEARCH","","","","N","00","","","","","","Query Database Log Transactions","00000000","RUNMAINTAIN","0000","20","","","","","","");
+		addMenuItem(fileno,"DATABASE","00002050","DATABASE","LOGSTAT","","","","N","05","","","","","","Transaction Log Statistics","00000000","RUNREPORT","0000","00","","","","","","");
 		addMenuItem(fileno,"DATABASE","00002100","DATABASE","PURGE-DATLOG","","","","N","05","","","","","","Purge Logs + Transactions","00000000","RUNREPORT","0000","00","","","","","","");
 		addMenuItem(fileno,"OLHELP","00001000","OLHELP","MTN SCNNOT","","","","N","05","","","","","","Screen Notes","00000000","RUNMAINTAIN","0000","00","","","","","","");
 		addMenuItem(fileno,"OLHELP","00001010","OLHELP","MTN RSCNOT","","","","N","05","","","","","","Resource Notes","00000000","RUNMAINTAIN","0000","00","","","","","","");

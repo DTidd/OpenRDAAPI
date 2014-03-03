@@ -1203,6 +1203,9 @@ static void SCN_DATABASE_DOCK_WINDOW()
 		ADVaddwdgt(scrn,6,"Query Database Logs","Query Logs","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,6,"Transaction Log Statistics","Process Log Statistics","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,6,"Purge Logs + Transactions","Purge Logs + Transactions","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,4,"","","","",0,0,0,NULL,NULL,NULL,NULL);
