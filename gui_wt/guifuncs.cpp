@@ -844,8 +844,9 @@ int main(int argc,char *argv[])
 	RDAMAINWIDGET=NULL;
 	Skip_OpenRDA_Cookies=FALSE;
 /*
+	diagapps=TRUE;TRACE;
+	diagapps=TRUE;diaggui=TRUE;diageval=TRUE;diagmix=TRUE;diagvirtual=TRUE;TRACE;
 	diagalloc=TRUE;diaggui=TRUE;diageval=TRUE;diagnrd=TRUE;diagmix=TRUE;diagvirtual=TRUE;diagsec=TRUE;diagmisc=TRUE;TRACE;
-	diaggui=TRUE;diageval=TRUE;diagmix=TRUE;diagvirtual=TRUE;TRACE;
 	diaggui=TRUE;TRACE;
 	diaggui=TRUE;diageval=TRUE;diagnrd=TRUE;diagmix=TRUE;diagvirtual=TRUE;diagsec=TRUE;diagmisc=TRUE;TRACE;
 */
