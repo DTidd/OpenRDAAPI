@@ -12,7 +12,6 @@ char *EscXHTMLLabel(char *s)
 	n=Rmalloc(len);
 	memset(n,0,len);
 	l=0;
-	n[l++]='"';
 	for(x=0,temp=s;*temp && x<len;++temp,++x)
 	{
 		if(*temp=='\n')
@@ -27,7 +26,6 @@ char *EscXHTMLLabel(char *s)
 			n[l++]=*temp;
 		}
 	}
-	n[l++]='"';
 	return(n);
 }
 char *fixname(char *name)
