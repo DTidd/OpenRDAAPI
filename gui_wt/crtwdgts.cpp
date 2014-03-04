@@ -1405,7 +1405,6 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 						{
 							myText = new Wt::WText(*temp_xstr,Wt::XHTMLText);
 							hold=(Wt::WWidget *)myText;
-							hold->setInline(TRUE);
 							mssc=ModuleScreenStyleClass(rsrc);
 							memset(GUIstemp,0,1024);
 							sprintf(GUIstemp,"OpenRDA %s Label",mssc);

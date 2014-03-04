@@ -2403,7 +2403,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				if(fssc!=NULL) Rfree(fssc);
 				c->~WString();
 				wATB=(Wt::WAbstractToggleButton *)wCB;
-				WW->setInline(TRUE);
 				wL=Wt::WLength(RDAstrlen(member->label)+4);
 				wH=member->w->minimumHeight();
 				if(Parent_Table!=NULL)
