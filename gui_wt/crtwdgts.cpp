@@ -1277,12 +1277,10 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 					{
 						if(num)
 						{
-							if(hold!=NULL)
+							if(RDAstrstr(rsrc->screen,"DOCK WINDOW"))
 							{
-								if(!last) lBox->addStretch(500);
-/**
-								lBox->setStretchFactor((Wt::WWidget *)hold,100);
-								
+								if(hold!=NULL)
+								{
 								if(!last)
 								{
 									hold =(Wt::WWidget *) new Wt::WText("<pre> </pre>",Wt::XHTMLText);
@@ -1293,7 +1291,10 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 									hold->addStyleClass(GUIstemp);
 									lBox->setStretchFactor((Wt::WWidget *)hold,400);
 								}
-*/
+								}
+							} else if(hold!=NULL)
+							{
+								if(!last) lBox->addStretch(500);
 							}
 							hold=NULL;
 						}
