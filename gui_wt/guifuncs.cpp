@@ -1736,6 +1736,8 @@ short xupdatemember(RDArmem *member,int line,char *file)
 					prterr("DIAG Resource [%s] Type [%d] [%s] Field Type [%d] [%s] has [%d] items.",member->rscrname,member->type,membertypes[member->type],member->field_type,standardfieldtypes[member->field_type],member->items);
 				}
 #endif /* USE_RDA_DIAGNOSTICS */
+
+				fprintf(RDA_STDERR,"member->rscrname [%s] ",member->rscrname);TRACE;
 				if(member->items>0)
 				{
 					if(member->rows>1)
@@ -1746,6 +1748,7 @@ short xupdatemember(RDArmem *member,int line,char *file)
 							member->wSIM->clear();
 							z=0;
 							temp1=NULL;
+							fprintf(RDA_STDERR,"member->rscrname [%s] ",member->rscrname);TRACE;
 							for(x=0;x<member->items;++x)
 							{
 								wSI=new WStandardItem();

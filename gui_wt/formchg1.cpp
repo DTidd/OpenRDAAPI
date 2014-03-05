@@ -568,7 +568,9 @@ void gainingfocusfunction(RDArmem *member)
 		ExecuteRDArmemFunction(NoLosingFocus);
 	}
 	NoLosingFocus=member;
+/*
 	wFormW->setFocus(TRUE);
+*/
 	switch(member->field_type)
 	{
 		case SCROLLEDTEXT:

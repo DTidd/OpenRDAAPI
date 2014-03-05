@@ -4879,6 +4879,7 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					LB->activated().connect(boost::bind(&list_callback,member));
 					LB->doubleClicked().connect(boost::bind(&list_doubleclick_callback,member));
 					temp1=NULL;
+					member->wSIM->clear();
 					for(w=0;w<member->items;++w)
 					{
 						wSI=new WStandardItem();
@@ -4991,7 +4992,17 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					if(mssc!=NULL) Rfree(mssc);
 					if(fssc!=NULL) Rfree(fssc);
 					cB=(Wt::WComboBox *)LB;
+					WWeb=(Wt::WWebWidget *)LB;
+					cDS=WWeb->decorationStyle();
+					wF=cDS.font();
+					wF.setFamily(Wt::WFont::GenericFamily::Monospace);
+					cDS.setFont(wF);
+					WWeb->setDecorationStyle(cDS);
 					wFormW=(Wt::WFormWidget *)LB;
+					fprintf(RDA_STDERR,"member [%s] ",member->rscrname);TRACE;
+					wSIM=new Wt::WStandardItemModel();
+					cB->setModel(wSIM);
+					member->wSIM=wSIM;
 					LB->setVerticalSize(member->rows);
 					WW->setMaximumSize(Wt::WLength(1600),Wt::WLength::Auto);
 					if(*member->value.integer_value<0)
@@ -5006,11 +5017,39 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					{
 						LB->doubleClicked().connect(boost::bind(&list_doubleclick_callback,member));
 					}
+					temp1=NULL;
+					member->wSIM->clear();
 					for(w=0;w<member->items;++w)
 					{
-						temp_xstr = new Wt::WString((*(member->list[0]+w)),UTF8);
-						cB->addItem(*temp_xstr);
+						wSI=new WStandardItem();
+						wSI->setFlags(wSI->flags() | Wt::ItemIsXHTMLText);
+/* can use UTF8 encoding instead of WString */
+/* replace each space with 2-3 char sequence */
+/* 0xC2 0xA0 2 byte sequence of UTF8 */
+						temp1=stralloc((*(member->list[0]+w)));
+						temp_str=Rmalloc((RDAstrlen(temp1)*2)+1);
+						z=0;
+						fprintf(RDA_STDERR,"member [%s] temp1 [%s] ",member->rscrname,(temp1!=NULL ? temp1:""));TRACE;
+						for(temp=temp1;*temp;++temp)
+						{
+							if(*temp==' ') 
+							{
+								TRACE;
+								temp_str[z]=0xC2;
+								temp_str[z+1]=0xA0;
+								z+=2;
+							} else {
+								TRACE;
+								temp_str[z]=*temp;
+								++z;
+							}
+						}	
+						temp_xstr = new Wt::WString(temp_str,UTF8);
+						if(temp_str!=NULL) Rfree(temp_str);
+						wSI->setText(*temp_xstr);
 						temp_xstr->~WString();
+						member->wSIM->appendRow(wSI);
+						if(temp1!=NULL) Rfree(temp1);
 					}
 					LB->setCurrentIndex(*member->value.integer_value);
 					if(!member->editable)

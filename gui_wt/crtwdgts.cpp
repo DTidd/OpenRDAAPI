@@ -1186,13 +1186,15 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 							lBox->addWidget((Wt::WWidget *)hold);
 							if(!RDAstrcmp(member->rscrname,"BROWSE LIST")) lBox->setStretchFactor(hold,200);
 							else if(wdgt->type==8 && wdgt->rtype==2) lBox->setStretchFactor(hold,500);
+							if(wdgt->type==7 && wdgt->rows>1) last=TRUE;
+							else last=FALSE;
 /*
+							if(wdgt->type==8 && wdgt->rows>1) last=TRUE;
+							else last=FALSE;
 							if(wdgt->type==7 && wdgt->rows<2) last=FALSE;
 							else if(wdgt->type==8 && wdgt->rows==1) last=FALSE;
 							else last=TRUE;
 */
-							if(wdgt->type==8 && wdgt->rows>1) last=TRUE;
-							else last=FALSE;
 							if(frame_style!=(-1))
 							{
 								FrameWidget((Wt::WWidget *)hold,frame_style);
@@ -1246,7 +1248,7 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 								frame_style=(-1);
 							}
 							if(rows==0) rows=1;
-							last=TRUE;
+							last=FALSE;
 /*
 							if(wdgt->type!=6 && wdgt->type!=9 && wdgt->type!=14) last=FALSE;
 								else last=TRUE;
@@ -1277,7 +1279,10 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 						{
 							if(hold!=NULL)
 							{
+								if(!last) lBox->addStretch(500);
+/**
 								lBox->setStretchFactor((Wt::WWidget *)hold,100);
+								
 								if(!last)
 								{
 									hold =(Wt::WWidget *) new Wt::WText("<pre> </pre>",Wt::XHTMLText);
@@ -1288,6 +1293,7 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 									hold->addStyleClass(GUIstemp);
 									lBox->setStretchFactor((Wt::WWidget *)hold,400);
 								}
+*/
 							}
 							hold=NULL;
 						}
@@ -1489,7 +1495,7 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 					if(num)
 					{
 						frame_style=wdgt->rtype;
-						last=FALSE;
+						last=TRUE;
 					}
 					break;
 				case 11: /* Separator */
