@@ -4999,7 +4999,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					cDS.setFont(wF);
 					WWeb->setDecorationStyle(cDS);
 					wFormW=(Wt::WFormWidget *)LB;
-					fprintf(RDA_STDERR,"member [%s] ",member->rscrname);TRACE;
 					wSIM=new Wt::WStandardItemModel();
 					cB->setModel(wSIM);
 					member->wSIM=wSIM;
@@ -5029,17 +5028,14 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 						temp1=stralloc((*(member->list[0]+w)));
 						temp_str=Rmalloc((RDAstrlen(temp1)*2)+1);
 						z=0;
-						fprintf(RDA_STDERR,"member [%s] temp1 [%s] ",member->rscrname,(temp1!=NULL ? temp1:""));TRACE;
 						for(temp=temp1;*temp;++temp)
 						{
 							if(*temp==' ') 
 							{
-								TRACE;
 								temp_str[z]=0xC2;
 								temp_str[z+1]=0xA0;
 								z+=2;
 							} else {
-								TRACE;
 								temp_str[z]=*temp;
 								++z;
 							}

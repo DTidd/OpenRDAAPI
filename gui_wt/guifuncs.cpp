@@ -1737,7 +1737,6 @@ short xupdatemember(RDArmem *member,int line,char *file)
 				}
 #endif /* USE_RDA_DIAGNOSTICS */
 
-				fprintf(RDA_STDERR,"member->rscrname [%s] ",member->rscrname);TRACE;
 				if(member->items>0)
 				{
 					if(member->rows>1)
@@ -1748,7 +1747,6 @@ short xupdatemember(RDArmem *member,int line,char *file)
 							member->wSIM->clear();
 							z=0;
 							temp1=NULL;
-							fprintf(RDA_STDERR,"member->rscrname [%s] ",member->rscrname);TRACE;
 							for(x=0;x<member->items;++x)
 							{
 								wSI=new WStandardItem();
