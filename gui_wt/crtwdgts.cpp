@@ -1188,7 +1188,7 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 							else if(wdgt->type==8 && wdgt->rtype==2) lBox->setStretchFactor(hold,500);
 							if(wdgt->type==7 && wdgt->rows>1) last=TRUE;
 							else last=FALSE;
-							if(wdgt->type==7)
+							if((wdgt->type==7 && wdgt->rows>1) || (wdgt->type==8))
 							{
 								lBox->setStretchFactor((Wt::WWidget *)hold,100);
 							}
