@@ -1074,7 +1074,7 @@ static void save_record_now(RDArsrc *add_rsrc,PowerAdd *POWERADD)
 		{
 			fprintf(stdout,"ERROR: wwwdoadd Supporting Files not found.\n");
 		 	ShutdownSubsystems();
-			exit(1);
+			return;
 		}
 		if(!isEMPTY(POWERADD->save_expression))
 		{
@@ -1084,7 +1084,7 @@ static void save_record_now(RDArsrc *add_rsrc,PowerAdd *POWERADD)
 				prterr("ERROR:%s",desc);
 				if(desc!=NULL) Rfree(desc);
 		 		ShutdownSubsystems();
-				exit(1);
+				return;
 			}
 		}
 		if(!isEMPTY(POWERADD->save_warning))
@@ -1096,7 +1096,7 @@ static void save_record_now(RDArsrc *add_rsrc,PowerAdd *POWERADD)
 				prterr("WARNING:%s\n",desc);
 				if(desc!=NULL) Rfree(desc);
 		 		ShutdownSubsystems();
-				exit(1);
+				return;
 			}
 		}
 		run_presave_buttons(add_rsrc,POWERADD);
@@ -1557,9 +1557,9 @@ short WWWInitializeSubsystems(int argc,char **argv,char *module,char *process)
 	char *desc=NULL;
 	short return_value=0;
 	long longtemp=0;
+
 	initrdadiag();
 	SETUSERLOGIN();
-	SETCWD();
 	desc=RDA_GetEnv("RDA_CURRENCY_SYMBOL");
 	if(!isEMPTY(desc))
 	{
@@ -1574,6 +1574,7 @@ short WWWInitializeSubsystems(int argc,char **argv,char *module,char *process)
 #endif
 	RDA_NOGUI=TRUE;
 	INITGUI(argc,argv,CURRENTDIRECTORY);
+	SETCWD();
 	PP_translate_GUIFUNC=PP_translate_GUI;
 	PP_translate_GUIFUNCALL=PP_translate_GUIALL;
 	XPERT_SETUP=XPERTstpNEW();
@@ -1623,7 +1624,7 @@ int main(int argc,char **argv)
 	if(WWWInitializeSubsystems(argc,argv,argv[1],argv[2]))
 	{
 		ShutdownSubsystems();
-		exit(1);
+		return;
 	}
 	RDA_NOGUI=TRUE;
 	RUNWWWADD(argv[1],argv[2],0,NULL,NULL,NULL);

@@ -38,7 +38,6 @@ short WWWInitializeSubsystems(int argc,char **argv,char *module,char *process)
 
 	initrdadiag();
 	SETUSERLOGIN();
-	SETCWD();
 	desc=RDA_GetEnv("RDA_CURRENCY_SYMBOL");
 	if(!isEMPTY(desc))
 	{
@@ -54,6 +53,7 @@ short WWWInitializeSubsystems(int argc,char **argv,char *module,char *process)
 	RDA_NOGUI=TRUE;
 	SECURITY_USERLOGIN=USERLOGIN;
 	INITGUI(argc,argv,CURRENTDIRECTORY);
+	SETCWD();
 	PP_translate_GUIFUNC=PP_translate_GUI;
 	PP_translate_GUIFUNCALL=PP_translate_GUIALL;
 	XPERT_SETUP=XPERTstpNEW();
