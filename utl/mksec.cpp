@@ -636,22 +636,22 @@ static void MKGUEST()
 		FINDFLDSETSTRING(user,"USER IDENTIFICATION","GUEST");
 		FINDFLDSETSTRING(user,"USER NAME","GUEST OF RDA SYSTEMS");
 #ifdef WIN32
-		FINDFLDSETSTRING(user,"DEFAULT PRINTER","rdaout.exe");
+		FINDFLDSETSTRING(user,"DEFAULT PRINTER","viewpdf.exe");
 #endif
 #ifdef SCO50P
-		FINDFLDSETSTRING(user,"DEFAULT PRINTER","rdaout.sco");
+		FINDFLDSETSTRING(user,"DEFAULT PRINTER","viewpdf.sco");
 #endif
 #ifdef RS6000
-		FINDFLDSETSTRING(user,"DEFAULT PRINTER","rdaout.rsc");
+		FINDFLDSETSTRING(user,"DEFAULT PRINTER","viewpdf.rsc");
 #endif
 #ifdef UNIXWARE
-		FINDFLDSETSTRING(user,"DEFAULT PRINTER","rdaout.unw");
+		FINDFLDSETSTRING(user,"DEFAULT PRINTER","viewpdf.unw");
 #endif
 #ifdef LINUX
-		FINDFLDSETSTRING(user,"DEFAULT PRINTER","rdaout.lnx");
+		FINDFLDSETSTRING(user,"DEFAULT PRINTER","viewpdf.lnx");
 #endif
 #if defined(LINUX2_2) || defined(UBUNTU_OS)
-		FINDFLDSETSTRING(user,"DEFAULT PRINTER","rdaout.lnx");
+		FINDFLDSETSTRING(user,"DEFAULT PRINTER","viewpdf.lnx");
 #endif
 		WRTNRD(user,0,NULL);
 		ZERNRD(msec);

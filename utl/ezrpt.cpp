@@ -3237,23 +3237,23 @@ static APPlib *makedevicelist()
 	if(libx!=NULL) Rfree(libx);
 	addAPPlibNoDuplicates(out_devs,"screen");
 #ifdef RS6000
-	addAPPlibNoDuplicates(out_devs,"rdaout.rsc");
+	addAPPlibNoDuplicates(out_devs,"viewpdf.rsc");
 #elif defined(UNIXWARE7)
-	addAPPlibNoDuplicates(out_devs,"rdaout.unw");
+	addAPPlibNoDuplicates(out_devs,"viewpdf.unw");
 #elif defined(UNIXWARE21)
-	addAPPlibNoDuplicates(out_devs,"rdaout.unw");
+	addAPPlibNoDuplicates(out_devs,"viewpdf.unw");
 #elif defined(LINUX)
-	addAPPlibNoDuplicates(out_devs,"rdaout.lnx");
+	addAPPlibNoDuplicates(out_devs,"viewpdf.lnx");
 #elif defined(LINUX2_2) || defined(UBUNTU_OS)
-	addAPPlibNoDuplicates(out_devs,"rdaout.lnx");
+	addAPPlibNoDuplicates(out_devs,"viewpdf.lnx");
 #elif defined(SCO386)
-	addAPPlibNoDuplicates(out_devs,"rdaout.sco");
+	addAPPlibNoDuplicates(out_devs,"viewpdf.sco");
 #elif defined(SCO50)
-	addAPPlibNoDuplicates(out_devs,"rdaout.sco");
+	addAPPlibNoDuplicates(out_devs,"viewpdf.sco");
 #elif defined(SCO50P)
-	addAPPlibNoDuplicates(out_devs,"rdaout.sco");
+	addAPPlibNoDuplicates(out_devs,"viewpdf.sco");
 #elif defined(SUNX86)
-	addAPPlibNoDuplicates(out_devs,"rdaout.sun");
+	addAPPlibNoDuplicates(out_devs,"viewpdf.sun");
 #endif
 	SORTAPPlib(out_devs);
 	return(out_devs);
