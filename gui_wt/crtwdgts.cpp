@@ -1185,20 +1185,14 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 								else hold=member->w;
 							lBox->addWidget((Wt::WWidget *)hold);
 							if(!RDAstrcmp(member->rscrname,"BROWSE LIST")) lBox->setStretchFactor(hold,200);
-							else if(wdgt->type==8 && wdgt->rtype==2) lBox->setStretchFactor(hold,500);
-							if(wdgt->type==7 && wdgt->rows>1) last=TRUE;
-							else last=FALSE;
-							if((wdgt->type==7 && wdgt->rows>1) || (wdgt->type==8))
+							else if(wdgt->type==8) lBox->setStretchFactor(hold,500);
+							else if((wdgt->type==7 && wdgt->rows>1))
 							{
 								lBox->setStretchFactor((Wt::WWidget *)hold,100);
 							}
-/*
-							if(wdgt->type==8 && wdgt->rows>1) last=TRUE;
+							if(wdgt->type==7 && wdgt->rows>1) last=TRUE;
+							else if(wdgt->type==8) last=TRUE;
 							else last=FALSE;
-							if(wdgt->type==7 && wdgt->rows<2) last=FALSE;
-							else if(wdgt->type==8 && wdgt->rows==1) last=FALSE;
-							else last=TRUE;
-*/
 							if(frame_style!=(-1))
 							{
 								FrameWidget((Wt::WWidget *)hold,frame_style);
@@ -1293,7 +1287,7 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 									sprintf(GUIstemp,"OpenRDA %s LineStretch",mssc);
 									if(mssc!=NULL) Rfree(mssc);
 									hold->addStyleClass(GUIstemp);
-									lBox->setStretchFactor((Wt::WWidget *)hold,400);
+									lBox->setStretchFactor((Wt::WWidget *)hold,100);
 								}
 								}
 							} else if(hold!=NULL)
@@ -1382,7 +1376,7 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 						rowsx=crtbox((Wt::WWidget *)*line,scn,rsrc,widgetcount,&hold);
 						if(rowsx>0)
 						{
-							lBox->addWidget((Wt::WWidget *)hold);
+							lBox->addWidget((Wt::WWidget *)hold,500);
 							last=TRUE;
 							if(frame_style!=(-1))
 							{
