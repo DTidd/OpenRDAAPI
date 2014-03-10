@@ -4750,6 +4750,8 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					wH=Wt::WLength(200,Wt::WLength::Pixel);
 					wL=Wt::WLength(600,Wt::WLength::Pixel);
 					TE->setMinimumSize(wL,wH);
+					TE->setConfigurationSetting("browser_spellcheck",TRUE);
+					TE->setConfigurationSetting("skins",(const char *)"highcontrast");
 /*
 					TA=(Wt::WTextArea *)TE;
 					TA->setColumns(cols);
