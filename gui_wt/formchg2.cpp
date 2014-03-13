@@ -2611,10 +2611,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 		case VARIABLETEXT:
 			if(!USER_INTERFACE)
 			{
-				if(Parent_Table!=NULL)
-				{
-					tCell->addWidget((Wt::WWidget *)member->w);
-				}
 				if(member->rtype==4 || member->rtype==5 || member->rtype==6 || member->rtype==7)
 				{
 					if(Parent_Table!=NULL)
@@ -2641,6 +2637,10 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				if(mssc!=NULL) Rfree(mssc);
 				if(fssc!=NULL) Rfree(fssc);
 				member->w=(Wt::WWidget *)LE;
+				if(Parent_Table!=NULL)
+				{
+					tCell->addWidget((Wt::WWidget *)member->w);
+				}
 				wFormW=(Wt::WFormWidget *)LE;
 				if(member->field_length!=0)
 				{
@@ -2718,10 +2718,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 		case PLAINTEXT:
 			if(!USER_INTERFACE)
 			{
-				if(Parent_Table!=NULL)
-				{
-					tCell->addWidget((Wt::WWidget *)member->w);
-				}
 				if(member->rtype==4 || member->rtype==5 || member->rtype==6 || member->rtype==7)
 				{
 					if(Parent_Table!=NULL)
@@ -2741,6 +2737,10 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				}
 				WW=(Wt::WWidget *)LE;
 				member->w=(Wt::WWidget *)LE;
+				if(Parent_Table!=NULL)
+				{
+					tCell->addWidget((Wt::WWidget *)member->w);
+				}
 				mssc=ModuleScreenStyleClass(rsx);
 				fssc=InputFieldStyleClass(member);
 				memset(GUIstemp,0,1024);
