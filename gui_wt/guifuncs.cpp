@@ -151,7 +151,6 @@ char *membertypes[5]={
 	"Control Button - RF & Exit",
 	"Control Button - RF & KW"
 };
-
 class BlockingDialog : public Wt::WDialog
 {
 public:
@@ -170,7 +169,6 @@ public:
      * See also: https://developer.mozilla.org/en-US/docs/Web/API/Window.open
      * for more options on the new window.
      */
-
     std::string js = 
       "var win = window.open('" + url + "');"
       "if (win) {" // not blocked
@@ -359,34 +357,36 @@ int WT_RDA_SetEnv(char *name,char *value,int line,char *file)
 	return(0);
 }
 
-int WT_RDA_PutEnv(char *name,char *value,int line,char *file)
+int WT_RDA_PutEnv(char *namevalue,int line,char *file)
 {
 	Wt::WApplication *myAPP=NULL;
 	std::string *n1=NULL,*v1=NULL,i,*p=NULL,*hname=NULL;
-	char *temp1=NULL,*temp2=NULL;
+	char *temp2=NULL,*name=NULL,*value=NULL;
 	char *temp=NULL,*x=NULL;
 
 	if(diaggui)
 	{
-		prterr("DIAG WT_RDA_PutEnv Cookie [%s] with value [%s] at line [%d] program [%s].",(name!=NULL ? name:""),(value!=NULL ? value:""),line,(file!=NULL ? file:""));
+		prterr("DIAG WT_RDA_PutEnv Cookie [%s] at line [%d] program [%s].",(namevalue!=NULL ? namevalue:""),line,(file!=NULL ? file:""));
 	}
-	setenv(name,value,TRUE);
-	if(Skip_OpenRDA_Cookies==FALSE) addAPPlib(OpenRDA_Cookies,name);
-	temp1=stralloc(name);
-	temp2=strchr(temp1,'=');
+	name=stralloc(namevalue);
+	temp2=strchr(name,'=');
 	if(temp2!=NULL)
 	{
 		*temp2=0;
 		++temp2;
 	}
+	if(Skip_OpenRDA_Cookies==FALSE) addAPPlib(OpenRDA_Cookies,name);
 	myAPP=Wt::WApplication::instance();
-	n1=new string(temp1);
-	if((RDAstrlen(name)-1)==RDAstrlen(temp1)) 
+	n1=new string(name);
+	if((RDAstrlen(namevalue)-1)==RDAstrlen(name)) 
 	{
 		v1=new string("");
+		value=NULL;
 	} else {
+		value=stralloc(temp2);
 		v1=new string(temp2);
 	}
+	setenv(name,value,TRUE);
 	i=myAPP->environment().hostName();
 	temp=i.c_str();
 	for(x=temp;*x;++x) if(*x=='/' || *x==':') x=0;
@@ -404,7 +404,8 @@ int WT_RDA_PutEnv(char *name,char *value,int line,char *file)
 	v1->~string();
 	hname->~string();
 	p->~string();
-	if(temp1!=NULL) Rfree(temp1);
+	if(name!=NULL) Rfree(name);
+	if(value!=NULL) Rfree(value);
 	return(0);
 }
 int WT_RDA_UnSetEnv(char *name,int line,char *file)
@@ -844,6 +845,7 @@ int main(int argc,char *argv[])
 	RDAMAINWIDGET=NULL;
 	Skip_OpenRDA_Cookies=FALSE;
 /*
+	diaggui=TRUE;diageval=TRUE;TRACE;
 	diagapps=TRUE;TRACE;
 	diagapps=TRUE;diaggui=TRUE;diageval=TRUE;diagmix=TRUE;diagvirtual=TRUE;TRACE;
 	diagalloc=TRUE;diaggui=TRUE;diageval=TRUE;diagnrd=TRUE;diagmix=TRUE;diagvirtual=TRUE;diagsec=TRUE;diagmisc=TRUE;TRACE;
@@ -8627,7 +8629,7 @@ void DisplayFile(char *filename)
 	mf->setDispositionType(Wt::WResource::DispositionType::Inline);
 	mf->suggestFileName(filename);
 	std::string url(mf->url());
-  	BlockingDialog d(url);
+	BlockingDialog d(url);
   	d.exec();
 }
 static char *strippathfromfile(char *filename)

@@ -192,29 +192,55 @@ char *CreateRegExpString(char *def)
 Wt::WFileUpload *CreateFileUpload(RDArmem *member,Wt::WContainerWidget *c)
 {
 	Wt::WFileUpload *fu=NULL;
-	Wt::WPushButton *uploadButton=NULL;
 	Wt::WLineEdit *LE=(Wt::WLineEdit *)member->w;
+	Wt::WProgressBar *pBar=NULL;
+	Wt::WString text;
 	std::string sfn;
 	char xtemp[1024];
 
 	fu=new Wt::WFileUpload(c);
 	fu->setMultiple(FALSE);
-	fu->setProgressBar(new Wt::WProgressBar());
-	fu->setMargin(10,Wt::Right);
+	pBar=new Wt::WProgressBar();
+	fu->setProgressBar(pBar);
+	fu->setMargin(5,Wt::Right);
+	if(member->rtype==4)
+	{
+/* prefer text */
+/*
+		std::string filter_string("*.csv,*.tsv,*.txt");
+		fu->setFilters(filter_string);
+*/
+	} else if(member->rtype==5)
+	{
+/* any file */
+	} else if(member->rtype==6)
+	{
+/* directory */
+	} else if(member->rtype==7)
+	{
+/* new file */
+	}
 
-	uploadButton=new Wt::WPushButton("Send",c);
-	uploadButton->clicked().connect(std::bind([=] () {
-		LE->setText(fu->clientFileName());
-		fu->upload();
-		sfn=fu->spoolFileName();
-		fu->stealSpooledFile();
-		memset(xtemp,0,1024);
-		sprintf(xtemp,"%s/%s",CURRENTDIRECTORY,fu->clientFileName().toUTF8().c_str());
-		RDAMoveFile(sfn.c_str(),xtemp);
-		uploadButton->disable();
+	fu->changed().connect(std::bind([=] () { 
+		fu->upload(); 
+		text=fu->clientFileName();
+		LE->setText(text);
+		LE->setReadOnly(TRUE);
 	}));
+	
 	fu->uploaded().connect(std::bind([=]() {
-		uploadButton->enable();
+		text=fu->clientFileName();
+		LE->setText(text);
+		pBar->setDisabled(TRUE);
+		fu->stealSpooledFile();
+		sfn=fu->spoolFileName();
+		sfn=fu->spoolFileName();
+		memset(xtemp,0,1024);
+		sprintf(xtemp,"%s/%s",CURRENTDIRECTORY,text.toUTF8().c_str());
+		AbsRDAMoveFile(sfn.c_str(),xtemp);
+		LE->setReadOnly(FALSE);
+		fu->setDisabled(FALSE);
+		fu->refresh();
 	}));
 }
 /*-------------------------------------------------------------------------
@@ -2509,6 +2535,7 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 	Wt::WTableColumn *tColumn=NULL;
 	Wt::WValidator *Valid=NULL;
 	Wt::WDoubleValidator *doubleValid=NULL;
+	Wt::WFileUpload *wfu=NULL;
 	Wt::WDateValidator *dateValid=NULL;
 	Wt::WIntValidator *intValid=NULL;
 	Wt::WRegExpValidator *regexValid=NULL;
@@ -2584,7 +2611,27 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 		case VARIABLETEXT:
 			if(!USER_INTERFACE)
 			{
-				LE=new Wt::WLineEdit((Wt::WWidget *)parent);
+				if(Parent_Table!=NULL)
+				{
+					tCell->addWidget((Wt::WWidget *)member->w);
+				}
+				if(member->rtype==4 || member->rtype==5 || member->rtype==6 || member->rtype==7)
+				{
+					if(Parent_Table!=NULL)
+					{
+						form1 = new Wt::WContainerWidget(tCell);
+					} else {
+						form1 = new Wt::WContainerWidget(parent);
+					}
+					daL=(Wt::WLayout *)form1;
+					daL->setContentsMargins(0,0,0,0);
+					LE=new Wt::WLineEdit();
+					member->w=(Wt::WWidget *)LE;
+					wfu=CreateFileUpload(member,form1);
+					form1->addWidget(LE);
+				} else {
+					LE=new Wt::WLineEdit((Wt::WWidget *)parent);
+				}
 				WW=(Wt::WWidget *)LE;
 				mssc=ModuleScreenStyleClass(rsx);
 				fssc=InputFieldStyleClass(member);
@@ -2595,10 +2642,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				if(fssc!=NULL) Rfree(fssc);
 				member->w=(Wt::WWidget *)LE;
 				wFormW=(Wt::WFormWidget *)LE;
-				if(Parent_Table!=NULL)
-				{
-					tCell->addWidget((Wt::WWidget *)member->w);
-				}
 				if(member->field_length!=0)
 				{
 					if(cols<=0)
@@ -2675,7 +2718,27 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 		case PLAINTEXT:
 			if(!USER_INTERFACE)
 			{
-				LE=new Wt::WLineEdit((Wt::WWidget *)parent);
+				if(Parent_Table!=NULL)
+				{
+					tCell->addWidget((Wt::WWidget *)member->w);
+				}
+				if(member->rtype==4 || member->rtype==5 || member->rtype==6 || member->rtype==7)
+				{
+					if(Parent_Table!=NULL)
+					{
+						form1 = new Wt::WContainerWidget(tCell);
+					} else {
+						form1 = new Wt::WContainerWidget(parent);
+					}
+					daL=(Wt::WLayout *)form1;
+					daL->setContentsMargins(0,0,0,0);
+					LE=new Wt::WLineEdit();
+					member->w=(Wt::WWidget *)LE;
+					wfu=CreateFileUpload(member,form1);
+					form1->addWidget(LE);
+				} else {
+					LE=new Wt::WLineEdit((Wt::WWidget *)parent);
+				}
 				WW=(Wt::WWidget *)LE;
 				member->w=(Wt::WWidget *)LE;
 				mssc=ModuleScreenStyleClass(rsx);
@@ -2709,10 +2772,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				} else h=22;
 				LE->setTextSize(h);
 				
-				if(Parent_Table!=NULL)
-				{
-					tColumn->setWidth(h);
-				}
 				if(member->rtype==3) /* Password */
 				{
 					LE->setEchoMode(1);

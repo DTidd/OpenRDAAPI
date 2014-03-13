@@ -631,6 +631,7 @@ int xcrttablecontainer(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widge
 						if(!isEMPTY(wdgt->transversal_expression)) member->transversal_expression=stralloc(wdgt->transversal_expression);
 						makefield((Wt::WWidget *)TE,member,wdgt->label,wdgt->XHTML_Label,wdgt->pixmap,wdgt->rows,wdgt->cols,wdgt->rtype,myTable,row,col,row_span,col_span);
 						if(!RDAstrcmp(member->rscrname,"BROWSE LIST")) hold=(Wt::WWidget *)member->w->parent();
+							else if((member->field_type==0 || member->field_type==1) && member->rtype>4) hold=(Wt::WWidget *)member->w->parent();
 							else hold=member->w;
 						TE->addWidget(hold);
 						if(wdgt->type==6)
@@ -1233,6 +1234,7 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 							if(!isEMPTY(wdgt->transversal_expression)) member->transversal_expression=stralloc(wdgt->transversal_expression);
 							makefield((Wt::WWidget *)*line,member,wdgt->label,wdgt->XHTML_Label,wdgt->pixmap,wdgt->rows,wdgt->cols,wdgt->rtype,NULL,0,0,0,0);
 							if(!RDAstrcmp(member->rscrname,"BROWSE LIST")) hold=(Wt::WWidget *)member->w->parent();
+								else if((member->field_type==0 || member->field_type==1) && member->rtype>4) hold=(Wt::WWidget *)member->w->parent();
 								else hold=member->w;
 							if(wdgt->type==9)
 							{
@@ -1992,6 +1994,7 @@ int xcrtbox(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt::
 							if(!isEMPTY(wdgt->transversal_expression)) member->transversal_expression=stralloc(wdgt->transversal_expression);
 							makefield((Wt::WWidget *)hBox,member,wdgt->label,wdgt->XHTML_Label,wdgt->pixmap,wdgt->rows,wdgt->cols,wdgt->rtype,NULL,0,0,0,0);
 							if(!RDAstrcmp(member->rscrname,"BROWSE LIST")) hold=(Wt::WWidget *)member->w->parent();
+								else if((member->field_type==0 || member->field_type==1) && member->rtype>4) hold=(Wt::WWidget *)member->w->parent();
 								else hold=member->w;
 							myGrid->addWidget((Wt::WWidget *)hold,row,col,0);
 							++col;

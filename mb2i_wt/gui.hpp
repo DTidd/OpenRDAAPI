@@ -734,7 +734,7 @@ void xfree_menu(RDAmenu *,int,char *);
 #define getmenubin(a,b)	xgetmenubin(a,b,__LINE__,__FILE__)
 short xgetmenubin(char *,RDAmenu *,int,char *);
 double GUIstripfamt(char *);
-int WT_RDA_PutEnv(char *,char *,int,char *);
+int WT_RDA_PutEnv(char *,int,char *);
 int WT_RDA_UnSetEnv(char *,int,char *);
 int WT_RDA_SetEnv(char *,char *,int,char *);
 char *WT_RDA_GetEnv(char *,int,char *);
