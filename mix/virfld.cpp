@@ -2032,6 +2032,7 @@ APPlib *GetProcessesAvailable(char *modexp,void (*SubFunc)(...),void *args)
 #define BACKUP_A_DIRECTORY
 APPlib *RemoteDirectoryContentsAvailable(char *modexp,void (*SubFunc)(...),void *args,short style)
 {
+#ifdef __USE_SFTPLIST__
 #ifndef WIN32
 	char *work_ip=NULL,*logname=NULL,*pass_word=NULL,*docfolder=NULL;
 	char buffer[4096],temp[1024];
@@ -2045,7 +2046,7 @@ APPlib *RemoteDirectoryContentsAvailable(char *modexp,void (*SubFunc)(...),void 
 	pass_word=UsersWorkstationPassword();
 	docfolder=UsersWorkstationDocuments();
 	memset(temp,0,1024);
-	sprintf(temp,"sftplist.lnx \"%s\" \"%s\" \"%s\" \"%s\"",(work_ip!=NULL ? work_ip:""),(docfolder!=NULL ? docfolder:""),(logname!=NULL ? logname:""),(pass_word!=NULL ? pass_word:""));
+	sprintf(temp,"%s/sftplist.lnx \"%s\" \"%s\" \"%s\" \"%s\"",(DOCUMENTROOT!=NULL ? DOCUMENTROOT:""),(work_ip!=NULL ? work_ip:""),(docfolder!=NULL ? docfolder:""),(logname!=NULL ? logname:""),(pass_word!=NULL ? pass_word:""));
 	fp=popen(temp,"r");
 	if(fp!=NULL)
 	{
@@ -2060,6 +2061,12 @@ APPlib *RemoteDirectoryContentsAvailable(char *modexp,void (*SubFunc)(...),void 
 		pclose(fp);
 	}
 	return(tmplist);
+#else
+	APPlib *tmplist=NULL;
+
+	tmplist=APPlibNEW();
+	return(tmplist);
+#endif
 #else
 	APPlib *tmplist=NULL;
 
