@@ -222,10 +222,15 @@ Wt::WFileUpload *CreateFileUpload(RDArmem *member,Wt::WContainerWidget *c)
 	}
 
 	fu->changed().connect(std::bind([=] () { 
-		fu->upload(); 
-		text=fu->clientFileName();
-		LE->setText(text);
-		LE->setReadOnly(TRUE);
+		if(fu->canUpload())
+		{
+			fu->upload(); 
+			text=fu->clientFileName();
+			LE->setText(text);
+			LE->setReadOnly(TRUE);
+		} else {
+			WMessageBox::show("Unable to Upload","Do not have permission to upload the selected file.",Ok|Cancel);
+		}
 	}));
 	
 	fu->uploaded().connect(std::bind([=]() {
