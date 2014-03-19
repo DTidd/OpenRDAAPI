@@ -143,8 +143,6 @@ int main(int argc,char **argv)
 			return;
 		}
 		EXECUTEimport(argv[1],argv[2]);
-		ShutdownSubsystems();
-		std::exit;
 	} else {
 		if(InitializeSubsystems(argc,argv,module,"DO IMPORT/EXPORT")) 
 		{

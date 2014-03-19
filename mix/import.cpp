@@ -937,6 +937,7 @@ static short importflatfile(RDArsrc *mainrsrc,IEfile *importx)
 	GET_ALL_SCREEN_VIRTUALS(tmprsrc,0);
 	previous=RDATDataNEW(importx->fileno);
 	if(e!=NULL) Rfree(e);
+#ifdef __USE_DIAGNOSTIC_SCREENS__
 	if(tmprsrc!=NULL)
 	{
 		if(ADVmakescrn(tmprsrc,TRUE))
@@ -954,6 +955,7 @@ static short importflatfile(RDArsrc *mainrsrc,IEfile *importx)
 			ForceWindowUpdate(tmprsrc);
 		}
 	}
+#endif /* __USE_DIAGNOSTIC_SCREENS__ *//
 	for(x=0,f=importx->fields;x<importx->num;++x,++f)
 	{
 		if(!isEMPTY(f->value_expression))
@@ -2891,10 +2893,12 @@ static short importflatfile(RDArsrc *mainrsrc,IEfile *importx)
 				}
 			}
 		}
+#ifdef __USE_DIAGNOSTIC_SCREENS__
 		if(!abort_diagnostic)
 		{
 			if(tmprsrc!=NULL) update_diagnostic(tmprsrc,(skip_field ? TRUE:FALSE));
 		}
+#endif /* __USE_DIAGNOSTIC_SCREENS__ *//
 	}
 	} else {
 	while(fread(temp,1,use_temp,fp))
@@ -4787,10 +4791,12 @@ static short importflatfile(RDArsrc *mainrsrc,IEfile *importx)
 	}
 	if(tmprsrc!=NULL)
 	{
+#ifdef __USE_DIAGNOSTIC_SCREENS__
 		if(!abort_diagnostic)
 		{
 			killwindow(tmprsrc);
 		}
+#endif /* __USE_DIAGNOSTIC_SCREENS__ *//
 		free_rsrc(tmprsrc);
 		tmprsrc=NULL;
 	}
@@ -5005,6 +5011,7 @@ static short importdelimitedfile(RDArsrc *mainrsrc,IEfile *importx)
 	previous=RDATDataNEW(importx->fileno);
 	if(e!=NULL) Rfree(e);
 	e=NULL;
+#ifdef __USE_DIAGNOSTIC_SCREENS__
 	if(tmprsrc!=NULL)
 	{
 		if(ADVmakescrn(tmprsrc,TRUE))
@@ -5022,6 +5029,7 @@ static short importdelimitedfile(RDArsrc *mainrsrc,IEfile *importx)
 			ForceWindowUpdate(tmprsrc);
 		}
 	}
+#endif /* __USE_DIAGNOSTIC_SCREENS__ *//
 	for(x=0,f=importx->fields;x<importx->num;++x,++f)
 	{
 		if(!isEMPTY(f->value_expression))
@@ -5792,20 +5800,24 @@ static short importdelimitedfile(RDArsrc *mainrsrc,IEfile *importx)
 				}
 			}
 		}
+#ifdef __USE_DIAGNOSTIC_SCREENS__
 		if(!abort_diagnostic)
 		{
 			if(tmprsrc!=NULL) update_diagnostic(tmprsrc,(skip_field ? TRUE:FALSE));
 		}
+#endif /* __USE_DIAGNOSTIC_SCREENS__ *//
 		if(ImportLine!=NULL) Rfree(ImportLine);
 		ImportLine=readDelimitedline(fp,rdel,&total);
 	}
 	if(ImportLine!=NULL) Rfree(ImportLine);
 	if(tmprsrc!=NULL)
 	{
+#ifdef __USE_DIAGNOSTIC_SCREENS__
 		if(!abort_diagnostic)
 		{
 			killwindow(tmprsrc);
 		}
+#endif /* __USE_DIAGNOSTIC_SCREENS__ *//
 		free_rsrc(tmprsrc);
 		tmprsrc=NULL;
 	}
@@ -5871,6 +5883,7 @@ static short exportflatfile(RDArsrc *mainrsrc,IEfile *importx)
 	if(e!=NULL) Rfree(e);
 	e=NULL;
 	addDFincvir(tmprsrc,MODULENAME(importx->fileno),FILENAME(importx->fileno),NULL,importx->fileno);
+#ifdef __USE_DIAGNOSTIC_SCREENS__
 	if(tmprsrc!=NULL)
 	{
 		if(ADVmakescrn(tmprsrc,TRUE))
@@ -5888,6 +5901,7 @@ static short exportflatfile(RDArsrc *mainrsrc,IEfile *importx)
 			ForceWindowUpdate(tmprsrc);
 		}
 	}
+#endif /* __USE_DIAGNOSTIC_SCREENS__ *//
 	ZERNRD(importx->fileno);
 	ef=FRSNRDsec(importx->fileno,1);
 	while(!ef)
@@ -6182,15 +6196,19 @@ static short exportflatfile(RDArsrc *mainrsrc,IEfile *importx)
 			if(importx->carriage_return==TRUE) fprintf(fp,"\r");
 			if(importx->line_feed==TRUE) fprintf(fp,"\n");
 		}
+#ifdef __USE_DIAGNOSTIC_SCREENS__
 		if(!abort_diagnostic)
 		{
 			if(tmprsrc!=NULL) update_diagnostic(tmprsrc,(testval ? TRUE:FALSE));
 		}
+#endif /* __USE_DIAGNOSTIC_SCREENS__ *//
 		ef=NXTNRDsec(importx->fileno,1);
 	}
 	if(tmprsrc!=NULL)
 	{
+#ifdef __USE_DIAGNOSTIC_SCREENS__
 		if(!abort_diagnostic) killwindow(tmprsrc);
+#endif /* __USE_DIAGNOSTIC_SCREENS__ *//
 		free_rsrc(tmprsrc);
 		tmprsrc=NULL;
 	}
@@ -6242,6 +6260,7 @@ static short exportdelimitedfile(RDArsrc *mainrsrc,IEfile *importx)
 	if(e!=NULL) Rfree(e);
 	e=NULL;
 	addDFincvir(tmprsrc,MODULENAME(importx->fileno),FILENAME(importx->fileno),NULL,importx->fileno);
+#ifdef __USE_DIAGNOSTIC_SCREENS__
 	if(tmprsrc!=NULL)
 	{
 		if(ADVmakescrn(tmprsrc,TRUE))
@@ -6259,6 +6278,7 @@ static short exportdelimitedfile(RDArsrc *mainrsrc,IEfile *importx)
 			ForceWindowUpdate(tmprsrc);
 		}
 	}
+#endif /* __USE_DIAGNOSTIC_SCREENS__ *//
 	if(importx->fields!=NULL)
 	{
 		for(x=0,f=importx->fields;x<importx->num;++x,++f)
@@ -6444,15 +6464,19 @@ static short exportdelimitedfile(RDArsrc *mainrsrc,IEfile *importx)
 			}
 			fprintf(fp,"%s",rdel);
 		}
+#ifdef __USE_DIAGNOSTIC_SCREENS__
 		if(!abort_diagnostic)
 		{
 			if(tmprsrc!=NULL) update_diagnostic(tmprsrc,(testval ? TRUE:FALSE));
 		}
+#endif /* __USE_DIAGNOSTIC_SCREENS__ *//
 		ef=NXTNRDsec(importx->fileno,1);
 	}
 	if(tmprsrc!=NULL)
 	{
+#ifdef __USE_DIAGNOSTIC_SCREENS__
 		if(!abort_diagnostic) killwindow(tmprsrc);
+#endif /* __USE_DIAGNOSTIC_SCREENS__ *//
 		free_rsrc(tmprsrc);
 		tmprsrc=NULL;
 	}
@@ -6511,6 +6535,7 @@ static short exportxmlfile(RDArsrc *mainrsrc,IEfile *importx)
 	if(e!=NULL) Rfree(e);
 	e=NULL;
 	addDFincvir(tmprsrc,MODULENAME(importx->fileno),FILENAME(importx->fileno),NULL,importx->fileno);
+#ifdef __USE_DIAGNOSTIC_SCREENS__
 	if(tmprsrc!=NULL)
 	{
 		if(ADVmakescrn(tmprsrc,TRUE))
@@ -6528,6 +6553,7 @@ static short exportxmlfile(RDArsrc *mainrsrc,IEfile *importx)
 			ForceWindowUpdate(tmprsrc);
 		}
 	}
+#endif /* __USE_DIAGNOSTIC_SCREENS__ *//
 /* What?  Skipping  for now.
 	if(importx->fields!=NULL)
 	{
@@ -6723,15 +6749,19 @@ static short exportxmlfile(RDArsrc *mainrsrc,IEfile *importx)
 			fprintf(fp,"%s",rdel);
 			*/
 		}
+#ifdef __USE_DIAGNOSTIC_SCREENS__
 		if(!abort_diagnostic)
 		{
 			if(tmprsrc!=NULL) update_diagnostic(tmprsrc,(testval ? TRUE:FALSE));
 		}
+#endif /* __USE_DIAGNOSTIC_SCREENS__ *//
 		ef=NXTNRDsec(importx->fileno,1);
 	}
 	if(tmprsrc!=NULL)
 	{
+#ifdef __USE_DIAGNOSTIC_SCREENS__
 		if(!abort_diagnostic) killwindow(tmprsrc);
+#endif /* __USE_DIAGNOSTIC_SCREENS__ *//
 		free_rsrc(tmprsrc);
 		tmprsrc=NULL;
 	}
@@ -6768,7 +6798,6 @@ void QUITimport(RDArsrc *mainrsrc,IEfile *importx)
 	}
 	if(mainrsrc!=NULL) free_rsrc(mainrsrc);
 	ShutdownSubsystems();
-	std::exit;
 }
 void SELECTimport(RDArsrc *mainrsrc,IEfile *importx)
 {
@@ -6794,7 +6823,7 @@ void SELECTimport(RDArsrc *mainrsrc,IEfile *importx)
 			if(!importx->MainLoop)
 			{
 				importx->MainLoop=TRUE;
-				RDAAPPMAINLOOP();
+				return;
 			}
 		}
 	} else {
@@ -6809,7 +6838,7 @@ void SELECTimport(RDArsrc *mainrsrc,IEfile *importx)
 			if(!importx->MainLoop)
 			{
 				importx->MainLoop=TRUE;
-				RDAAPPMAINLOOP();
+				return;
 			}
 		}
 		if(removewc==TRUE)
@@ -6904,7 +6933,7 @@ void xEXECUTEimport(char *module,char *name,int line,char *file)
 			APPmakescrn(MainRsrc,TRUE,QUITimport,importx,TRUE);
 			if(screen!=NULL) Rfree(screen);
 			importx->MainLoop=TRUE;
-			RDAAPPMAINLOOP();
+			return;
 		} else {
 			SELECTimport(NULL,importx);
 		}
