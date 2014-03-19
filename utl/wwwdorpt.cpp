@@ -89,27 +89,26 @@ int c_main(int argc,char **argv)
 int main(int argc,char **argv)
 #endif
 {
-		RDA_NOGUI=TRUE;
+	RDA_NOGUI=TRUE;
 #ifdef LINUX 
-		umask(002);
+	umask(002);
 #endif
 #if defined(LINUX2_2) || defined(UBUNTU_OS) 
-		umask(002);
+	umask(002);
 #endif
-		fprintf(stdout,"\n\n");
-		if(WWWInitializeSubsystems(argc,argv,argv[1],argv[2])) 
-		{
-			ShutdownSubsystems();
-			return(1);
-		}
-		if(argc==3)
-		{
-			ShutdownSubsystems();
-			return(1);
-		}
-		RDA_NOGUI=TRUE;
-		RUNREPORTADV3(argv[1],argv[2],NULL,NULL,FALSE,TRUE,NULL,NULL,NULL,NULL,0,(void (*)(...))WWWprocess_dataline);
+	fprintf(stdout,"\n\n");
+	if(WWWInitializeSubsystems(argc,argv,argv[1],argv[2])) 
+	{
 		ShutdownSubsystems();
-		return(0);
+		return(1);
 	}
+	if(argc==3)
+	{
+		ShutdownSubsystems();
+		return(1);
+	}
+	RDA_NOGUI=TRUE;
+	RUNREPORTADV3(argv[1],argv[2],NULL,NULL,FALSE,TRUE,NULL,NULL,NULL,NULL,0,(void (*)(...))WWWprocess_dataline);
+	ShutdownSubsystems();
+	return(0);
 }
