@@ -104,6 +104,7 @@
 #include <Wt/WSocketNotifier>
 #include <Wt/WSound>
 #include <Wt/WSpinBox>
+#include <Wt/WSplitButton>
 #include <Wt/WStackedWidget>
 #include <Wt/WStandardItem>
 #include <Wt/WStandardItemModel>
@@ -200,14 +201,16 @@ int xcrtline(Wt::WWidget *,RDAscrn *,RDArsrc *rsrc,int *,Wt::WWidget **,int,char
 int xcrtbox(Wt::WWidget *,RDAscrn *,RDArsrc *,int *,Wt::WWidget **,int,char *);
 #define crttab(a,b,c,d,e)	xcrttab(a,b,c,d,e,__LINE__,__FILE__)
 int xcrttab(Wt::WWidget *,RDAscrn *,RDArsrc *,int *,Wt::WWidget **,int,char *);
-#define crtpopup(a,b,c,d,e,f)	xcrtpopup(a,b,c,d,e,f,__LINE__,__FILE__)
-int xcrtpopup(Wt::WWidget *,RDAscrn *,RDArsrc *,int *,Wt::WWidget **,short,int,char *);
+#define crtpopup(a,b,c,d,e,f,g)	xcrtpopup(a,b,c,d,e,f,g,__LINE__,__FILE__)
+int xcrtpopup(Wt::WWidget *,RDAscrn *,RDArsrc *,int *,Wt::WWidget **,short,int,int,char *);
 #define crttoolbarcontainer(a,b,c,d,e)	xcrttoolbarcontainer(a,b,c,d,e,__LINE__,__FILE__)
 int xcrttoolbarcontainer(Wt::WWidget *,RDAscrn *,RDArsrc *,int *,Wt::WWidget **,int,char *);
 #define crttablecontainer(a,b,c,d,e,f)	xcrttablecontainer(a,b,c,d,e,f,__LINE__,__FILE__)
 int xcrttablecontainer(Wt::WWidget *,RDAscrn *,RDArsrc *,int *,Wt::WWidget **,int,int,char *);
 #define crtheadercontainer(a,b,c,d,e,f)	xcrtheadercontainer(a,b,c,d,e,f,__LINE__,__FILE__)
 void xcrtheadercontainer(Wt::WTable *,RDAscrn *,RDArsrc *,int *,Wt::WTableRow **,int,int,char *);
+#define crtpanel(a,b,c,d,e)	xcrtpanel(a,b,c,d,e,__LINE__,__FILE__)
+int xcrtpanel(Wt::WWidget *,RDAscrn *,RDArsrc *,int *,Wt::WWidget **,int,char *);
 #define crtscrollwindow(a,b,c,d,e)	xcrtscrollwindow(a,b,c,d,e,__LINE__,__FILE__)
 int xcrtscrollwindow(Wt::WWidget *,RDAscrn *,RDArsrc *,int *,Wt::WWidget **,int,char *);
 #define numperline(a,b)	xnumperline(a,b,__LINE__,__FILE__)

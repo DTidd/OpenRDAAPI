@@ -5,6 +5,8 @@
 #include <nrdp.hpp>
 #include <nrdp1.hpp>
 
+#define SINGLE_THREADED_APPLICATION
+
 // define __USE_ANIMATIONS__
 
 /*lint -e537*/
@@ -110,7 +112,7 @@ char *standardfieldtypes[29]=
 	"Progress Bar",
 };
 
-char *wdgttypes[32]={
+char *wdgttypes[34]={
 	"Standard Resource",
 	"New Line",
 	"End Line",
@@ -143,6 +145,8 @@ char *wdgttypes[32]={
 	"End Table",
 	"Start Header",
 	"End Header",
+	"Start Panel",
+	"End Panel",
 };
 char *membertypes[5]={
 	"Standard Resource",
@@ -298,7 +302,6 @@ char *WT_RDA_GetEnv(char *name,int line,char *file)
 	if(FINDAPPLIBELEMENT(OpenRDA_Cookies,name)!=(-1))
 	{
 		temp=getenv(name);
-		WT_RDA_UnSetEnv(name,__LINE__,__FILE__);
 		return(temp);
 	} else {
 		myAPP=Wt::WApplication::instance();
@@ -548,6 +551,7 @@ public:
   }
 };
 
+#ifdef SINGLE_THREADED_APPLICATION
 /* Application which authenticates before calling loggedIn() */
 class AuthApplication : public SingleThreadedApplication
 {
@@ -746,6 +750,205 @@ private:
   Session session_;
   Wt::Auth::AuthWidget *authWidget_;
 };
+#else /* WHEN NOT SINGLE_THREADED_APPLICATION */
+/* Application which authenticates before calling loggedIn() */
+class AuthApplication : public Wt::WApplication 
+{
+public:
+  AuthApplication(const Wt::WEnvironment& env)
+    : Wt::WApplication(env)
+  { 
+
+	Wt::WString *c=NULL;
+	int x=0;
+	char tempx[512];
+#ifdef WT_FASTCGI
+	std::string pv[99],url;
+	char *pname=NULL,*temp=NULL;
+#endif
+/* NEED THE ITEMS BELOW SUBSTANTIATED IN ORDER TO READ USERS TABLES FOR AUTHENTICATION */
+
+/* Initialize Database, Security, Misc */
+	RDA_STDERR=stderr;
+
+	UI_RDA_GetEnv=WT_RDA_GetEnv;
+	UI_RDA_SetEnv=WT_RDA_SetEnv;
+	UI_RDA_PutEnv=WT_RDA_PutEnv;
+	UI_RDA_UnSetEnv=WT_RDA_UnSetEnv;
+	UI_GetDocRoot=WT_GetDocRoot;
+	UI_GetAppRoot=WT_GetAppRoot;
+	UI_OpenWindow=GUI_OpenWindow;
+	UI_OpenWindowWait=GUI_OpenWindowWait;
+	BCryptValue=WtPassWdHash;
+
+	AlreadyInitialized=FALSE;
+	RDA_NOGUI=FALSE;
+	SEC_USERS_FILENO=(-1);
+	SEC_TOKEN_FILENO=(-1);
+	SETCWD();
+	NRDbuf=NULL;	
+	no_buffers=0;
+	dbcons.s=NULL;
+	dbcons.num=0;
+#ifdef USE_BERKELEY_BTREE
+	retval=INITNRDberkeley();
+	if(retval)
+	{
+		prterr("Error INITNRDberkeley Failed to Initialize the Berkeley Btree Engine.");
+	}
+#endif
+#ifdef USE_MYISAM
+	INITNRDmyisam();
+#endif
+#ifdef USE_MYSQL
+	INITNRDmysql();
+#endif
+#ifdef USE_CTREE
+#ifdef XXXXX
+	ctWNGV=NULL;
+#endif
+	retval=INITNRDctree();
+	if(retval) 
+	{
+		prterr("Error INITNRDctree Failed to Initialize the Faircom Engines.");
+	}
+#endif
+#ifdef INFORMIX_ISAM
+	retval=INITNRDisam();
+	if(retval) 
+	{
+		prterr("Error INITNRDisam Failed to Initialize the Informix Engines.");
+	}
+#endif
+/* appRoot needed to open files */
+	SEC_USERS_FILENO=OPNNRD("SECURITY","USERS");
+	SEC_TOKEN_FILENO=OPNNRD("SECURITY","TOKENS");
+	if(diaggui)
+	{
+		std::cerr << "SEC_USERS_FILENO [" << SEC_USERS_FILENO << "]" << std::endl;
+		std::cerr << "SEC_TOKEN_FILENO [" << SEC_TOKEN_FILENO << "]" << std::endl;
+	}
+	AlreadyInitialized=TRUE;
+/* NEED THE ITEMS ABOVE SUBSTANTIATED IN ORDER TO READ USERS TABLES FOR AUTHENTICATION */
+	RDAMAINWIDGET=this;
+#ifdef _USE_GOOGLE_ANALYTICS_ 
+	RDAMAINWIDGET->require("http://www.google-analytics.com/ga.js");
+
+
+// form of url but doens't have to be a true url 
+
+	RDAMAINWIDGET->doJavaScript(
+		"window.pageTracker=_gat._getTracker('UA-41161936-2');"
+		"window.pageTracker.initData();"
+		"window.pageTracker._trackPageview();"
+	);
+#endif /* _USE_GOOGLE_ANALYTICS_  */
+	
+	RDAMAINWIDGET->setCssTheme("polished");
+
+	RDAMAINWIDGET->useStyleSheet(Wt::WLink("/resources/OpenRDA/OpenRDA4.0.css"));
+	memset(tempx,0,512);
+	sprintf(tempx,"%s/LoginTemplates",CURRENTDIRECTORY);
+	RDAMAINWIDGET->messageResourceBundle().use(tempx);
+
+
+	RDA_session=RDAMAINWIDGET->sessionId();
+	RDA_UserAgent=RDAMAINWIDGET->environment().agent();
+	using_ajax=RDAMAINWIDGET->environment().ajax();
+	using_js=RDAMAINWIDGET->environment().javaScript();
+	RDAMAINWIDGET->setLoadingIndicator(new OpenRDALoadingIndicator());
+	c=new WString("Please wait while we get that for you...");
+	RDAMAINWIDGET->loadingIndicator()->setMessage(*c);
+	c->~WString();
+	OpenRDA_Cookies=APPlibNEW();
+	CMAIN_ARGS=APPlibNEW();
+#ifndef WT_FASTCGI
+	for(x=0;x<RDA_argc;++x)
+	{
+		if(!RDAstrcmp(RDA_argv[x],"client"))
+		{
+			break;
+		} else if(!strncmp(RDA_argv[x],"--",2)) 
+		{
+			++x;
+		} else {
+			addAPPlib(CMAIN_ARGS,RDA_argv[x]);
+		}
+	}
+#else 
+	url=RDAMAINWIDGET->url();
+	pname=url.c_str();
+	for(temp=pname;*temp;++temp)
+	{
+		if(*temp=='?' || *temp==' ') 
+		{
+			*temp=0;
+			break;
+		}
+	}
+	addAPPlib(CMAIN_ARGS,&pname[1]);
+	for(x=0;x<99;++x)
+	{
+		memset(stemp,0,101);
+		sprintf(stemp,"arg%d",(x+1));
+		if(!RDAMAINWIDGET->environment().getParameterValues(stemp).empty())
+		{
+			pv[x]=RDAMAINWIDGET->environment().getParameterValues(stemp)[0];
+			addAPPlib(CMAIN_ARGS,pv[x].c_str());
+		} else break;
+	}		
+#endif /* FASTCGI */
+    session_.login().changed().connect(this, &AuthApplication::authEvent);
+
+    authWidget_ = new Wt::Auth::AuthWidget(session_.login());
+
+    authWidget_->setModel(new RDAAuthModel(Session::auth(), session_.users(),
+					   this));
+
+    authWidget_->model()->addPasswordAuth(&Session::passwordAuth());
+
+    root()->addWidget(authWidget_);
+
+    processCookie();
+  }
+
+  virtual void destroy() {
+    root()->clear();
+  }
+
+  void processCookie() {
+    authWidget_->processEnvironment();
+  }
+
+  void authEvent() {
+    if (session_.login().loggedIn()) {
+      const Wt::Auth::User& u = session_.login().user();
+
+      root()->clear();
+      authWidget_ = 0;
+
+      loggedIn();
+    } else {
+      Wt::log("notice") << "User logged out.";
+    }
+  }
+
+protected:
+  virtual void threadNotify(const Wt::WEvent& event) {
+    if (event.eventType() == Wt::UserEvent) {
+      if (session_.login().loggedIn()) {
+	session_.users().extendAuthTokenValidity(session_.login().user());
+      }
+    }
+
+    WApplication::notify(event);
+  }
+
+private:
+  Session session_;
+  Wt::Auth::AuthWidget *authWidget_;
+};
+#endif /* SINGLE_THREADED_APPLICATION */
 
 Wt::WApplication *createApplication(const WEnvironment& env)
 {
@@ -971,7 +1174,7 @@ void xINITGUI(int argc,char *argv[],char *d,int line,char *file)
 }
 void xEXITGUI(int line,char *file)
 {
-	std::string *s1=NULL;
+	std::string s1("http:/");
 	Wt::WString *c=NULL;
 	int x=0;
 #ifdef WT_FASTCGI
@@ -1021,16 +1224,14 @@ void xEXITGUI(int line,char *file)
 #ifdef WT_FASTCGI
 	if(!RDAstrcmp(PROGRAM_NAME,"openrda.lnx") || !RDAstrcmp(PROGRAM_NAME,"openrda.exe"))
 	{
-		s1=new string("http://www.openrda.com");
-		RDAMAINWIDGET->redirect(*s1);
-		s1->~string();
+		s1+RDAMAINWIDGET->environment().hostName();
+		RDAMAINWIDGET->redirect(s1);
 	} else {
 		RDAMAINWIDGET->doJavaScript(closeWindowCmd);
 	}
 #else
-	s1=new string("http://www.openrda.com");
-	RDAMAINWIDGET->redirect(*s1);
-	s1->~string();
+	s1+RDAMAINWIDGET->environment().hostName();
+	RDAMAINWIDGET->redirect(s1);
 #endif
 	RDAMAINWIDGET=NULL;
 	if(LastGroupDefault!=NULL) Rfree(LastGroupDefault);
@@ -2739,6 +2940,7 @@ short xwritescrnbin(char *libname,RDAscrn *screen,int line,char *file)
 			case 29: /* End Table */
 			case 30: /* Start Header */
 			case 31: /* End Header */
+			case 33: /* End Panel */
 				break;
 			case 11: /* seperator */
 			case 10: /* frame */
@@ -2749,6 +2951,7 @@ short xwritescrnbin(char *libname,RDAscrn *screen,int line,char *file)
 			case 24: /* New Popup Menu */
 			case 26: /* New ToolBar    */
 			case 28: /* New Table      */
+			case 32: /* Start Panel */
 			case 5: /* labels */
 				if(!isEMPTY(wdgt->label))
 				{
@@ -3179,6 +3382,7 @@ short xgetscrnbin(char *libname,RDAscrn *screen,short showerror,int line,char *f
 			case 29: /* End Table */
 			case 30: /* Start Header */
 			case 31: /* End Header */
+			case 33: /* End Panel */
 				wdgt->resource_name=NULL;
 				wdgt->label=NULL;
 				wdgt->pixmap=NULL;
@@ -3190,6 +3394,7 @@ short xgetscrnbin(char *libname,RDAscrn *screen,short showerror,int line,char *f
 			case 24: /* New Popup Menu */
 			case 26: /* New Toolbar */
 			case 28: /* New Table */
+			case 32: /* Start Panel */
 			case 5: /* labels */
 				wdgt->resource_name=NULL;
 				if(donewscreen>2)
@@ -3708,6 +3913,7 @@ int xDeActivateLine(RDAscrn *scn,int curnum,int line,char *file)
 			case 26: /* New Tabbed Container */
 			case 28: /* New Tabbed Container */
 			case 30: /* New Tabbed Container */
+			case 32: /* New Panel */
 				wdgt->resource_num=(-1);
 				if(!box) box=TRUE;
 				++boxcount;
@@ -3719,6 +3925,7 @@ int xDeActivateLine(RDAscrn *scn,int curnum,int line,char *file)
 			case 27: /* End Tabbed Container */
 			case 29: /* End Tabbed Container */
 			case 31: /* End Tabbed Container */
+			case 33: /* End Panel */
 				--boxcount;
 				if(boxcount==0) box=FALSE;
 				wdgt->resource_num=(-1);
@@ -3809,6 +4016,7 @@ int xDeActivateTabContainer(RDAscrn *scn,int curnum,int line,char *file)
 			case 26: /* New Toolbar Container */
 			case 28: /* New Toolbar Container */
 			case 30: /* New Toolbar Container */
+			case 32: /* New Panel */
 				wdgt->resource_num=(-1);
 				if(!box) box=TRUE;
 				++boxcount;
@@ -3819,6 +4027,7 @@ int xDeActivateTabContainer(RDAscrn *scn,int curnum,int line,char *file)
 			case 27: /* End Toolbar Container */
 			case 29: /* End Toolbar Container */
 			case 31: /* End Toolbar Container */
+			case 33: /* End Panel */
 				--boxcount;
 				if(boxcount==0) box=FALSE;
 				wdgt->resource_num=(-1);
@@ -3907,6 +4116,7 @@ int xDeActivateScrolledWindow(RDAscrn *scn,int curnum,int line,char *file)
 			case 26: /* New Tabbed Container */
 			case 28: /* New Tabbed Container */
 			case 30: /* New Tabbed Container */
+			case 32: /* New Panel */
 				wdgt->resource_num=(-1);
 				if(!box) box=TRUE;
 				++boxcount;
@@ -3917,6 +4127,7 @@ int xDeActivateScrolledWindow(RDAscrn *scn,int curnum,int line,char *file)
 			case 27: /* End Tabbed Container */
 			case 29: /* End Tabbed Container */
 			case 31: /* End Tabbed Container */
+			case 33: /* End Panel */
 				--boxcount;
 				if(boxcount==0) box=FALSE;
 				wdgt->resource_num=(-1);
@@ -3990,6 +4201,7 @@ int xDeActivateBox(RDAscrn *scn,int curnum,int line,char *file)
 			case 26: /* New Tab Bar */
 			case 28: /* New Tab Bar */
 			case 30: /* New Tab Bar */
+			case 32: /* New Panel */
 				++boxcount;
 				box=TRUE;
 				wdgt->resource_num=(-1);
@@ -4000,6 +4212,7 @@ int xDeActivateBox(RDAscrn *scn,int curnum,int line,char *file)
 			case 27: /* End Tabbed Container */
 			case 29: /* End Tabbed Container */
 			case 31: /* End Tabbed Container */
+			case 33: /* End Panel */
 				--boxcount;
 				if(boxcount==0) box=FALSE;
 				wdgt->resource_num=(-1);
@@ -4090,6 +4303,7 @@ int xDeActivatePopup(RDAscrn *scn,int curnum,int line,char *file)
 			case 26: /* New Tab Bar */
 			case 28: /* New Tab Bar */
 			case 30: /* New Tab Bar */
+			case 32: /* New Panel */
 				++boxcount;
 				box=TRUE;
 				wdgt->resource_num=(-1);
@@ -4115,6 +4329,7 @@ int xDeActivatePopup(RDAscrn *scn,int curnum,int line,char *file)
 			case 27: /* End ToolBar */
 			case 29: /* End ToolBar */
 			case 31: /* End ToolBar */
+			case 33: /* End Panel */
 				--boxcount;
 				if(boxcount==0) box=FALSE;
 				wdgt->resource_num=(-1);
@@ -4178,6 +4393,7 @@ int xDeActivateToolbar(RDAscrn *scn,int curnum,int line,char *file)
 			case 25: /* New Tab Bar */
 			case 28: /* New Tab Bar */
 			case 30: /* New Tab Bar */
+			case 32: /* New Panel */
 				wdgt->resource_num=(-1);
 				break;
 			case 1: /* new line */
@@ -4192,6 +4408,7 @@ int xDeActivateToolbar(RDAscrn *scn,int curnum,int line,char *file)
 			case 13: /* end scrolled window */
 			case 29: /* end scrolled window */
 			case 31: /* end scrolled window */
+			case 33: /* end Panel */
 				wdgt->resource_num=(-1);
 				break;
 			case 26: /* New Tab Bar */
@@ -4329,6 +4546,7 @@ void xsetrscnum(RDArsrc *rsc,short (*EvalFunc)(...),void *EvalFuncArgs,int line,
 					}
 					break;
 				case 1: /* new line */
+				case 32: /* new Panel */
 					if(PP_translate_GUIFUNC!=NULL)
 					{
 /*lint -e746 */
@@ -4370,6 +4588,7 @@ void xsetrscnum(RDArsrc *rsc,short (*EvalFunc)(...),void *EvalFuncArgs,int line,
 				case 23: /* New Tab Bar */
 				case 29: /* end table */
 				case 31: /* end header */
+				case 33: /* end panel */
 					if(PP_translate_GUIFUNC!=NULL)
 					{
 /*lint -e746 */
@@ -8626,7 +8845,7 @@ void DisplayFile(char *filename)
 	extn=DetermineMimeType(filename);
 	mf->setMimeType(extn);
 	mf->setFileName(f2);
-	mf->setDispositionType(Wt::WResource::DispositionType::Inline);
+	mf->setDispositionType(Wt::WResource::DispositionType::Attachment);
 	mf->suggestFileName(filename);
 	std::string url(mf->url());
 	BlockingDialog d(url);
@@ -8664,7 +8883,7 @@ void DisplayRelativeFile(char *filename)
 	extn=DetermineMimeType(filename);
 	mf->setMimeType(extn);
 	mf->setFileName(filename);
-	mf->setDispositionType(Wt::WResource::DispositionType::Inline);
+	mf->setDispositionType(Wt::WResource::DispositionType::Attachment);
 	name=strippathfromfile(filename);	
 	mf->suggestFileName(name);
 	if(name!=NULL) Rfree(name);

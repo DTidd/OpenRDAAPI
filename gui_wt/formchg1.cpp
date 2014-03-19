@@ -778,6 +778,8 @@ int xnumperline(RDAscrn *scn,int curnum,int line,char *file)
 			case 29: /* end popup menu    */
 			case 30: /* end popup menu    */
 			case 31: /* end popup menu    */
+			case 32: /* new panel         */
+			case 33: /* end panel     */
 				break;
 			case 23: /* tab bar */
 				if(!box)
@@ -853,6 +855,12 @@ int xfindmaxlines(RDAscrn *scn,int line,char *file)
 			case 25: /* end popup menu    */
 			case 26: /* new popup menu    */
 			case 27: /* end popup menu    */
+			case 28: /* end popup menu    */
+			case 29: /* end popup menu    */
+			case 30: /* new popup menu    */
+			case 31: /* end popup menu    */
+			case 32: /* new panel */
+			case 33: /* end panel */
 				break;
 			case 1: /* new line */
 				if(!box)
@@ -932,6 +940,8 @@ int xboxmaxcols(RDAscrn *scn,int curnum,int line,char *file)
 			case 2: /* end line */
 			case 30: /* new header */
 			case 31: /* end header */
+			case 32: /* new panel */
+			case 33: /* end panel */
 				if(boxcount==1)
 				{
 					if(hold<count) hold=count;
@@ -1020,10 +1030,12 @@ int xboxmaxrows(RDAscrn *scn,int curnum,int line,char *file)
 				break;
 			case 1:  /* new line */
 			case 30: /* new header */
+			case 32: /* new panel    */
 				if(boxcount==1) wcount=0;
 				break;
 			case 2:  /* end line */
 			case 31: /* end header */
+			case 33: /* end panel */
 				if(boxcount==1) if(wcount>0) ++count;
 				break;
 			case 3: /* new box */

@@ -691,7 +691,7 @@ int xcrttablecontainer(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widge
 					++col;
 					break;
 				case 24: /* New Popup Menu */
-					crtpopup((Wt::WWidget *)TE,scn,rsrc,widgetcount,&hold,FALSE);
+					crtpopup((Wt::WWidget *)TE,scn,rsrc,widgetcount,&hold,FALSE,wdgt->rtype);
 					TE->addWidget(hold);
 					last=FALSE;
 					if(frame_style!=(-1))
@@ -1086,6 +1086,22 @@ int xcrttablecontainer(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widge
 					prterr("Error WWidget [%d] Type [%d] [%s] on Screen [%s] [%s] is out of sequence.",*widgetcount,wdgt->type,wdgttypes[wdgt->type],rsrc->module,rsrc->screen);
 					hold=NULL;
 					break;
+				case 32: /* New Panel */
+					rowsx=crtpanel((Wt::WWidget *)TE,scn,rsrc,widgetcount,&hold);
+					TE->addWidget((Wt::WWidget *)hold);
+					last=TRUE;
+					if(frame_style!=(-1))
+					{
+						FrameWidget((Wt::WWidget *)hold,frame_style);
+						frame_style=(-1);
+					}
+					if(rowsx>1) rows+=(rowsx-1);
+					++col;
+					break;
+				case 33: /* End Panel */
+					prterr("Error WWidget [%d] Type [%d] [%s] on Screen [%s] [%s] is out of sequence.",*widgetcount,wdgt->type,wdgttypes[wdgt->type],rsrc->module,rsrc->screen);
+					hold=NULL;
+					break;
 				default:
 					prterr("Error WWidget *Type [%d] is invalid for WWidget [%d] on Screen [%s] [%s]",wdgt->type,*widgetcount,scn->module,scn->name);
 					hold=NULL;
@@ -1317,7 +1333,7 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 				case 24: /* New Popup Menu */
 					if(num)
 					{
-						crtpopup((Wt::WWidget *)*line,scn,rsrc,widgetcount,&hold,FALSE);
+						crtpopup((Wt::WWidget *)*line,scn,rsrc,widgetcount,&hold,FALSE,wdgt->rtype);
 						lBox->addWidget((Wt::WWidget *)hold);
 						last=FALSE;
 						if(frame_style!=(-1))
@@ -1560,6 +1576,27 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 						hold=NULL;
 					}
 					break;
+				case 32: /* New Panel */
+					if(num)
+					{
+						rowsx=crtpanel((WWidget *)*line,scn,rsrc,widgetcount,&hold);
+						lBox->addWidget((Wt::WWidget *)hold);
+						last=TRUE;
+						if(frame_style!=(-1))
+						{
+							FrameWidget((Wt::WWidget *)hold,frame_style);
+							frame_style=(-1);
+						}
+						if(rowsx>rows) rows=rowsx;
+					}
+					break;
+				case 33: /* End Panel */
+					if(num)
+					{
+						prterr("Error WWidget [%d] Type [%d] [%s] on Screen [%s] [%s] is out of sequence.",*widgetcount,wdgt->type,wdgttypes[wdgt->type],rsrc->module,rsrc->screen);
+						hold=NULL;
+					}
+					break;
 				default:
 					prterr("Error WWidget *Type [%d] is invalid for WWidget [%d] on Screen [%s] [%s]",wdgt->type,*widgetcount,scn->module,scn->name);
 					hold=NULL;
@@ -1722,7 +1759,7 @@ int xcrttoolbarcontainer(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *wid
 				member->field_type=BUTTONS;
 			} else if(wdgt->type==24) /* Popup */
 			{
-				x=crtpopup((Wt::WPopupMenu *)popMenu,scn,rsrc,widgetcount,&hold,TRUE);
+				x=crtpopup((Wt::WPopupMenu *)popMenu,scn,rsrc,widgetcount,&hold,TRUE,wdgt->rtype);
 				if(x>0) 
 				{
 					++count;
@@ -1738,18 +1775,20 @@ int xcrttoolbarcontainer(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *wid
 	}
 	return(1);
 }
-int xcrtpopup(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt::WWidget **pop,short parent_type,int line,char *file)
+int xcrtpopup(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt::WWidget **pop,short parent_type,int rtype,int line,char *file)
 {
 	Wt::WPopupMenu *pB=NULL,*ppB=NULL;
 	Wt::WPushButton *B=NULL;
+	Wt::WSplitButton *SB=NULL;
+	Wt::WToolBar *tBar=NULL;
 	Wt::WWidget *hold=NULL;
 	Wt::WString *c=NULL;
 	Wt::WMenuItem *Item=NULL;
 	RDAwdgt *wdgt=NULL;
 	RDArmem *member=NULL;
-	char *dashes=NULL;
+	char *dashes=NULL,first_button=TRUE;
 	int count=0,x=0;
-	char *mssc=NULL;
+	char *mssc=NULL,*fssc=NULL;
 	
 #ifdef USE_RDA_DIAGNOSTICS
 	if(diaggui || diaggui_field)
@@ -1771,31 +1810,57 @@ int xcrtpopup(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt
 		ppB=((Wt::WPopupMenu *)parent);		
 		ppB->addMenu(wdgt->label,(Wt::WPopupMenu *)pB);
 	} else {
-		c = new WString(wdgt->label);
-		B = new Wt::WPushButton(*c,(Wt::WContainerWidget *)parent);
-		*pop=(Wt::WWidget *)B;
-		B->setDefault(FALSE);
-		B->setTextFormat(XHTMLText); /* or PlainText */
-		mssc=ModuleScreenStyleClass(rsrc);
-		memset(GUIstemp,0,1024);
-		sprintf(GUIstemp,"OpenRDA %s PushButton",mssc);
-		if(mssc!=NULL) Rfree(mssc);
-		B->addStyleClass(GUIstemp);
-		c->~WString();
+		if(rtype==0)
+		{
+			c = new WString(wdgt->label);
+			B = new Wt::WPushButton(*c,(Wt::WContainerWidget *)parent);
+			*pop=(Wt::WWidget *)B;
+			B->setDefault(FALSE);
+			B->setTextFormat(XHTMLText); /* or PlainText */
+			mssc=ModuleScreenStyleClass(rsrc);
+			memset(GUIstemp,0,1024);
+			sprintf(GUIstemp,"OpenRDA %s PushButton",mssc);
+			if(mssc!=NULL) Rfree(mssc);
+			B->addStyleClass(GUIstemp);
+			c->~WString();
+		} else {
+			c = new WString(wdgt->label);
+			SB = new Wt::WSplitButton(*c,(Wt::WContainerWidget *)parent);
+			*pop=(Wt::WWidget *)SB;
+			mssc=ModuleScreenStyleClass(rsrc);
+			memset(GUIstemp,0,1024);
+			sprintf(GUIstemp,"OpenRDA %s SplitButton",mssc);
+			if(mssc!=NULL) Rfree(mssc);
+			SB->addStyleClass(GUIstemp);
+			c->~WString();
+		}
 		pB = new Wt::WPopupMenu();
 		mssc=ModuleScreenStyleClass(rsrc);
 		memset(GUIstemp,0,1024);
-		sprintf(GUIstemp,"OpenRDA %s PushButton PopupMenu",mssc);
+		if(rtype==0)
+		{
+			sprintf(GUIstemp,"OpenRDA %s PushButton PopupMenu",mssc);
+		} else {
+			sprintf(GUIstemp,"OpenRDA %s SplitButton PopupMenu",mssc);
+		}
 		if(mssc!=NULL) Rfree(mssc);
 		pB->addStyleClass(GUIstemp);
 		pB->setAutoHide(TRUE,1500);
-		B->setMenu(pB);
-		B->setDefault(FALSE);
-#ifdef FLAT_DOCK_BUTTON
-		if(RDAstrstr(rsrc->screen,"DOCK WINDOW"))
+		if(rtype==0)
 		{
-			B->setCheckable(TRUE);
-		} else B->setCheckable(FALSE);
+			B->setMenu(pB);
+			B->setDefault(FALSE);
+		} else {
+			SB->dropDownButton()->setMenu(pB);
+		}
+#ifdef FLAT_DOCK_BUTTON
+		if(rtype==0)
+		{
+			if(RDAstrstr(rsrc->screen,"DOCK WINDOW"))
+			{
+				B->setCheckable(TRUE);
+			} else B->setCheckable(FALSE);
+		}
 #endif /* FLAT_DOCK_BUTTON */
 	}
 	while((*widgetcount+1)<scn->numwdgts)
@@ -1821,6 +1886,40 @@ int xcrtpopup(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt
 			if(wdgt->type==6) /* buttons */
 			{
 				++count;
+				if(first_button)
+				{
+					if(SB!=NULL)
+					{
+						if(member->type==1 || member->type==2)
+						{
+/* runfunctioncallback */
+							SB->actionButton()->clicked().connect(boost::bind(&runfunctioncallback,member));
+						} else if(member->type==3)
+						{
+/* runfuncexitcallback */
+							SB->actionButton()->clicked().connect(boost::bind(&runfuncexitcallback,member));
+						} else if(member->type==4)
+						{
+/* runfunckwincallback */
+							SB->actionButton()->clicked().connect(boost::bind(&runfunckwincallback,member));
+						} else if(member->type==5)
+						{
+/* runfunckwincallback */
+							SB->actionButton()->clicked().connect(boost::bind(&runfunckwincallback,member));
+						}
+						mssc=ModuleScreenStyleClass(rsrc);
+						fssc=InputFieldStyleClass(member);
+						memset(GUIstemp,0,1024);
+						sprintf(GUIstemp,"OpenRDA %s %s SplitButton ActionButton Wt-btn",mssc,fssc);
+						if(fssc!=NULL) Rfree(fssc);
+						SB->actionButton()->addStyleClass(GUIstemp);
+						memset(GUIstemp,0,1024);
+						sprintf(GUIstemp,"OpenRDA %s SplitButton DropDownButton Down-Arrow Wt-btn",mssc);
+						if(mssc!=NULL) Rfree(mssc);
+						SB->dropDownButton()->addStyleClass(GUIstemp);
+					}
+					first_button=FALSE;
+				}
 				if(member->editable_expression!=NULL) Rfree(member->editable_expression);
 				if(!isEMPTY(wdgt->editable_expression)) member->editable_expression=stralloc(wdgt->editable_expression);
 				if(member->sensitive_expression!=NULL) Rfree(member->sensitive_expression);
@@ -1837,7 +1936,7 @@ int xcrtpopup(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt
 				member->field_type=BUTTONS;
 			} else if(wdgt->type==24)
 			{
-				x=crtpopup((Wt::WPopupMenu *)pB,scn,rsrc,widgetcount,&hold,TRUE);
+				x=crtpopup((Wt::WPopupMenu *)pB,scn,rsrc,widgetcount,&hold,TRUE,wdgt->rtype);
 				if(x>0) 
 				{
 					++count;
@@ -2060,7 +2159,7 @@ int xcrtbox(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt::
 					if(USER_INTERFACE || (!USER_INTERFACE 
 						&& fractbase))
 					{
-						crtpopup((Wt::WWidget *)hBox,scn,rsrc,widgetcount,&hold,FALSE);
+						crtpopup((Wt::WWidget *)hBox,scn,rsrc,widgetcount,&hold,FALSE,wdgt->rtype);
 						myGrid->addWidget((Wt::WWidget *)hold,row,col,0);
 						++col;
 						if(Widest!=0)
@@ -2335,6 +2434,29 @@ int xcrtbox(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt::
 					}
 					break;
 				case 13: /* End ScrolledWindow */
+					if(USER_INTERFACE || (!USER_INTERFACE 
+						&& fractbase))
+					{
+						prterr("Error WWidget [%d] Type [%d] [%s] on Screen [%s] [%s] is out of sequence.",*widgetcount,wdgt->type,wdgttypes[wdgt->type],rsrc->module,rsrc->screen);
+						hold=NULL;
+					}
+					break;
+				case 32: /* New Panel */
+					if(USER_INTERFACE || (!USER_INTERFACE 
+						&& fractbase))
+					{
+						rowsx=crtpanel((Wt::WWidget *)hBox,scn,rsrc,widgetcount,&hold);
+						myGrid->addWidget((Wt::WWidget *)hold,row,col,0);
+						++col;
+						if(frame_style!=(-1))
+						{
+							FrameWidget((Wt::WWidget *)hold,frame_style);
+							frame_style=(-1);
+						}
+						if(rowsx>rows) rows=rowsx;
+					}
+					break;
+				case 33: /* End Panel */
 					if(USER_INTERFACE || (!USER_INTERFACE 
 						&& fractbase))
 					{
@@ -2686,6 +2808,314 @@ int xcrttab(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,WWid
 					}
 					rows+=rowsx;
 				}
+			} else if(wdgt->type==32)
+			{
+				rowsx=crtpanel((Wt::WWidget *)TabD,scn,rsrc,widgetcount,&line_widget);
+				if(rowsx>0)
+				{
+#ifdef __NEED_WDIALOG_LAYOUT__
+					if(rsrc->primary==NULL)
+					{
+						TabD->addWidget(line_widget);
+					} else {
+						vb->addWidget((Wt::WWidget *)line_widget,(rowsx>0 ? rowsx-1:0),Wt::AlignLeft | Wt::AlignJustify);
+					}
+#else
+					TabD->addWidget(line_widget);
+#endif /* __NEED_WDIALOG_LAYOUT__ */
+					hold_widget=line_widget;
+					if(frame_style!=(-1))
+					{
+						FrameWidget((Wt::WWidget *)line_widget,frame_style);
+						frame_style=(-1);
+					}
+					rows+=rowsx;
+				}
+			} else {
+				prterr("Error WWidget *Type [%d] is invalid for WWidget [%d] on Screen [%s] [%s]",wdgt->type,*widgetcount,scn->module,scn->name);
+			}
+		}
+	}
+}
+/*---------------------------------------------------------------------------
+	crtpanel - function to create lines inside a window
+---------------------------------------------------------------------------*/
+int xcrtpanel(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
+	int *widgetcount,Wt::WWidget **panel,int line,char *file)
+{
+	Wt::WPanel *myPanel=NULL;
+	Wt::WWidget *line_widget=NULL,*hold_widget=NULL;
+	RDAwdgt *wdgt=NULL;
+	int line_count=0,w=0,h=0;
+	Wt::WScrollArea *SA=NULL;
+	int frame_style=(-1);
+	Wt::WVBoxLayout *vb=NULL;
+	Wt::WHBoxLayout *vb1=NULL;
+	Wt::WLayout *daL=NULL;
+	Wt::WImage *myImage=NULL;
+	Wt::WLink *WK=NULL;
+	Wt::WString *temp_xstr=NULL;
+	Wt::WContainerWidget *Vb=NULL,*VB=NULL;
+	Wt::WLength H,L;
+	char *tmpstr=NULL,*dashes=NULL,*rname=NULL;
+	int rows=0,rowsx=0;
+	Wt::WLength spc,mw,ml;
+	Wt::WText *myText=NULL;
+	char *mssc=NULL;
+
+#ifdef USE_RDA_DIAGNOSTICS
+	if(diaggui || diaggui_field)
+	{
+		prterr("DIAG crtpanel Creating Panel on Screen [%s] [%s] starting with WWidget [%d] at line [%d] program [%s].",scn->module,scn->name,*widgetcount,line,file);
+	}
+#endif /* USE_RDA_DIAGNOSTICS */
+	wdgt=scn->wdgts+(*widgetcount);
+	myPanel = new Wt::WPanel((Wt::WContainerWidget *)parent);
+	temp_xstr = new WString(wdgt->label,UTF8);
+	myPanel->setTitle(*temp_xstr);
+	temp_xstr->~WString();
+	myPanel->setCollapsible(TRUE);
+	if(wdgt->rtype==1) myPanel->setCollapsed(FALSE);
+		else myPanel->setCollapsed(TRUE);
+	mssc=ModuleScreenStyleClass(rsrc);
+	memset(GUIstemp,0,1024);
+	sprintf(GUIstemp,"OpenRDA %s Panel",mssc);
+	if(mssc!=NULL) Rfree(mssc);
+	myPanel->addStyleClass(GUIstemp);
+	*panel=(WWidget *)myPanel;
+
+	Vb=new Wt::WContainerWidget();
+	mssc=ModuleScreenStyleClass(rsrc);
+	memset(GUIstemp,0,1024);
+	sprintf(GUIstemp,"OpenRDA %s Panel InternalContainer",mssc);
+	if(mssc!=NULL) Rfree(mssc);
+	Vb->addStyleClass(GUIstemp);
+	myPanel->setCentralWidget((Wt::WWidget *)Vb);
+	vb=new Wt::WVBoxLayout();
+	Vb->setLayout(vb);
+	daL=(Wt::WLayout *)vb;
+	daL->setContentsMargins(0,0,0,0);
+
+	while((*widgetcount+1)<scn->numwdgts)
+	{
+		++(*widgetcount);
+		wdgt=scn->wdgts+(*widgetcount);
+		if(wdgt->resource_num!=(-1))
+		{
+#ifdef USE_RDA_DIAGNOSTICS
+			if(diaggui || diaggui_field)
+			{
+				prterr("DIAG Creating WWidget [%d] Type [%s] Name [%s] Label [%s] Rows [%d] Cols [%d] Rtype [%d]",
+					*widgetcount,wdgttypes[wdgt->type],
+					(wdgt->resource_name!=NULL ? wdgt->resource_name:""),
+					(wdgt->label!=NULL ? wdgt->label:""),
+					wdgt->rows,wdgt->cols,wdgt->rtype); 
+			}
+#endif /* USE_RDA_DIAGNOSTICS */
+			if(wdgt->type==1) /* LINE */
+			{
+				if(numperline(scn,*widgetcount))
+				{
+					rowsx=crtline((Wt::WWidget *)Vb,scn,rsrc,widgetcount,&line_widget);
+					if(rowsx>0)
+					{
+						vb->addWidget((Wt::WWidget *)line_widget,(rowsx>0 ? rowsx-1:0),Wt::AlignLeft | Wt::AlignJustify);
+						++line_count;
+						hold_widget=line_widget;
+						if(frame_style!=(-1))
+						{
+							FrameWidget((Wt::WWidget *)line_widget,frame_style);
+							frame_style=(-1);
+						}
+						rows+=rowsx;
+					}
+				}
+			} else if(wdgt->type==5) /* LABEL */
+			{
+				if(!USER_INTERFACE)
+				{
+					if(wdgt->label!=NULL)
+					{
+						tmpstr=stralloc(wdgt->label);
+					} else {
+						tmpstr=stralloc(" ");
+					}
+					dashes=adddashes(wdgt->label);
+					temp_xstr = new WString(wdgt->label,UTF8);
+					if(wdgt->rtype==0)
+					{
+						myText = new Wt::WText(wdgt->label);
+						h=getLeadingSpaces(wdgt->label);
+						line_widget = (Wt::WWidget *)myText;
+						if(h>0)
+						{
+							spc=Wt::WLength(h,Wt::WLength::FontEm);
+							myText->setPadding(spc,Left);
+						}
+						mssc=ModuleScreenStyleClass(rsrc);
+						memset(GUIstemp,0,1024);
+						sprintf(GUIstemp,"OpenRDA %s Label",mssc);
+						if(mssc!=NULL) Rfree(mssc);
+						line_widget->addStyleClass(GUIstemp);
+					} else if(wdgt->rtype==1)
+					{
+						WK = new WLink(wdgt->pixmap);
+						myImage  = new  Wt::WImage(*WK,(Wt::WContainerWidget *)Vb);
+						line_widget = (WWidget *)myImage;
+						myImage->setAlternateText(*temp_xstr);
+						mssc=ModuleScreenStyleClass(rsrc);
+						memset(GUIstemp,0,1024);
+						sprintf(GUIstemp,"OpenRDA %s Image",mssc);
+						if(mssc!=NULL) Rfree(mssc);
+						line_widget->addStyleClass(GUIstemp);
+					} else if(wdgt->rtype==2)
+					{
+						rname=Rmalloc(512);
+#ifndef RDA_64BITS
+						sprintf(rname,"resources/OpenRDA/rda.png");
+#else
+						sprintf(rname,"resources/OpenRDA/rda64.png");
+#endif
+						WK = new WLink(rname);
+						myImage  = new  Wt::WImage(*WK,(Wt::WContainerWidget *)Vb);
+						line_widget = (WWidget *)myImage;
+						myImage->setAlternateText(*temp_xstr);
+						if(rname!=NULL) Rfree(rname);
+						mssc=ModuleScreenStyleClass(rsrc);
+						memset(GUIstemp,0,1024);
+						sprintf(GUIstemp,"OpenRDA %s Image",mssc);
+						if(mssc!=NULL) Rfree(mssc);
+						line_widget->addStyleClass(GUIstemp);
+					} else if(wdgt->rtype==3)
+					{
+						rname=Rmalloc(512);
+						sprintf(rname,"resources/OpenRDA/tuxcloud.png");
+						WK = new WLink(rname);
+						myImage  = new  Wt::WImage(*WK,(Wt::WContainerWidget *)Vb);
+						line_widget = (WWidget *)myImage;
+						myImage->setAlternateText(*temp_xstr);
+						if(rname!=NULL) Rfree(rname);
+						mssc=ModuleScreenStyleClass(rsrc);
+						memset(GUIstemp,0,1024);
+						sprintf(GUIstemp,"OpenRDA %s Image",mssc);
+						if(mssc!=NULL) Rfree(mssc);
+						line_widget->addStyleClass(GUIstemp);
+					} else if(wdgt->rtype==4)
+					{
+						myText = new Wt::WText(wdgt->XHTML_Label);
+						line_widget = (Wt::WWidget *)myText;
+						mssc=ModuleScreenStyleClass(rsrc);
+						memset(GUIstemp,0,1024);
+						sprintf(GUIstemp,"OpenRDA %s Label",mssc);
+						if(mssc!=NULL) Rfree(mssc);
+						line_widget->addStyleClass(GUIstemp);
+					}
+#ifdef USE_RDA_DIAGNOSTICS
+					if(diagcss)
+					{
+						if(cssNames!=NULL)
+						{
+							fprintf(cssNames,"\"%s\",\"%s\"\r\n","",line_widget->styleClass().toUTF8().c_str());
+						}
+					}
+#endif /* USE_RDA_DIAGNOSTICS */
+					vb->addWidget((Wt::WWidget *)line_widget,0,Wt::AlignLeft | Wt::AlignJustify);
+					if(frame_style!=(-1))
+					{
+						FrameWidget((Wt::WWidget *)line_widget,frame_style);
+						frame_style=(-1);
+					}
+					if(dashes!=NULL) Rfree(dashes);
+					temp_xstr->~WString();
+					if(tmpstr!=NULL) Rfree(tmpstr);
+					tmpstr=NULL;
+					++rows;
+				}
+			} else if(wdgt->type==10) /* FRAME */
+			{
+				if(!USER_INTERFACE)
+				{
+					frame_style=wdgt->rtype;
+				}
+				++line_count;
+			} else if(wdgt->type==28) /* Table Container */
+			{
+				rowsx=crttablecontainer((Wt::WWidget *)Vb,scn,rsrc,widgetcount,&line_widget,wdgt->rtype);
+				if(rowsx>0)
+				{
+					vb->addWidget((Wt::WWidget *)line_widget,(rowsx>0 ? rowsx-1:0),Wt::AlignLeft | Wt::AlignJustify);
+					++line_count;
+					hold_widget=line_widget;
+					if(frame_style!=(-1))
+					{
+						FrameWidget((Wt::WWidget *)line_widget,frame_style);
+						frame_style=(-1);
+					}
+					rows+=rowsx;
+				}
+			} else if(wdgt->type==23) /* NEW TAB BAR */
+			{
+				rowsx=crttab((Wt::WWidget *)Vb,scn,rsrc,widgetcount,&line_widget);
+				if(rowsx>0)
+				{
+					vb->addWidget((Wt::WWidget *)line_widget,(rowsx>0 ? rowsx-1:0),Wt::AlignLeft | Wt::AlignJustify);
+					++line_count;
+					hold_widget=line_widget;
+					if(frame_style!=(-1))
+					{
+						FrameWidget((Wt::WWidget *)line_widget,frame_style);
+						frame_style=(-1);
+					}
+					rows+=rowsx;
+				}
+			} else if(wdgt->type==3) /* START BOX */
+			{
+				rowsx=crtbox((Wt::WWidget *)Vb,scn,rsrc,widgetcount,&line_widget);
+				if(rowsx>0)
+				{
+					vb->addWidget((Wt::WWidget *)line_widget,(rowsx>0 ? rowsx-1:0),Wt::AlignLeft | Wt::AlignJustify);
+					++line_count;
+					hold_widget=line_widget;
+					if(frame_style!=(-1))
+					{
+						FrameWidget((Wt::WWidget *)line_widget,frame_style);
+						frame_style=(-1);
+					}
+					rows+=rowsx;
+				}
+			} else if(wdgt->type==12)
+			{
+				rowsx=crtscrollwindow((Wt::WWidget *)Vb,scn,rsrc,widgetcount,&line_widget);
+				if(rowsx>0)
+				{
+					vb->addWidget((Wt::WWidget *)line_widget,(rowsx>0 ? rowsx-1:0),Wt::AlignLeft | Wt::AlignJustify);
+					++line_count;
+					hold_widget=line_widget;
+					if(frame_style!=(-1))
+					{
+						FrameWidget((Wt::WWidget *)line_widget,frame_style);
+						frame_style=(-1);
+					}
+					rows+=rowsx;
+				}
+			} else if(wdgt->type==32)
+			{
+				rowsx=crtpanel((Wt::WWidget *)Vb,scn,rsrc,widgetcount,&line_widget);
+				if(rowsx>0)
+				{
+					vb->addWidget((Wt::WWidget *)line_widget,(rowsx>0 ? rowsx-1:0),Wt::AlignLeft | Wt::AlignJustify);
+					++line_count;
+					hold_widget=line_widget;
+					if(frame_style!=(-1))
+					{
+						FrameWidget((Wt::WWidget *)line_widget,frame_style);
+						frame_style=(-1);
+					}
+					rows+=rowsx;
+				}
+			} else if(wdgt->type==33) /* END PANEL */
+			{
+				return(rows);
 			} else {
 				prterr("Error WWidget *Type [%d] is invalid for WWidget [%d] on Screen [%s] [%s]",wdgt->type,*widgetcount,scn->module,scn->name);
 			}
@@ -2726,10 +3156,6 @@ int xcrtscrollwindow(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 	sprintf(GUIstemp,"OpenRDA %s ScrolledWindow ExternalContainer",mssc);
 	if(mssc!=NULL) Rfree(mssc);
 	VB->addStyleClass(GUIstemp);
-/*
-	VB->setOverflow(WContainerWidget::OverflowVisible,Vertical);	
-	VB->setOverflow(WContainerWidget::OverflowVisible,Horizontal);	
-*/
 	wdgt=scn->wdgts+(*widgetcount);
 	if(wdgt->cols!=0 && wdgt->rows!=0)
 	{
@@ -2971,7 +3397,22 @@ int xcrtscrollwindow(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 				}
 			} else if(wdgt->type==13) /* END SCROLLED WINDOW */
 			{
-				break;
+				return(rows);
+			} else if(wdgt->type==32)
+			{
+				rowsx=crtpanel((Wt::WWidget *)Vb,scn,rsrc,widgetcount,&line_widget);
+				if(rowsx>0)
+				{
+					vb->addWidget((Wt::WWidget *)line_widget,(rowsx>0 ? rowsx-1:0),Wt::AlignLeft | Wt::AlignJustify);
+					++line_count;
+					hold_widget=line_widget;
+					if(frame_style!=(-1))
+					{
+						FrameWidget((Wt::WWidget *)line_widget,frame_style);
+						frame_style=(-1);
+					}
+					rows+=rowsx;
+				}
 			} else {
 				prterr("Error WWidget *Type [%d] is invalid for WWidget [%d] on Screen [%s] [%s]",wdgt->type,*widgetcount,scn->module,scn->name);
 			}
@@ -3473,21 +3914,43 @@ void crtwdgts(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsc,char *label)
 				if(rowz>0)
 				{
 #ifdef __NEED_WDIALOG_LAYOUT__
-				if(rsc->primary==NULL)
-				{
-					CW->addWidget(line_widget);
-				} else {
-					vb->addWidget((Wt::WWidget *)line_widget,(rowz>0 ? rowz-1:0),Wt::AlignLeft | Wt::AlignJustify);
-				}
+					if(rsc->primary==NULL)
+					{
+						CW->addWidget(line_widget);
+					} else {
+						vb->addWidget((Wt::WWidget *)line_widget,(rowz>0 ? rowz-1:0),Wt::AlignLeft | Wt::AlignJustify);
+					}
 #else 
-				CW->addWidget(line_widget);
+					CW->addWidget(line_widget);
 #endif /* __NEED_WDIALOG_LAYOUT__ */
-				++line_count;
-				if(frame_style!=(-1))
-				{
-					FrameWidget((Wt::WWidget *)line_widget,frame_style);
-					frame_style=(-1);
+					++line_count;
+					if(frame_style!=(-1))
+					{
+						FrameWidget((Wt::WWidget *)line_widget,frame_style);
+						frame_style=(-1);
+					}
 				}
+			} else if(wdgt->type==32) /* NEW PANEL */
+			{
+				rowz=crtpanel((Wt::WWidget *)CW,scn,rsc,&widgetcount,&line_widget);
+				if(rowz>0)
+				{
+#ifdef __NEED_WDIALOG_LAYOUT__
+					if(rsc->primary==NULL)
+					{
+						CW->addWidget(line_widget);
+					} else {
+						vb->addWidget((Wt::WWidget *)line_widget,(rowz>0 ? rowz-1:0),Wt::AlignLeft | Wt::AlignJustify);
+					}
+#else 
+					CW->addWidget(line_widget);
+#endif /* __NEED_WDIALOG_LAYOUT__ */
+					++line_count;
+					if(frame_style!=(-1))
+					{
+						FrameWidget((Wt::WWidget *)line_widget,frame_style);
+						frame_style=(-1);
+					}
 				}
 			} else { /* ERROR */
 				prterr("Error WWidget [%d] Type [%d] [%s] on Screen [%s] [%s] is out of sequence.",widgetcount,wdgt->type,wdgttypes[wdgt->type],rsc->module,rsc->screen);

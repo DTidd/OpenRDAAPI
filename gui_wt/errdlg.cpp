@@ -14,7 +14,6 @@ void exitdlg(RDArsrc *parent,ErrorDialogArg *e)
 	if(e->function!=NULL) e->function();
 /*lint +e746 */
 	Rfree(e);
-	std::exit;
 }
 void xERRORDIALOG(char *name,char *description,void (*function)(...),char exit_req,int line,char *file)
 {

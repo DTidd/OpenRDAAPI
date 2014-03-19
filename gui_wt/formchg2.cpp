@@ -222,7 +222,8 @@ Wt::WFileUpload *CreateFileUpload(RDArmem *member,Wt::WContainerWidget *c)
 	}
 
 	fu->changed().connect(std::bind([=] () { 
-		if(fu->canUpload())
+		text=fu->clientFileName();
+		if(fu->canUpload() && access(text.toUTF8().c_str(),R_OK))
 		{
 			fu->upload(); 
 			text=fu->clientFileName();
