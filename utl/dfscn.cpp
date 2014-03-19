@@ -1090,6 +1090,7 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 		case 27: /* End Toolbar Menu */
 		case 29: /* End Table */
 		case 31: /* End Header */
+		case 33: /* End Panel */
 			addAPPlib(rsrclist,"Not Applicable");
 			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET NAME",FALSE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET NAMES",FALSE);
@@ -1105,6 +1106,7 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			break;
 		case 20: /* New Tab Container */
 		case 5: /* label */
+		case 32: /* Panel */
 			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET NAME",FALSE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET NAMES",FALSE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET LABEL",TRUE);
@@ -1118,16 +1120,45 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"NUMBER ROWS",FALSE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"NUMBER COLUMNS",FALSE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"RESOURCE TYPES",TRUE);
-			addAPPlib(rsrclist,"Text Label");
-			addAPPlib(rsrclist,"Pixmap Label");
-			addAPPlib(rsrclist,"RDA Logo");
-			addAPPlib(rsrclist,"TuxCloud");
-			addAPPlib(rsrclist,"XHTML");
+			if(selected==20)
+			{ 
+				addAPPlib(rsrclist,"Text Label");
+			} else if(selected==5)
+			{
+				addAPPlib(rsrclist,"Text Label");
+				addAPPlib(rsrclist,"Pixmap Label");
+				addAPPlib(rsrclist,"RDA Logo");
+				addAPPlib(rsrclist,"TuxCloud");
+				addAPPlib(rsrclist,"XHTML");
+			} else if(selected==32)
+			{
+				addAPPlib(rsrclist,"Collapsed");
+				addAPPlib(rsrclist,"Expanded");
+			}
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",FALSE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",FALSE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"TRANSVERSAL EXPRESSION",FALSE);
 			break;
 		case 24: /* New Popup Menu */
+			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET NAME",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET NAMES",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET LABEL",TRUE);
+			if(selectedr==0)
+			{
+				FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET PIXMAP",FALSE);
+			} else {
+				FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET PIXMAP",TRUE);
+			}
+			FINDRSCSETSENSITIVE(edit_rsrc,"XHTML LABEL",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"NUMBER ROWS",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"NUMBER COLUMNS",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"RESOURCE TYPES",TRUE);
+			addAPPlib(rsrclist,"Normal Popup");
+			addAPPlib(rsrclist,"SplitButton");
+			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"TRANSVERSAL EXPRESSION",TRUE);
+			break;
 		case 26: /* New Toolbar Menu */
 			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET NAME",FALSE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET NAMES",FALSE);
@@ -1141,7 +1172,7 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"XHTML LABEL",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"NUMBER ROWS",FALSE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"NUMBER COLUMNS",FALSE);
-			FINDRSCSETSENSITIVE(edit_rsrc,"RESOURCE TYPES",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"RESOURCE TYPES",FALSE);
 			addAPPlib(rsrclist,"Not Applicable");
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",TRUE);
@@ -1407,6 +1438,8 @@ static void changersctype(RDArsrc *edit_rsrc)
 		case 29: /* End Table */
 		case 30: /* New Header */
 		case 31: /* End Header */
+		case 32: /* New Panel */
+		case 33: /* End Panel */
 			break;
 		case 5: /* label */
 			if(selectedr==0)
@@ -1505,6 +1538,7 @@ static void makewlist(char ***wlist)
 			case 27: /* End Toolbar */
 			case 29: /* End Table */
 			case 31: /* End Header */
+			case 33: /* End Header */
 				length=RDAstrlen(wdgttypes[w->type])+24+8;
 				if(*(wlist[0]+x)!=NULL)
 				{
@@ -1522,6 +1556,7 @@ static void makewlist(char ***wlist)
 			case 26: /* New Toolbar Menu */
 			case 28: /* New Table */
 			case 30: /* New Header */
+			case 32: /* New Panel */
 				length=RDAstrlen(wdgttypes[w->type])+RDAstrlen(w->label)+34+8;
 				if(*(wlist[0]+x)!=NULL)
 				{
@@ -1591,7 +1626,6 @@ static void doexit(RDArsrc *mainrsrc)
 	if(screen!=NULL) { free_scrn(screen); screen=NULL; }
 	if(HoldRsrc!=NULL) FreeHoldRDArsrc(HoldRsrc);
 	ShutdownSubsystems();
-	std::exit;
 }
 static void doexit1(RDArsrc *rsrc,RDArsrc *edit_rsrc)
 {	
@@ -1821,7 +1855,8 @@ static void save_widget(RDArsrc *edit_rsrc,RDArsrc *rsrc)
 		wdgt->type==8 || wdgt->type==9 || wdgt->type==14 || 
 		wdgt->type==15 || wdgt->type==16 || wdgt->type==17 || 
 		wdgt->type==18 || wdgt->type==19 || wdgt->type==20 || wdgt->type==22 || 
-		wdgt->type==23 || wdgt->type==24 || wdgt->type==26 || wdgt->type==28 || wdgt->type==30)
+		wdgt->type==23 || wdgt->type==24 || wdgt->type==26 || wdgt->type==28 || 
+		wdgt->type==30 || wdgt->type==32)
 	{
 		FINDRSCGETSTRING(edit_rsrc,"WIDGET LABEL",&wdgt->label);
 	} else {
@@ -1835,7 +1870,7 @@ static void save_widget(RDArsrc *edit_rsrc,RDArsrc *rsrc)
 		if(wdgt->pixmap!=NULL) Rfree(wdgt->pixmap);
 		wdgt->pixmap=NULL;
 	}
-	if(wdgt->type==9 || wdgt->type==5 || wdgt->type==6 || wdgt->type==14 || wdgt->type==20 || wdgt->type==24 || wdgt->type==26 || wdgt->type==28)
+	if(wdgt->type==5)
 	{
 		FINDRSCGETSTRING(edit_rsrc,"XHTML LABEL",&wdgt->XHTML_Label);
 	} else {
@@ -1855,7 +1890,9 @@ static void save_widget(RDArsrc *edit_rsrc,RDArsrc *rsrc)
 	if(wdgt->type==6 || wdgt->type==8 || wdgt->type==10 || 
 		wdgt->type==11 || wdgt->type==14 || wdgt->type==15 || 
 		wdgt->type==9 || wdgt->type==5 || wdgt->type==16 || 
-		wdgt->type==17 || wdgt->type==18 || wdgt->type==19 || wdgt->type==0 || wdgt->type==22 || wdgt->type==23 || wdgt->type==28)
+		wdgt->type==17 || wdgt->type==18 || wdgt->type==19 || 
+		wdgt->type==0 || wdgt->type==22 || wdgt->type==23 || 
+		wdgt->type==24 || wdgt->type==28 || wdgt->type==32)
 	{
 		FINDRSCGETINT(edit_rsrc,"RESOURCE TYPES",&wdgt->rtype);
 	} else wdgt->rtype=0;
