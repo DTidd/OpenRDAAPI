@@ -30,7 +30,7 @@ extern char SIMPLE_SCREENS,SKIP_DOMENU_TRANSVERSAL,CENTER_WINDOWS;
 extern Wt::WApplication *RDAMAINWIDGET;
 extern std::string RDA_Session;
 extern char *membertypes[5];
-extern char *wdgttypes[32];
+extern char *wdgttypes[34];
 extern char *standardfieldtypes[29];
 extern char *accttypes[5];
 extern int WindowCount;
