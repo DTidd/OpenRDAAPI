@@ -296,7 +296,6 @@ static void doexit_forced(MTNPassableStruct *PSTRUCT)
 				sprintf(stemp,"%d.csv",RGETPID());
 				unlink(stemp);
 				ShutdownSubsystems();
-				std::exit;
 			} else {
 				return;
 			}
@@ -332,7 +331,6 @@ static void doexit(MTNPassableStruct *PSTRUCT,int ab)
 				if(level==0)
 				{
 					ShutdownSubsystems();
-					std::exit;
 				}
 			} else {
 				if(MTNMASTER->mbl_utlmstr!=NULL) MTNMASTER->mbl_utlmstr=NULL;
@@ -580,7 +578,11 @@ void xPowerExecuteListFunc(RDArsrc *mainrsrc,int listnum,void *targetkey,
 							}
 							if(!RDAstrcmp(button->progname,"RUNREPORT") || !RDAstrcmp(button->progname,"runreport"))
 							{
+
+/* This removes the environment variables before they can be read when there is a range screen
+*/
 								blank_envpx1=TRUE;
+
 								if(envpx!=NULL)
 								{
 									for(x=0;x<envpx->numlibs;++x)
@@ -715,6 +717,9 @@ void PowerExecuteBrowseButtonFunc(RDArsrc *brsrc,MaintainButton *button,void *ta
 							}
 							if(!RDAstrcmp(button->progname,"RUNREPORT") || !RDAstrcmp(button->progname,"runreport"))
 							{
+
+/* This removes the environment variables before they can be read when there is a range screen
+*/
 								blank_envpx1=TRUE;
 								if(envpx!=NULL)
 								{
@@ -888,6 +893,9 @@ void PostSaveButtonFunction(RDArsrc *mainrsrc,MaintainButton *button)
 					}
 					if(!RDAstrcmp(button->progname,"RUNREPORT") || !RDAstrcmp(button->progname,"runreport"))
 					{
+
+/* This removes the environment variables before they can be read when there is a range screen
+*/
 						blank_envpx1=TRUE;
 						if(envpx!=NULL)
 						{
@@ -1077,6 +1085,9 @@ void PowerMasterButtonFunction(RDArsrc *mainrsrc,MaintainButton *button)
 					}
 					if(!RDAstrcmp(button->progname,"RUNREPORT") || !RDAstrcmp(button->progname,"runreport"))
 					{
+
+/* This removes the environment variables before they can be read when there is a range screen
+*/
 						blank_envpx1=TRUE;
 						if(envpx!=NULL)
 						{
@@ -1937,7 +1948,6 @@ static void quit_record_2(RDArsrc *mtnrsrc,MTNPassableStruct *PSTRUCT)
 				if(level==0)
 				{
 					ShutdownSubsystems();
-					std::exit;
 				} else {
 					return;
 				}
@@ -1993,7 +2003,6 @@ static void quit_record(RDArsrc *mtnrsrc,MTNPassableStruct *PSTRUCT)
 				if(level==0)
 				{
 					ShutdownSubsystems();
-					std::exit;
 				} else {
 					return;
 				}

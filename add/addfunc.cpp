@@ -3268,7 +3268,11 @@ void PowerAddButtonFunction(RDArsrc *mainrsrc,MaintainButton *button)
 		}
 		if(!RDAstrcmp(button->progname,"RUNREPORT") || !RDAstrcmp(button->progname,"runreport"))
 		{
+
+/* This removes environment before it can be read when there is a range screen 
+
 			blank_envpx1=TRUE;
+*/
 			if(envpx!=NULL)
 			{
 				for(x=0;x<envpx->numlibs;++x)
