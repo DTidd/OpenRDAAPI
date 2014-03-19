@@ -253,12 +253,13 @@ void RDAreportSetFunc(HoldReport *h)
 
 static void shutdown_report(RDArsrc *rsrc)
 {
-
 	ShutdownSubsystems();
 }
 void xexit_cleanly(RDArunrpt *runrpt,RDAreport *rpt,short exit_report,char *err_header,char *err_message,short remove_sort,char error_type,int line,char *file)
 {
 	char *temp=NULL;
+	RDAvirtual *v;
+	int x=0;
 
 #ifdef USE_RDA_DIAGNOSTICS
 	if(diagrptgen)
@@ -279,6 +280,28 @@ void xexit_cleanly(RDArunrpt *runrpt,RDAreport *rpt,short exit_report,char *err_
 #endif
 		deletelibbin(temp,runrpt->sortfile);
 		if(temp!=NULL) Rfree(temp);
+	}
+/* 
+	DCT:  03/17/2014 
+	
+	Find a way to remove the environment variables read by virtual fields
+	appropriately within this function. 
+*/
+	if(rpt!=NULL)
+	{
+		if(rpt->virflds!=NULL)
+		{
+			for(x=0,v=rpt->virflds;x<rpt->numvirtuals;++x,++v)
+			{
+				if(v->range==3) break;
+			}
+			if(x<rpt->numvirtuals)
+			{
+				temp=adddashes(v->name);
+				RDA_UnSetEnv(temp);
+				if(temp!=NULL) Rfree(temp);
+			}
+		}
 	}
 	if(!isEMPTY(err_header))
 	{
@@ -1001,6 +1024,10 @@ void xRUNREPORT(char *module,char *name,char *server_name,char *sortfile,short A
 	}
 #endif /* ifdef USE_RDA_DIAGNOSTICS */
 #endif /* XXXX */
+
+/*
+	fprintf(RDA_STDERR,"APPmainLoop [%d] exitstatus [%d] ",APPmainLoop,exitstatus);TRACE;
+*/
 	x=0;
 	ArchiveSource=4;
 	ArchiveExtension=0;
@@ -1294,6 +1321,9 @@ void quitreport(RDArsrc *parent,HoldReport *h)
 	RDArunrpt *runrpt=NULL;
 	RDAreport *rpt=NULL;
 
+/*
+	fprintf(RDA_STDERR,"quitreport ");TRACE;
+*/
 	if(h!=NULL)
 	{
 		runrpt=h->rrpt;
@@ -2862,6 +2892,7 @@ void xReportBackEnd(RDArunrpt *runrpt,RDAreport *rpt,int line,char *file)
 	int pdfpagetype=1;
 	int ret_int=0;
 
+	diagrptgen=TRUE;
 	CLSReportfiles(runrpt,FALSE);
 #ifdef USE_RDA_DIAGNOSTICS
 	if(diagrptgen_outall)
