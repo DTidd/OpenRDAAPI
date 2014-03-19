@@ -47,12 +47,12 @@ void DB_MENUITEM()
 		addDBfield(sort,"STYLE",7,2);
 		addDBfield(sort,"Z ITEM NUMBER",8,8);
 		addDBfield(sort,"Z PARENT",8,8);
-		addDBfield(sort,"ENVIRONMENT VALUE 1",14,3000);
-		addDBfield(sort,"ENVIRONMENT VALUE 2",14,3000);
-		addDBfield(sort,"ENVIRONMENT VALUE 3",14,3000);
-		addDBfield(sort,"ENVIRONMENT VALUE 4",14,3000);
-		addDBfield(sort,"ENVIRONMENT VALUE 5",14,3000);
-		addDBfield(sort,"VISIBLE EXPRESSION",14,3000);
+		addDBfield(sort,"ENVIRONMENT VALUE 1",14,2000);
+		addDBfield(sort,"ENVIRONMENT VALUE 2",14,2000);
+		addDBfield(sort,"ENVIRONMENT VALUE 3",14,2000);
+		addDBfield(sort,"ENVIRONMENT VALUE 4",14,2000);
+		addDBfield(sort,"ENVIRONMENT VALUE 5",14,2000);
+		addDBfield(sort,"VISIBLE EXPRESSION",14,2000);
 		addDBfield(sort,"RESTRICTED PROCESS",10,1);
 		addDBkey(sort,"MENUITEM KEY 1");
 		addDBkeypart(sort,1,"MODULE NAME");

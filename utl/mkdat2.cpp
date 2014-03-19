@@ -106,8 +106,8 @@ void DB_DATTRN()
 		addDBfield(sort,"CHANGED MODULE",1,15);
 		addDBfield(sort,"DELETEFLAG",10,1);
 		addDBfield(sort,"NO PREVIOUS VALUE",10,1);
-		addDBfield(sort,"PREVIOUS VALUE",14,5000);
-		addDBfield(sort,"NEW VALUE",14,5000);
+		addDBfield(sort,"PREVIOUS VALUE",14,2000);
+		addDBfield(sort,"NEW VALUE",14,2000);
 		addDBkey(sort,"DATTRN KEY 1");
 		addDBkeypart(sort,1,"MODULE");
 		addDBkeypart(sort,1,"USER IDENTIFICATION");
