@@ -1586,7 +1586,6 @@ static void quit(RDArsrc *mainrsrc)
 	if(archwork!=(-1)) CLSNRD(archwork);
 	if(archsub!=(-1)) CLSNRD(archsub);
 	ShutdownSubsystems();
-	std::exit;
 }
 static void quitcheck(RDArsrc *mainrsrc)
 {

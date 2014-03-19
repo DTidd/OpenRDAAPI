@@ -16,7 +16,6 @@ static void quit_change(RDArsrc *r)
 {
 	if(r!=NULL) free_rsrc(r);
 	doexit();
-	std::exit;
 }
 static void set_simplefrom(RDArsrc *rsrc)
 {

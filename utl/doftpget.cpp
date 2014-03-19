@@ -173,7 +173,6 @@ static void quitfunc(RDArsrc *r)
 #endif
 	}
 #endif /* WIN32 */
-	std::exit;
 }
 int packlist(void *buffer,size_t size,size_t nmemb,void *stream)
 {

@@ -97,8 +97,8 @@ static void quit_avery(RDArsrc *m)
 	{
 		killwindow(m);
 		free_rsrc(m);
-		std::exit;
 	}
+	ShutdownSubsystems();
 }
 #ifdef CPPMAIN
 int c_main(int argc,char **argv)

@@ -34,7 +34,6 @@ static void doexit(RDArsrc *r)
 	if(suffix1!=NULL) Rfree(suffix1);
 	if(suffix2!=NULL) Rfree(suffix2);
 	ShutdownSubsystems();
-	std::exit;
 }
 static void okfunction(RDArsrc *r)
 {

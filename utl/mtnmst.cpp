@@ -27,13 +27,18 @@ int main(int argc,char **argv)
 #endif
 {
 	char temp[512];
-	if(argc<3) std::exit;
 	if(!RDAstrcmp(argv[1],"-s") || !RDAstrcmp(argv[1],"-S"))
 	{
 		SIMPLE_SCREENS=TRUE;
 		if(InitializeSubsystems(argc,argv,argv[2],argv[3]))
 		{
-			return;
+			ShutdownSubsystems();
+			return(1);
+		}
+		if(argc<3) 
+		{
+			ShutdownSubsystems();
+			return(1);
 		}
 		if(!RDAstrcmp(argv[2],"ARCHIVE") && (!RDAstrcmp(argv[3],"MTN ARCHIVES") || !RDAstrcmp(argv[3],"MTN ARCHIVES.SEARCH") || !RDAstrcmp(argv[3],"MTN ARCHIVES.BROWSE")) && argc>4) 
 		{

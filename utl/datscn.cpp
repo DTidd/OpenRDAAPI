@@ -306,7 +306,6 @@ int main(int argc,char **argv)
 	{
 		make_screens(argc,argv);
 		ShutdownSubsystems();
-		std::exit;
 	} else {
 		mainrsrc=RDArsrcNEW(module,"MAKE DATABASE SCREENS");
 		scnlist=makescnlist();

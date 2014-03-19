@@ -2678,11 +2678,12 @@ int main(int argc,char **argv)
 		if(module!=NULL) Rfree(module);
 		quitvirt(mainrsrc);
 		ShutdownSubsystems();
-		std::exit;
+		return(0);
 	} else {
 		if(InitializeSubsystems(argc,argv,modulename,"MAKE VIRTUAL FIELDS")) 
 		{
-			return;
+			ShutdownSubsystems();
+			return(1);
 		}
 		finsetup=RDAfinmgtNEW();
 		if(GetFinmgtSetup(finsetup,NULL,NULL)==(-1)) return;

@@ -900,7 +900,6 @@ void quitdfacct(RDArsrc *mainrsrc)
 	if(holdacct!=NULL) FreeRDAacctmstr(holdacct);
 	if(maindefaults!=NULL) FreeRDAdefault(maindefaults);
 	ShutdownSubsystems();
-	std::exit;
 }
 void savedfacct(RDArsrc *mainrsrc)
 {

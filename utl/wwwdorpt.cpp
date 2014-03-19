@@ -89,8 +89,6 @@ int c_main(int argc,char **argv)
 int main(int argc,char **argv)
 #endif
 {
-	if(argc==3)
-	{
 		RDA_NOGUI=TRUE;
 #ifdef LINUX 
 		umask(002);
@@ -102,13 +100,16 @@ int main(int argc,char **argv)
 		if(WWWInitializeSubsystems(argc,argv,argv[1],argv[2])) 
 		{
 			ShutdownSubsystems();
-                        exit(1);
+			return(1);
+		}
+		if(argc==3)
+		{
+			ShutdownSubsystems();
+			return(1);
 		}
 		RDA_NOGUI=TRUE;
 		RUNREPORTADV3(argv[1],argv[2],NULL,NULL,FALSE,TRUE,NULL,NULL,NULL,NULL,0,(void (*)(...))WWWprocess_dataline);
 		ShutdownSubsystems();
-		std::exit;
-	} else {
-		exit(1);
+		return(0);
 	}
 }

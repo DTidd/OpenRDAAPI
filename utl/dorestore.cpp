@@ -25,7 +25,6 @@ static void quitfunc(RDArsrc *r)
 	if(r!=NULL) free_rsrc(r);
 	if(drvspc!=NULL) Rfree(drvspc);
 	ShutdownSubsystems();
-	std::exit;
 }
 static void dorestore(RDArsrc *r)
 {

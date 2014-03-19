@@ -44,7 +44,6 @@ static void doexit(RDArsrc *mainrsrc)
 	if(screen!=NULL) { free_scrn(screen); screen=NULL; }
 	if(libx!=NULL) Rfree(libx);
 	ShutdownSubsystems();
-	std::exit;
 }
 static void doliblist(RDArsrc *mainrsrc)
 {

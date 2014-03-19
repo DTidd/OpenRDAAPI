@@ -50,7 +50,6 @@ static void quitfunc(RDArsrc *r)
 	if(mod_from!=NULL) Rfree(mod_from);
 	if(mod_to!=NULL) Rfree(mod_to);
 	ShutdownSubsystems();
-	std::exit;
 }
 static void dat2conv(char *modx,char *filx)
 {

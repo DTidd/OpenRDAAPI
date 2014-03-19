@@ -1900,6 +1900,7 @@ int main(int argc,char **argv)
 	char *tempstr;
 	char inputarray[65535];
 	RDA_PS_VARS *myvars=NULL;
+	char cwd[256];
 
 #ifdef WIN32
 	BOOL fConnected;
@@ -2010,6 +2011,13 @@ int main(int argc,char **argv)
 			}
 			*/
 	
+	tempstr=getenv("RDA_DATA_DIR");
+	if(tempstr!=NULL)
+	{
+		chdir(tempstr);	
+		tempstr==NULL;
+	}
+
 	ParseCmdLine(argc,argv,myvars);
 	
 #ifdef CAPTURE_INPUT

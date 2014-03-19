@@ -147,7 +147,6 @@ void quitprt(RDArsrc *mainrsrc)
 	}
 	if(printers!=NULL) freeapplib(printers);
 	ShutdownSubsystems();
-	std::exit;
 }
 static void getprinters(RDArsrc *mainrsrc)
 {

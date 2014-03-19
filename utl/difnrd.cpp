@@ -2062,7 +2062,7 @@ int main(int argc,char **argv)
 				prterr("Error - Cannot Read Binary for Module [%s], File [%s].",argv[1],argv[2]);
 			}
 			doexitsub();
-			std::exit;
+			return;
 		}
 	}
 	mainrsrc=RDArsrcNEW("DATABASE","DEFINE FILES");

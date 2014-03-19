@@ -28,7 +28,6 @@ void quitconv(RDArsrc *mainrsrc)
 	if(chgfilenum!=(-1)) CLSNRD(chgfilenum);
 	if(module!=NULL) Rfree(module);
 	ShutdownSubsystems();
-	std::exit;
 }
 short convertfield(RDArsrc *tmprsrc,RangeScreen *rs,short range_screen)
 {
@@ -295,7 +294,7 @@ int main(int argc,char **argv)
 		module=stralloc(argv[1]);
 	} else {
 		fprintf(stdout,"Error not enough arguments....");
-		std::exit;
+		return;
 	}
 	s=RDA_GetEnv("RANGE_SCREEN");
 	if(!isEMPTY(s)) range_screen=TRUE;

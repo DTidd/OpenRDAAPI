@@ -27,18 +27,29 @@ int c_main(int argc,char **argv)
 int main(int argc,char **argv)
 #endif
 {
-	if(argc<3) std::exit;
 	if(!RDAstrcmp(argv[1],"-s") || !RDAstrcmp(argv[1],"-S"))
 	{
 		SIMPLE_SCREENS=TRUE;
 		if(InitializeSubsystems(argc,argv,argv[2],argv[3]))
 		{
+			ShutdownSubsystems();
+			return;
+		}
+		if(argc<3) 
+		{
+			ShutdownSubsystems();
 			return;
 		}
 		RUNPOWERADD(argv[2],argv[3],0,NULL,NULL,NULL);
 	} else {
 		if(InitializeSubsystems(argc,argv,argv[1],argv[2]))
 		{
+			ShutdownSubsystems();
+			return;
+		}
+		if(argc<3) 
+		{
+			ShutdownSubsystems();
 			return;
 		}
 		RUNPOWERADD(argv[1],argv[2],0,NULL,NULL,NULL);

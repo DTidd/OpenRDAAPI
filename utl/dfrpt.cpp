@@ -1843,7 +1843,6 @@ void quitdfrpt(RDArsrc *r)
 	if(dbengines!=NULL) freeapplib(dbengines);
 	if(remfile!=NULL) freeapplib(remfile);
 	ShutdownSubsystems();
-	std::exit;
 }
 void setvalues(RDArsrc *mainrsrc,char *modname,char *rptname)
 {

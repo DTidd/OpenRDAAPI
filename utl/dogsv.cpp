@@ -48,9 +48,14 @@ int main(int argc,char **argv)
 {
 	RDArsrc *mainrsrc=NULL;
 
-	if(argc<2) std::exit;
 	if(InitializeSubsystems(argc,argv,argv[1],"GENERIC SETUP VARIABLES"))
 	{
+		ShutdownSubsystems();
+		return;
+	}
+	if(argc<2)
+	{
+		ShutdownSubsystems();
 		return;
 	}
 	if(argc>2)

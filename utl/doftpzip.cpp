@@ -53,7 +53,6 @@ static void quitfunc(RDArsrc *r)
 	if(whichs!=NULL) freeapplib(whichs);
 	curl_global_cleanup();
 	ShutdownSubsystems();
-	std::exit;
 }
 int getprogram(void *buffer,size_t size,size_t nmemb,void *stream)
 {

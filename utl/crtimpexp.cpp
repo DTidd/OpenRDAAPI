@@ -43,7 +43,6 @@ static void doexit(RDArsrc *r)
 	if(ToMod!=NULL) Rfree(ToMod);
 	if(suffix!=NULL) Rfree(suffix);
 	ShutdownSubsystems();
-	std::exit;
 }
 static void CreateIE(char *mod,char *fil)
 {

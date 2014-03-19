@@ -415,7 +415,7 @@ int main(int argc,char **argv)
 	{
 		make_screens(argc,argv);
 		ShutdownSubsystems();
-		std::exit;
+		return(0);
 	} else {
 		mainrsrc=RDArsrcNEW(module,"MAKE RPTGEN");
 		scnlist=makescnlist();

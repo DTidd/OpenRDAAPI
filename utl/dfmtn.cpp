@@ -4131,7 +4131,6 @@ static void quitdfmtn(RDArsrc *mainrsrc)
 	if(diravl!=NULL) freeapplib(diravl);
 	if(btntypes!=NULL) freeapplib(btntypes);
 	ShutdownSubsystems();
-	std::exit;
 }
 static void deletemtn(RDArsrc *mainrsrc)
 {

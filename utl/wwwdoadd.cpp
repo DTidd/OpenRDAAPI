@@ -1549,7 +1549,6 @@ static void quit_record(RDArsrc *add_rsrc,PowerAdd *POWERADD)
 	if(level==0)
 	{
 		ShutdownSubsystems();
-		std::exit;
 	}
 }
 short WWWInitializeSubsystems(int argc,char **argv,char *module,char *process)

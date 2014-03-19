@@ -41,7 +41,6 @@ static void quitprt(RDArsrc *mainrsrc)
 		free_rsrc(mainrsrc);
 	}
 	ShutdownSubsystems();
-	std::exit;
 }
 static void workstationvalidate(RDArsrc *mainrsrc)
 {

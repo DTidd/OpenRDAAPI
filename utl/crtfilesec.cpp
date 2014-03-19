@@ -72,5 +72,4 @@ int main(int argc,char **argv)
 	if(userid!=NULL) Rfree(userid);
 	if(module!=NULL) Rfree(module);
 	ShutdownSubsystems();
-	std::exit;
 }

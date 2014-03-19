@@ -95,7 +95,6 @@ static void quitdfout(RDArsrc *mainrsrc)
 	if(mtndefaults!=NULL) FreeRDAdefault(mtndefaults);
 	if(editdefaults!=NULL) FreeRDAdefault(editdefaults);
 	ShutdownSubsystems();
-	std::exit;
 }
 static void makespacepvar(int pos)
 {

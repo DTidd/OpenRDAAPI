@@ -4548,7 +4548,6 @@ static void quit_record(RDArsrc *add_rsrc,PowerAdd *POWERADD)
 	if(level==0)
 	{
 		ShutdownSubsystems();
-		std::exit;
 	}
 }
 void xGET_POWERADD_SCREEN_VIRTUALS(RDArsrc *r,short type,short force,

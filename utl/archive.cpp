@@ -75,6 +75,5 @@ int main(int argc,char **argv)
 		CLSNRD(a_fileno);
 	}
 	ShutdownSubsystems();
-	std::exit;
 }
 

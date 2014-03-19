@@ -413,7 +413,6 @@ static void quitdfvir(RDArsrc *mainrsrc)
 	if(incdefaults!=NULL) FreeRDAdefault(incdefaults);
 	if(virtdefaults!=NULL) FreeRDAdefault(virtdefaults);
 	ShutdownSubsystems();
-	std::exit;
 }
 static void getvrtentries(RDArsrc *mainrsrc)
 {

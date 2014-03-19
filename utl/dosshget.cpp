@@ -605,7 +605,6 @@ static void quitfunc(RDArsrc *r)
 #endif
 	}
 #endif /* WIN32 */
-	std::exit;
 }
 static void dosshget(RDArsrc *r)
 {

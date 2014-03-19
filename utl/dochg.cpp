@@ -33,7 +33,6 @@ extern void dochg(void);
 void shutdownit()
 {
 	ShutdownSubsystems();
-	std::exit;
 }
 static short findCHGstruct(CHGstruct *CHG)
 {
@@ -289,9 +288,14 @@ int main(int argc,char **argv)
 	char *tmp=NULL,*temp1=NULL;
 	RDArsrc *dl_rsrc=NULL;
 
-	if(argc<3) std::exit;
 	if(InitializeSubsystems(argc,argv,argv[1],argv[2]))
 	{
+		ShutdownSubsystems();
+		return;
+	}
+	if(argc<3) 
+	{
+		ShutdownSubsystems();
 		return;
 	}
 	CHGSTRUCT=CHGstructNEW(argv[1],argv[2]);
@@ -443,5 +447,4 @@ void doexit(void)
 		FreeCHGstruct(CHGSTRUCT);
 	}
 	ShutdownSubsystems();
-	std::exit;
 }

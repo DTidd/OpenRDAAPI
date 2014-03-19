@@ -148,6 +148,5 @@ int main(int argc,char **argv)
 	if(email_vars!=NULL) free(email_vars);
 	if(fileno!=(-1)) CLSNRD(fileno);
 	ShutdownSubsystems();
-	std::exit;
 }
 

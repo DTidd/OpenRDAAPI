@@ -35,7 +35,6 @@ static void doexit(RDArsrc *r)
 	if(FromMod!=NULL) Rfree(FromMod);
 	if(ToMod!=NULL) Rfree(ToMod);
 	ShutdownSubsystems();
-	std::exit;
 }
 static void CHECKFILE(char *mod,char *fil)
 {

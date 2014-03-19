@@ -31,7 +31,6 @@ static void quit(RDArsrc *mainrsrc)
 	killwindow(mainrsrc);
 	if(mainrsrc!=NULL) free_rsrc(mainrsrc);
 	ShutdownSubsystems();
-	std::exit;
 }
 #ifdef CPPMAIN
 int c_main(int argc,char **argv)

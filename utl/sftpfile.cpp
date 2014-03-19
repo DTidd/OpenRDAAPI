@@ -482,5 +482,4 @@ int main(int argc,char **argv)
 	if(logname!=NULL) Rfree(logname);
 	if(server_filename!=NULL) Rfree(server_filename);
 	}
-	std::exit;
 }

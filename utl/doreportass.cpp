@@ -215,7 +215,7 @@ int main(int argc,char **argv)
 		}
 		RUNREPORT(argv[1],argv[2],argv[3],argv[4],FALSE,TRUE,NULL);
 		ShutdownSubsystems();
-		std::exit;
+		return(0);
 	}
 	}
 	if(argc==3)
@@ -228,7 +228,7 @@ int main(int argc,char **argv)
 		}
 		RUNREPORT(argv[1],argv[2],NULL,NULL,FALSE,TRUE,NULL);
 		ShutdownSubsystems();
-		std::exit;
+		return(0);
 	}
 	}
 	if(InitializeSubsystems(argc,argv,module,"DO REPORT")) 

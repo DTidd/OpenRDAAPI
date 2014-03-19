@@ -675,7 +675,7 @@ void quituimetric(RDArsrc *r)
 	if(myMetric!=NULL) FreeUIMetric();
 	myMetric=NULL;
 	numMetric=0;
-	std::exit;
+	ShutdownSubsystems();
 }
 #ifdef CPPMAIN
 int c_main(int argc,char **argv)
@@ -698,11 +698,13 @@ int main(int argc,char **argv)
 
 	if(InitializeSubsystems(argc,argv,"UTILITIES","USER INTERFACE METRICS")) 
 	{
+		ShutdownSubsystems();
         	return(1);
 	}
 	if(argc<2)
 	{
-		std::exit;
+		ShutdownSubsystems();
+        	return(1);
 	}
 	if(argc>2)
 	{

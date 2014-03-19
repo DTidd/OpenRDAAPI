@@ -429,7 +429,6 @@ void quitdfscreendef(RDArsrc *mainrsrc,RDArsrc *mtnrsrc)
 	if(defscn_defs!=NULL) freeapplib(defscn_defs);
 	if(dir_libs!=NULL) freeapplib(dir_libs);
 	ShutdownSubsystems();
-	std::exit;
 }
 void makemtnscreen(RDArsrc *mtnrsrc,RDArsrc *mainrsrc,char *libname,char *sname)
 {

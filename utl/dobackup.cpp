@@ -28,7 +28,6 @@ static void quitfunc(RDArsrc *r)
 	if(drvspc!=NULL) Rfree(drvspc);
 	if(cdrw_bus!=NULL) Rfree(cdrw_bus);
 	ShutdownSubsystems();
-	std::exit;
 }
 static void dobackup(RDArsrc *r)
 {

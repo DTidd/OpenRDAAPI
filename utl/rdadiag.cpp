@@ -180,7 +180,7 @@ static void quitfunc(RDArsrc *r)
 		killwindow(r);
 		free_rsrc(r);
 	}
-	std::exit;
+	ShutdownSubsystems();
 }
 void LaunchStrCat(char **s,char *x)
 {

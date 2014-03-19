@@ -475,7 +475,6 @@ static void doexitsub(void)
 	if(modlst!=NULL) freeapplib(modlst);
 	if(dbengines!=NULL) freeapplib(dbengines);
 	ShutdownSubsystems();
-	std::exit;
 }
 static void doexit(RDArsrc *mainrsrc)
 {
@@ -2333,7 +2332,7 @@ int main(int argc,char **argv)
 				prterr("Error - Cannot Read Binary for Module [%s], File [%s].",argv[1],argv[2]);
 			}
 			doexitsub();
-			std::exit;
+			return;
 		}
 	}
 	mainrsrc=RDArsrcNEW("DATABASE","DEFINE FILES");

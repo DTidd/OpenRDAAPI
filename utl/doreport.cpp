@@ -213,6 +213,7 @@ int main(int argc,char **argv)
 			{
        		      	        return(1);
 			}
+	diagmyisam=1;
 			RUNREPORT(argv[2],argv[3],NULL,NULL,FALSE,TRUE,NULL);
 			return(0);
 		} else if(argc==3 && strcmp(argv[1],"-a"))
@@ -221,6 +222,7 @@ int main(int argc,char **argv)
 			{
        			        return(1);
 			}
+	diagmyisam=1;
 			RUNREPORT(argv[1],argv[2],NULL,NULL,FALSE,TRUE,NULL);
 			return(0);
 		}

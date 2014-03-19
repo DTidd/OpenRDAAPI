@@ -74,5 +74,4 @@ int main(int argc,char **argv)
 	if(module!=NULL) Rfree(module);
 	if(filename!=NULL) Rfree(filename);
 	ShutdownSubsystems();
-	std::exit;
 }

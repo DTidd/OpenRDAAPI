@@ -1331,7 +1331,6 @@ static void quiteditmatrix(RDArsrc *mainrsrc)
 	if(matrixdefaults!=NULL) FreeRDAdefault(matrixdefaults);
 	if(DFV!=NULL) FreeRDAMATRIX(DFV);
 	ShutdownSubsystems();
-	std::exit;
 }
 /***************************************************************************
 ***************************************************************************/

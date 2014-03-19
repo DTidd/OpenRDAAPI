@@ -6,6 +6,7 @@
 #define __NAM__ "getforms.exe"
 #endif
 #include <app.hpp>
+#include <mix.hpp>
 #include <mkmsc.hpp>
 #include <curl/curl.h>
 #include <curl/easy.h>
@@ -140,17 +141,18 @@ static void getForm(short which)
 	if(( (!strncmp(&namx[RDAstrlen(namx)-3],".7z",3)) || (!strncmp(&namx[RDAstrlen(namx)-4],".zip",4))))
 	{
 #ifndef WIN32
+		RDA_NOGUI=1;
 		args=APPlibNEW();
 		addAPPlib(args,"x");
 		addAPPlib(args,"-aoa");
 		memset(stemp1,0,512);
 		sprintf(stemp1,"-o%s/",CURRENTDIRECTORY);
-		prterr("stemp1 [%s] ",stemp1);TRACE;
 		addAPPlib(args,stemp1);
 		addAPPlib(args,plst.filename);
 		ADVExecute2Program("7za",args,NULL);
 		if(args!=NULL) freeapplib(args);
 		unlink(plst.filename);
+		RDA_NOGUI=0;
 
 #endif
 #ifdef WIN32
@@ -310,7 +312,7 @@ static void quitx(RDArsrc *r)
 		killwindow(r);
 		free_rsrc(r);
 	}
-	std::exit;
+	ShutdownSubsystems();
 }
 static void selectx(RDArsrc *r)
 {

@@ -69,6 +69,7 @@ static void doexit(RDArsrc *mainrsrc)
 	ShutdownSecurity();
 	EXITHELP();
 	CLSLOG();
+	ShutdownSubsystems();
 }
 static void okfunctioncb(RDArsrc *mainrsrc)
 {
@@ -153,7 +154,7 @@ int main(int argc,char **argv)
 		{
 			okfunction(mainrsrc,argv[1],argv[2]);
 			ShutdownSubsystems();
-			std::exit;
+			return;
 		}
 	}
 

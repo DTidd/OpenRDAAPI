@@ -247,7 +247,6 @@ void runcommand(RDArsrc *mainrsrc,char *command)
 			{
 				killwindow(mainrsrc);
 				quitmenu(mainrsrc);
-				std::exit;
 			}
 		}
 #endif
@@ -262,7 +261,6 @@ void runcommand(RDArsrc *mainrsrc,char *command)
 		{
 			killwindow(mainrsrc);
 			quitmenu(mainrsrc);
-			std::exit;
 		}
 	}
 }

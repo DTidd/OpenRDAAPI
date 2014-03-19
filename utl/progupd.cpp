@@ -32,7 +32,7 @@ static void quitfunction(RDArsrc *m)
 {
 	if(IsScreenDisplayed(m)) killwindow(m);
 	if(m!=NULL) free_rsrc(m);
-	std::exit;
+	ShutdownSubsystems();
 }
 static void downloadfunction(RDArsrc *m)
 {

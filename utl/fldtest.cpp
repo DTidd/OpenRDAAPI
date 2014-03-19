@@ -58,7 +58,7 @@ int main(int argc,char **argv)
 	if(InitializeSubsystems(argc,argv,"UTILITIES","FIELD TEST"))
 	{
 		ShutdownSubsystems();
-		std::exit;
+		return(1);
 	}
 #ifdef _TEST_MYISAM_
 // Adding an open to VENPMT -> VENJRNL and connecting it to the VENMSR loop in field test should cause a failure... that's basically what's happening in the browse.  Let me know if you want me to pound that code frag.... may do it anyway depending on the day.

@@ -80,7 +80,7 @@ static void quitx(RDArsrc *r)
 		killwindow(r);
 		free_rsrc(r);
 	}
-	std::exit;
+	ShutdownSubsystems();
 }
 static void selectx(RDArsrc *r)
 {

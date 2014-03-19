@@ -220,11 +220,12 @@ int main(int argc,char **argv)
 		}
 		RUNREPORTADV3(argv[1],argv[2],NULL,NULL,FALSE,TRUE,NULL,NULL,NULL,NULL,0,(void (*)(...))WWWprocess_dataline);
 		ShutdownSubsystems();
-		std::exit;
+		return(0);
 	}
 	}
 	if(InitializeSubsystems(argc,argv,module,"DO REPORT")) 
 	{
+		ShutdownSubsystems();
         	return(1);
 	}
 	getmodulelist(mainrsrc);

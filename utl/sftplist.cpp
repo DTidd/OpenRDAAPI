@@ -474,5 +474,4 @@ int main(int argc,char **argv)
 	if(pass_word!=NULL) Rfree(pass_word);
 	if(logname!=NULL) Rfree(logname);
 	ShutdownSubsystems();
-	std::exit;
 }

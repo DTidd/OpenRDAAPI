@@ -675,7 +675,6 @@ void quitscrncode(RDArsrc *r)
 	if(prog_path!=NULL) Rfree(prog_path);
 	if(prevlink!=NULL) Rfree(prevlink);
 	ShutdownSubsystems();
-	std::exit;
 }
 #ifdef CPPMAIN
 int c_main(int argc,char **argv)
