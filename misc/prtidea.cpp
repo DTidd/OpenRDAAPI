@@ -68,9 +68,6 @@ RDA_PFILE *xRDA_PFILE_NEW(char *name,char *perm,int line,char *file)
 	APPlib *args=NULL;
 #endif /* ifdef WIN32 */
 
-	diagmisc=1;
-	diagprt=1;
-
 	if(diagprt)
 	{
 		prterr("DIAG RDA_PFILE_NEW name [%s] perm [%s] at line [%d] program [%s].",(name!=NULL ? name:""),(perm!=NULL ? perm:""),line,file);
@@ -81,11 +78,9 @@ RDA_PFILE *xRDA_PFILE_NEW(char *name,char *perm,int line,char *file)
 	temp1=RDA_GetEnv("VIEWPDF_OUTPUT_FILENAME");
 	if((!strncmp(name,"viewpdf",7) || !strncmp(name,"VIEWPDF",7)) && (temp1==NULL) && (RDAstrlen(name)<12))
 	{
-		TRACE;
 		if((diagprt)&&(temp1!=NULL))
 		{
 			prterr("DIAG:  VIEWPDF_OUTPUT_FILENAME: [%s]",temp1);
-		TRACE;
 		}
 #ifdef __PREVIOUSLY_USED_CODE__
 		pipe (fds); 
@@ -121,16 +116,13 @@ RDA_PFILE *xRDA_PFILE_NEW(char *name,char *perm,int line,char *file)
 #endif
 		r->pfile=popen(pname,perm);
 #endif /* __PREVIOUSLY_USED_CODE__ */
-		TRACE;
 	}else if((!strncmp(name,"viewpdf",7) || !strncmp(name,"VIEWPDF",7)) && (temp1!=NULL))
 	{
-		TRACE;
 		pname=Rmalloc(RDAstrlen(DOCUMENTROOT)+RDAstrlen(CURRENTDIRECTORY)+RDAstrlen(temp1)+128);
 		sprintf(pname,"%s/viewpdf.lnx --dont-view --dont-delete -o %s/%s",DOCUMENTROOT,CURRENTDIRECTORY,temp1);
 		r->pfile=popen(pname,perm);
 		r->name=stralloc(name);
 	}else{
-		TRACE;
 		pname=Rmalloc(RDAstrlen(DOCUMENTROOT)+RDAstrlen(CURRENTDIRECTORY)+RDAstrlen(temp1)+128);
 		sprintf(pname,"%s/%s",DOCUMENTROOT,name);
 		r->pfile=popen(pname,perm);
@@ -221,9 +213,6 @@ RDA_PFILE *xRDA_PFILE_NEW(char *name,char *perm,int line,char *file)
 	r->name=stralloc(name);
 #endif /* ifdef WIN32 */
 	r->perm=stralloc(perm);
-
-	diagmisc=0;
-	diagprt=0;
 
 	return(r);
 }
