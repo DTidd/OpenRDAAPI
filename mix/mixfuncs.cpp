@@ -2729,3 +2729,53 @@ void OpenRDA_CaptureAutoComplete(char *module,char *screen,char *w,char *v)
 		WRTNRD(GUI_AUTO_COMPLETE,0,NULL);
 	}
 }
+char *EscXHTMLLabel(char *s,short type)
+{
+	char *n=NULL,*temp=NULL,ok=TRUE;
+	int l=0,x=0,len=0;
+
+	if(isEMPTY(s)) return(NULL);
+	len=(RDAstrlen(s)*2)+1;
+	n=Rmalloc(len);
+	memset(n,0,len);
+	l=0;
+	for(x=0,temp=s;*temp && x<len;++temp,++x)
+	{
+		if(type==0)
+		{
+			if((*temp==13) || (l==0 && *temp==' '))
+			{
+			} else if(!RDAstrcmp(temp,"<!--"))
+			{
+				temp+=3;
+				x+=3;
+				ok=FALSE;
+			} else if(!RDAstrcmp(temp,"--!>"))
+			{
+				temp+=3;
+				x+=3;
+				ok=TRUE;
+			} else if(*temp=='"' && ok==TRUE)
+			{
+				n[l++]='\"';
+			} else if(ok==TRUE)
+			{
+				n[l++]=*temp;
+			}
+		} else {
+			if(*temp=='\n')
+			{
+				sprintf(&n[l],"\\\n");
+				l+=2;
+			} else if(*temp=='"')
+			{
+				sprintf(&n[l],"\\\"");
+				l+=2;
+			} else {
+				n[l++]=*temp;
+			}
+		}
+	}
+	if(!type) unpad(n);
+	return(n);
+}

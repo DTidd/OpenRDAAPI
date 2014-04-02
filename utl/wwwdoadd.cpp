@@ -1601,8 +1601,6 @@ short WWWInitializeSubsystems(int argc,char **argv,char *module,char *process)
 		INITTRANS();
 		OPNLOG(module,process);
 	}
-	diagsec=FALSE;
-	diagnrd=FALSE;
 	return(return_value);
 }
 #ifdef CPPMAIN

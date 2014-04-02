@@ -9,3 +9,10 @@ int RGETPID()
 	PROSID=(int)getpid();
 	return(PROSID);	
 }
+int RGETPPID() 
+{
+	int PROSID=0;
+
+	PROSID=(int)getppid();
+	return(PROSID);	
+}

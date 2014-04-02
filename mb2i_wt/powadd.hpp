@@ -103,10 +103,10 @@ void xMULTIPOWERADD(char *,char *,int,void (*)(...),RDArsrc *,void *,short,int,c
 void xCopyEditWdgt2EditWdgt(AddEditWdgt *,AddEditWdgt *,int,char *);
 
 char run_changevalue_buttons(RDArsrc *,PowerAdd *);
-void MTNrun_prequit_buttonsbl(RDArsrc *,MTNPassableStruct *,short);
+short MTNrun_prequit_buttonsbl(RDArsrc *,MTNPassableStruct *,short);
 void MTNrun_presave_buttons(RDArsrc *,MTNPassableStruct *,short);
 void MTNrun_postsave_buttons(RDArsrc *,MTNPassableStruct *,short);
-void MTNrun_prequit_buttonsmtn(RDArsrc *,MTNPassableStruct *,short);
+short MTNrun_prequit_buttonsmtn(RDArsrc *,MTNPassableStruct *,short);
 char *GETASSIGNNEXTNEWID(PowerAdd *,AddEditWdgt *,char *,short,void (*)(...),void *);
 #define ASSIGNNEWID(a,b,c,d,e)	xASSIGNNEWID(a,b,c,d,e,__LINE__,__FILE__)
 void xASSIGNNEWID(PowerAdd *,AddEditWdgt *,char *,void (*)(...),void *,int,char *);

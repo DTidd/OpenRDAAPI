@@ -230,6 +230,7 @@ union rda_field_types
 #define BEG_ACCT 3
 #define CUSTOM_ACCT 4
 int RGETPID(void);
+int RGETPPID(void);
 void SETUSERLOGIN(void);
 
 extern char errspace[];
@@ -325,7 +326,7 @@ char *famt(double,int);		/*Regular Dollar Format function*/
 char *GUIfamt(double,int);		/*Regular Dollar Format function*/
 char *GUIfamtncents(double,int,char);	/*Dollar No Cents Format function*/
 char *GUIfloatamt(double,int);	/*Regular Float Format function w/neg*/
-char *GUIuintamt(long,int);	/*Integer with negitive field*/
+char *GUIsintamt(long,int);	/*Integer with negitive field*/
 char *famtncents(double,int,char);	/*Dollar No Cents Format function*/
 char *famtncomma(double,int,char);	/*Dollar No Comma Format function*/
 char *famtncnc(double,int,char);	/*Dollar No Comma No Cents Format func*/
@@ -335,7 +336,7 @@ char *famtnbkncomma(double,int,char);/*Dollar Brackets For Neg & No Comma*/
 char *famtnbkncnc(double,int,char);	/*Dollar Brackets For Neg,No Cents, & No Comma*/
 char *famtpad(double,int,char);	/*Dollar with pad chars*/
 char *ufloatamt(double,int);
-char *uintamt(long,int);	/*Integer with negitive field*/
+char *sintamt(long,int);	/*Integer with negitive field*/
 char *famt_inttoencrypted1(double,int,char); /* */
 double stripfamt(char *);
 double GUIstripfamt(char *);

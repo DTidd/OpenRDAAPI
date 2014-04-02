@@ -230,10 +230,10 @@ Wt::WFileUpload *CreateFileUpload(RDArmem *member,Wt::WContainerWidget *c)
 			LE->setText(text);
 			LE->setReadOnly(TRUE);
 		} else {
-			WMessageBox::show("Unable to Upload","Do not have permission to upload the selected file.",Ok|Cancel);
+			WMessageBox::show("Unable to Upload","Do not have permission to upload the selected file and it cannot exceed the size.",Ok|Cancel);
 		}
 	}));
-	
+
 	fu->uploaded().connect(std::bind([=]() {
 		text=fu->clientFileName();
 		LE->setText(text);
@@ -1624,7 +1624,7 @@ void signed_integer(RDArmem *member,const Wt::WKeyEvent& e)
 			f=*member->value.integer_value;
 		}
 	}
-	t=uintamt(f,col);
+	t=sintamt(f,col);
 	text1 = new Wt::WString(t,UTF8);
 	LE->setText(*text1);
 	text1->~WString();
@@ -1691,7 +1691,7 @@ void signed_integerCHG(RDArmem *member)
 			f=*member->value.integer_value;
 		}
 	}
-	t=uintamt(f,col);
+	t=sintamt(f,col);
 	text1 = new Wt::WString(t,UTF8);
 	LE->setText(*text1);
 	text1->~WString();
@@ -4081,9 +4081,9 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 		case SLONGV:
 			if(member->field_type==SSHORTV)
 			{
-				temp_str=uintamt(*member->value.short_value,(cols ? cols:member->field_length));
+				temp_str=sintamt(*member->value.short_value,(cols ? cols:member->field_length));
 			} else {
-				temp_str=uintamt(*member->value.integer_value,(cols ? cols:member->field_length));
+				temp_str=sintamt(*member->value.integer_value,(cols ? cols:member->field_length));
 			}
 			unpad(temp_str);
 			if(!USER_INTERFACE)
@@ -4898,12 +4898,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					WW->addStyleClass(GUIstemp);
 					if(mssc!=NULL) Rfree(mssc);
 					if(fssc!=NULL) Rfree(fssc);
-					WWeb=(Wt::WWebWidget *)bLE;
-					cDS=WWeb->decorationStyle();
-					wF=cDS.font();
-					wF.setFamily(Wt::WFont::GenericFamily::Monospace);
-					cDS.setFont(wF);
-					WWeb->setDecorationStyle(cDS);
 					WW->setMaximumSize(Wt::WLength(1600),Wt::WLength::Auto);
 					browse_list_desc->w=(Wt::WWidget *)bLE;
 					c=new Wt::WString(browse_list_desc->value.string_value,UTF8);
@@ -4911,12 +4905,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					if(c!=NULL) c->~WString();
 					form->addWidget((Wt::WWidget *)bLE,10,Wt::AlignLeft | Wt::AlignJustify);
 					LB=new Wt::WSelectionBox(form1);
-					WWeb=(Wt::WWebWidget *)LB;
-					cDS=WWeb->decorationStyle();
-					wF=cDS.font();
-					wF.setFamily(Wt::WFont::GenericFamily::Monospace);
-					cDS.setFont(wF);
-					WWeb->setDecorationStyle(cDS);
 					WW=(Wt::WWidget *)LB;
 					mssc=ModuleScreenStyleClass(rsx);
 					fssc=InputFieldStyleClass(member);
@@ -4954,27 +4942,13 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 /* can use UTF8 encoding instead of WString */
 /* replace each space with 2-3 char sequence */
 /* 0xC2 0xA0 2 byte sequence of UTF8 */
-						temp1=stralloc((*(member->list[0]+w)));
-						temp_str=Rmalloc((RDAstrlen(temp1)*2)+1);
-						z=0;
-						for(temp=temp1;*temp;++temp)
-						{
-							if(*temp==' ') 
-							{
-								temp_str[z]=0xC2;
-								temp_str[z+1]=0xA0;
-								z+=2;
-							} else {
-								temp_str[z]=*temp;
-								++z;
-							}
-						}	
+						temp1=((*(member->list[0]+w)));
+						temp_str=RDA_EncodeWhiteSpace(temp1);
 						temp_xstr = new Wt::WString(temp_str,UTF8);
 						if(temp_str!=NULL) Rfree(temp_str);
 						wSI->setText(*temp_xstr);
 						temp_xstr->~WString();
 						member->wSIM->appendRow(wSI);
-						if(temp1!=NULL) Rfree(temp1);
 					}
 					LB->setCurrentIndex(*member->value.integer_value);
 					if(!member->editable)
@@ -5059,12 +5033,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					if(mssc!=NULL) Rfree(mssc);
 					if(fssc!=NULL) Rfree(fssc);
 					cB=(Wt::WComboBox *)LB;
-					WWeb=(Wt::WWebWidget *)LB;
-					cDS=WWeb->decorationStyle();
-					wF=cDS.font();
-					wF.setFamily(Wt::WFont::GenericFamily::Monospace);
-					cDS.setFont(wF);
-					WWeb->setDecorationStyle(cDS);
 					wFormW=(Wt::WFormWidget *)LB;
 					wSIM=new Wt::WStandardItemModel();
 					cB->setModel(wSIM);

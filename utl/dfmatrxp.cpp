@@ -540,10 +540,10 @@ static char *MakeMatrixSubHeader(char rc,int fc,int tc,int line_length,
 					case SSHORTV:
 						if(X_axis_max>DFV->xaxis.len)
 						{
-							temp=uintamt(*mem->data.short_value,DFV->xaxis.len-1);
+							temp=sintamt(*mem->data.short_value,DFV->xaxis.len-1);
 							sprintf(&tmp[count],"%*s%*s ",X_axis_max-DFV->xaxis.len,"",DFV->xaxis.len,temp);
 						} else {
-							temp=uintamt(*mem->data.short_value,X_axis_max-1);
+							temp=sintamt(*mem->data.short_value,X_axis_max-1);
 							sprintf(&tmp[count],"%*s ",X_axis_max,(temp!=NULL ? temp:""));
 						}
 						if(temp!=NULL) Rfree(temp);
@@ -559,10 +559,10 @@ static char *MakeMatrixSubHeader(char rc,int fc,int tc,int line_length,
 					case SLONGV:
 						if(X_axis_max>DFV->xaxis.len)
 						{
-							temp=uintamt(*mem->data.integer_value,DFV->xaxis.len-1);
+							temp=sintamt(*mem->data.integer_value,DFV->xaxis.len-1);
 							sprintf(&tmp[count],"%*s%*s ",X_axis_max-DFV->xaxis.len,"",DFV->xaxis.len,temp);
 						} else {
-							temp=uintamt(*mem->data.integer_value,X_axis_max-1);
+							temp=sintamt(*mem->data.integer_value,X_axis_max-1);
 							sprintf(&tmp[count],"%*s ",X_axis_max,(temp!=NULL ? temp:""));
 						}
 						if(temp!=NULL) Rfree(temp);
@@ -863,10 +863,10 @@ static void print_regular_matrix(RDA_PFILE *fp,char rr,int fr,int tr,char rc,int
 							case SSHORTV:
 								if(Y_axis_max>DFV->yaxis.len)
 								{
-									temp=uintamt(*am->data.short_value,DFV->yaxis.len-1);
+									temp=sintamt(*am->data.short_value,DFV->yaxis.len-1);
 									sprintf(&tmp[count],"%*s%*s ",Y_axis_max-DFV->yaxis.len,"",DFV->yaxis.len,temp);
 								} else {
-									temp=uintamt(*am->data.short_value,Y_axis_max-1);
+									temp=sintamt(*am->data.short_value,Y_axis_max-1);
 									sprintf(&tmp[count],"%*s ",Y_axis_max,(temp!=NULL ? temp:""));
 								}
 								if(temp!=NULL) Rfree(temp);
@@ -882,10 +882,10 @@ static void print_regular_matrix(RDA_PFILE *fp,char rr,int fr,int tr,char rc,int
 							case SLONGV:
 								if(Y_axis_max>DFV->yaxis.len)
 								{
-									temp=uintamt(*am->data.integer_value,DFV->yaxis.len-1);
+									temp=sintamt(*am->data.integer_value,DFV->yaxis.len-1);
 									sprintf(&tmp[count],"%*s%*s ",Y_axis_max-DFV->yaxis.len,"",DFV->yaxis.len,temp);
 								} else {
-									temp=uintamt(*am->data.integer_value,Y_axis_max-1);
+									temp=sintamt(*am->data.integer_value,Y_axis_max-1);
 									sprintf(&tmp[count],"%*s ",Y_axis_max,(temp!=NULL ? temp:""));
 								}
 								if(temp!=NULL) Rfree(temp);
@@ -1026,10 +1026,10 @@ static void print_regular_matrix(RDA_PFILE *fp,char rr,int fr,int tr,char rc,int
 										case SSHORTV:
 											if(X_axis_max>c->len)
 											{
-												temp=uintamt(*v->data.short_value,c->len-1);
+												temp=sintamt(*v->data.short_value,c->len-1);
 												sprintf(&tmp[count],"%*s%*s ",X_axis_max-c->len,"",c->len,temp);
 											} else {
-												temp=uintamt(*v->data.short_value,X_axis_max-1);
+												temp=sintamt(*v->data.short_value,X_axis_max-1);
 												sprintf(&tmp[count],"%*s ",X_axis_max,(temp!=NULL ? temp:""));
 											}
 											if(temp!=NULL) Rfree(temp);
@@ -1045,10 +1045,10 @@ static void print_regular_matrix(RDA_PFILE *fp,char rr,int fr,int tr,char rc,int
 										case SLONGV:
 											if(X_axis_max>c->len)
 											{
-												temp=uintamt(*v->data.integer_value,c->len-1);
+												temp=sintamt(*v->data.integer_value,c->len-1);
 												sprintf(&tmp[count],"%*s%*s ",X_axis_max-c->len,"",c->len,temp);
 											} else {
-												temp=uintamt(*v->data.integer_value,X_axis_max-1);
+												temp=sintamt(*v->data.integer_value,X_axis_max-1);
 												sprintf(&tmp[count],"%*s ",X_axis_max,(temp!=NULL ? temp:""));
 											}
 											if(temp!=NULL) Rfree(temp);
@@ -1361,10 +1361,10 @@ static void print_linear_matrix(RDA_PFILE *fp,char rcell,int from_cell,int to_ce
 							case SSHORTV:
 								if(Y_axis_max>DFV->yaxis.len)
 								{
-									temp=uintamt(*am->data.short_value,DFV->yaxis.len-1);
+									temp=sintamt(*am->data.short_value,DFV->yaxis.len-1);
 									sprintf(&tmp[count],"%*s%*s ",Y_axis_max-DFV->yaxis.len,"",DFV->yaxis.len,temp);
 								} else {
-									temp=uintamt(*am->data.short_value,Y_axis_max-1);
+									temp=sintamt(*am->data.short_value,Y_axis_max-1);
 									sprintf(&tmp[count],"%*s ",Y_axis_max,(temp!=NULL ? temp:""));
 								}
 								if(temp!=NULL) Rfree(temp);
@@ -1380,10 +1380,10 @@ static void print_linear_matrix(RDA_PFILE *fp,char rcell,int from_cell,int to_ce
 							case SLONGV:
 								if(Y_axis_max>DFV->yaxis.len)
 								{
-									temp=uintamt(*am->data.integer_value,DFV->yaxis.len-1);
+									temp=sintamt(*am->data.integer_value,DFV->yaxis.len-1);
 									sprintf(&tmp[count],"%*s%*s ",Y_axis_max-DFV->yaxis.len,"",DFV->yaxis.len,temp);
 								} else {
-									temp=uintamt(*am->data.integer_value,Y_axis_max-1);
+									temp=sintamt(*am->data.integer_value,Y_axis_max-1);
 									sprintf(&tmp[count],"%*s ",Y_axis_max,(temp!=NULL ? temp:""));
 								}
 								if(temp!=NULL) Rfree(temp);
@@ -1528,10 +1528,10 @@ static void print_linear_matrix(RDA_PFILE *fp,char rcell,int from_cell,int to_ce
 										case SSHORTV:
 											if(X_axis_max>c->len)
 											{
-												temp=uintamt(*v->data.short_value,c->len-1);
+												temp=sintamt(*v->data.short_value,c->len-1);
 												sprintf(&tmp[count],"%*s%*s ",X_axis_max-c->len,"",c->len,temp);
 											} else {
-												temp=uintamt(*v->data.short_value,X_axis_max-1);
+												temp=sintamt(*v->data.short_value,X_axis_max-1);
 												sprintf(&tmp[count],"%*s ",X_axis_max,(temp!=NULL ? temp:""));
 											}
 											if(temp!=NULL) Rfree(temp);
@@ -1547,10 +1547,10 @@ static void print_linear_matrix(RDA_PFILE *fp,char rcell,int from_cell,int to_ce
 										case SLONGV:
 											if(X_axis_max>c->len)
 											{
-												temp=uintamt(*v->data.integer_value,c->len-1);
+												temp=sintamt(*v->data.integer_value,c->len-1);
 												sprintf(&tmp[count],"%*s%*s ",X_axis_max-c->len,"",c->len,temp);
 											} else {
-												temp=uintamt(*v->data.integer_value,X_axis_max-1);
+												temp=sintamt(*v->data.integer_value,X_axis_max-1);
 												sprintf(&tmp[count],"%*s ",X_axis_max,(temp!=NULL ? temp:""));
 											}
 											if(temp!=NULL) Rfree(temp);
@@ -1732,10 +1732,10 @@ static char *MakeReverseSubHeader(char rr,int fr,int tr,int line_length,
 					case SSHORTV:
 						if(Y_axis_max>DFV->yaxis.len)
 						{
-							temp=uintamt(*mem->data.short_value,DFV->yaxis.len-1);
+							temp=sintamt(*mem->data.short_value,DFV->yaxis.len-1);
 							sprintf(&tmp[count],"%*s%*s ",Y_axis_max-DFV->yaxis.len,"",DFV->yaxis.len,temp);
 						} else {
-							temp=uintamt(*mem->data.short_value,Y_axis_max-1);
+							temp=sintamt(*mem->data.short_value,Y_axis_max-1);
 							sprintf(&tmp[count],"%*s ",Y_axis_max,(temp!=NULL ? temp:""));
 						}
 						if(temp!=NULL) Rfree(temp);
@@ -1751,10 +1751,10 @@ static char *MakeReverseSubHeader(char rr,int fr,int tr,int line_length,
 					case SLONGV:
 						if(Y_axis_max>DFV->yaxis.len)
 						{
-							temp=uintamt(*mem->data.integer_value,DFV->yaxis.len-1);
+							temp=sintamt(*mem->data.integer_value,DFV->yaxis.len-1);
 							sprintf(&tmp[count],"%*s%*s ",Y_axis_max-DFV->yaxis.len,"",DFV->yaxis.len,temp);
 						} else {
-							temp=uintamt(*mem->data.integer_value,Y_axis_max-1);
+							temp=sintamt(*mem->data.integer_value,Y_axis_max-1);
 							sprintf(&tmp[count],"%*s ",Y_axis_max,(temp!=NULL ? temp:""));
 						}
 						if(temp!=NULL) Rfree(temp);
@@ -2062,10 +2062,10 @@ static void print_reverse_matrix(RDA_PFILE *fp,char rr,int fr,int tr,char rc,int
 							case SSHORTV:
 								if(X_axis_max>DFV->xaxis.len)
 								{
-									temp=uintamt(*am->data.short_value,DFV->xaxis.len-1);
+									temp=sintamt(*am->data.short_value,DFV->xaxis.len-1);
 									sprintf(&tmp[count],"%*s%*s ",X_axis_max-DFV->xaxis.len,"",DFV->xaxis.len,temp);
 								} else {
-									temp=uintamt(*am->data.short_value,X_axis_max-1);
+									temp=sintamt(*am->data.short_value,X_axis_max-1);
 									sprintf(&tmp[count],"%*s ",X_axis_max,(temp!=NULL ? temp:""));
 								}
 								if(temp!=NULL) Rfree(temp);
@@ -2081,10 +2081,10 @@ static void print_reverse_matrix(RDA_PFILE *fp,char rr,int fr,int tr,char rc,int
 							case SLONGV:
 								if(X_axis_max>DFV->xaxis.len)
 								{
-									temp=uintamt(*am->data.integer_value,DFV->xaxis.len-1);
+									temp=sintamt(*am->data.integer_value,DFV->xaxis.len-1);
 									sprintf(&tmp[count],"%*s%*s ",X_axis_max-DFV->xaxis.len,"",DFV->xaxis.len,temp);
 								} else {
-									temp=uintamt(*am->data.integer_value,X_axis_max-1);
+									temp=sintamt(*am->data.integer_value,X_axis_max-1);
 									sprintf(&tmp[count],"%*s ",X_axis_max,(temp!=NULL ? temp:""));
 								}
 								if(temp!=NULL) Rfree(temp);
@@ -2224,10 +2224,10 @@ static void print_reverse_matrix(RDA_PFILE *fp,char rr,int fr,int tr,char rc,int
 											case SSHORTV:
 												if(Y_axis_max>c->len)
 												{
-													temp=uintamt(*v->data.short_value,c->len-1);
+													temp=sintamt(*v->data.short_value,c->len-1);
 													sprintf(&tmp[count],"%*s%*s ",Y_axis_max-c->len,"",c->len,temp);
 												} else {
-													temp=uintamt(*v->data.short_value,Y_axis_max-1);
+													temp=sintamt(*v->data.short_value,Y_axis_max-1);
 													sprintf(&tmp[count],"%*s ",Y_axis_max,(temp!=NULL ? temp:""));
 												}
 												if(temp!=NULL) Rfree(temp);
@@ -2243,10 +2243,10 @@ static void print_reverse_matrix(RDA_PFILE *fp,char rr,int fr,int tr,char rc,int
 											case SLONGV:
 												if(Y_axis_max>c->len)
 												{
-													temp=uintamt(*v->data.integer_value,c->len-1);
+													temp=sintamt(*v->data.integer_value,c->len-1);
 													sprintf(&tmp[count],"%*s%*s ",Y_axis_max-c->len,"",c->len,temp);
 												} else {
-													temp=uintamt(*v->data.integer_value,Y_axis_max-1);
+													temp=sintamt(*v->data.integer_value,Y_axis_max-1);
 													sprintf(&tmp[count],"%*s ",Y_axis_max,(temp!=NULL ? temp:""));
 												}
 												if(temp!=NULL) Rfree(temp);

@@ -172,13 +172,7 @@ static void printerrorlistcb(RDArsrc *prsrc,HoldReport *h)
 					fp=RDA_popen(outdevice,"w");
 					if(fp!=NULL)
 					{
-						if(!strncmp(outdevice,"rdareportcd",11) || !strncmp(outdevice,"outputemail",11))
-						{	
-							sprintf(stemp,"%.11s.lnx",outdevice);
-							SelectPrintType(outdevice,print_style,fp);
-						} else {
-							SelectPrintType(outdevice,print_style,fp);
-						}
+						SelectPrintType(outdevice,print_style,fp);
 						printerrorlist(fp,h,&lines,&pages);
 						RDA_pclose(fp);
 					} else {
@@ -281,12 +275,6 @@ void xexit_cleanly(RDArunrpt *runrpt,RDAreport *rpt,short exit_report,char *err_
 		deletelibbin(temp,runrpt->sortfile);
 		if(temp!=NULL) Rfree(temp);
 	}
-/* 
-	DCT:  03/17/2014 
-	
-	Find a way to remove the environment variables read by virtual fields
-	appropriately within this function. 
-*/
 	if(rpt!=NULL)
 	{
 		if(rpt->virflds!=NULL)
@@ -331,12 +319,16 @@ void xexit_cleanly(RDArunrpt *runrpt,RDAreport *rpt,short exit_report,char *err_
 		if((exit_report==TRUE) && (runrpt->exit_status!=2))
 		{
 			shutdown_report(runrpt->rsrsrc);
+			return;
 		}
 	}
 	if(exit_report==2)
 	{
 /*lint -e746 */
-		if(runrpt->quitfunc!=NULL) runrpt->quitfunc(runrpt->quitfuncrsrc,runrpt->quitfuncArgs);
+		if(runrpt->quitfunc!=NULL) 
+		{
+			runrpt->quitfunc(runrpt->quitfuncrsrc,runrpt->quitfuncArgs);
+		}
 /*lint +e746 */
 		if(rpt!=NULL)
 		{
@@ -348,6 +340,12 @@ void xexit_cleanly(RDArunrpt *runrpt,RDAreport *rpt,short exit_report,char *err_
 			FreeRDArunrpt(runrpt);
 			runrpt=NULL;
 		}
+/* DCT: added this ShutdownSubsystems() on 4/1/2014 before finding the
+        audit trail, POAUDITENV was chained to didn't have the environment 
+	type virtual fields, so it couldn't remove the cookies.  This might
+	not be necessary.  Haven't yet found that it fails though....   
+*/
+		ShutdownSubsystems();
 	} else if(exit_report==1)
 	{
 		if(!runrpt->APPmainLoop) 
@@ -765,9 +763,6 @@ void clear_accum(RDAreport *rpt,int number)
 			prterr("Error:  Accumulator a->name [%s] a->num [%d] number [%d] couldn't be resolved....",(a->name!=NULL ? a->name:""),a->num,number);
 		} else {
 		accval=a->accvals+number;
-/*
-		accval->count=0;
-*/
 		if(accval!=NULL)
 		{
 			accval->count=0;
@@ -1025,9 +1020,6 @@ void xRUNREPORT(char *module,char *name,char *server_name,char *sortfile,short A
 #endif /* ifdef USE_RDA_DIAGNOSTICS */
 #endif /* XXXX */
 
-/*
-	fprintf(RDA_STDERR,"APPmainLoop [%d] exitstatus [%d] ",APPmainLoop,exitstatus);TRACE;
-*/
 	x=0;
 	ArchiveSource=4;
 	ArchiveExtension=0;
@@ -1321,9 +1313,6 @@ void quitreport(RDArsrc *parent,HoldReport *h)
 	RDArunrpt *runrpt=NULL;
 	RDAreport *rpt=NULL;
 
-/*
-	fprintf(RDA_STDERR,"quitreport ");TRACE;
-*/
 	if(h!=NULL)
 	{
 		runrpt=h->rrpt;
@@ -1435,12 +1424,7 @@ void setdevicevariables(RDArsrc *parent,HoldReport *h)
 	} else {
 		temp=EVALUATEstr(outdev,ReportGenSubData1,h);
 	}
-	if(!strncmp(temp,"rdareportcd",11) || !strncmp(temp,"outputemail",11))
-	{	
-		sprintf(stemp,"%.11s.lnx",temp);
-		stemp[11]=0;
-		pdev=RDApdevNEW(stemp);
-	} else if(!strncmp(temp,"AUTOARCHIVE",11) && (XPERT_SETUP->ARCHIVE==TRUE))
+	if(!strncmp(temp,"AUTOARCHIVE",11) && (XPERT_SETUP->ARCHIVE==TRUE))
 	{
 		ArchiveSource=6;
 #ifdef WIN32
@@ -1817,11 +1801,7 @@ void RPTSelectFuncDeviceName(RDArsrc *r,RDArsrc *prtrsrc)
 		updatersrc(prtrsrc,"DEVICE NAME");
 		readwidget(prtrsrc,"PAGE LENGTH");
 		FINDRSCGETDOUBLE(prtrsrc,"PAGE LENGTH",&l);
-		if(!strncmp(MYout_devs->libs[x],"rdareportcd",11) || !strncmp(MYout_devs->libs[x],"outputemail",11))
-		{	
-			sprintf(stemp,"%.11s.lnx",MYout_devs->libs[x]);
-			pdev=RDApdevNEW(stemp);
-		} else if((!strncmp(MYout_devs->libs[x],"AUTOARCHIVE",11)) && (XPERT_SETUP->ARCHIVE==TRUE))
+		if((!strncmp(MYout_devs->libs[x],"AUTOARCHIVE",11)) && (XPERT_SETUP->ARCHIVE==TRUE))
 		{
 			ArchiveSource=6;
 #ifdef WIN32
@@ -1841,12 +1821,6 @@ void RPTSelectFuncDeviceName(RDArsrc *r,RDArsrc *prtrsrc)
 			} else if(pdev->page_length!=0 && l>9.9)
 			{
 				l=pdev->page_length;
-				FINDRSCSETDOUBLE(prtrsrc,"PAGE LENGTH",l);
-				updatersrc(prtrsrc,"PAGE LENGTH");
-			}
-			if(!strncmp(MYout_devs->libs[x],"rdareportcd",11) || !strncmp(MYout_devs->libs[x],"outputemail",11))
-			{	
-				l=0;
 				FINDRSCSETDOUBLE(prtrsrc,"PAGE LENGTH",l);
 				updatersrc(prtrsrc,"PAGE LENGTH");
 			}
@@ -1951,11 +1925,7 @@ void runprtscreen(HoldReport *h)
 			{
 				rrpt->archive=TRUE;
 			}
-			if(!strncmp(d->set_lpp,"rdareportcd",11) || !strncmp(d->set_lpp,"outputemail",11))
-			{
-				sprintf(stemp,"%.11s.lnx",d->set_lpp);
-				pdev=RDApdevNEW(stemp);
-			} else if((!strncmp(d->set_lpp,"AUTOARCHIVE",11)) && (XPERT_SETUP->ARCHIVE==TRUE))
+			if((!strncmp(d->set_lpp,"AUTOARCHIVE",11)) && (XPERT_SETUP->ARCHIVE==TRUE))
 			{
 				ArchiveSource=6;
 #ifdef WIN32
@@ -1974,10 +1944,6 @@ void runprtscreen(HoldReport *h)
 				} else if(pdev->page_length!=0 && r->display->page_length>9.9 && r->display->dumprinter==TRUE)
 				{
 					r->display->page_length=pdev->page_length;
-				}
-				if(!strncmp(d->set_lpp,"rdareportcd",11) || !strncmp(d->set_lpp,"outputemail",11))
-				{
-					r->display->page_length=0;
 				}
 /* needs to set the device variables HERE */
 				if(d->pvars!=NULL)
@@ -2110,11 +2076,7 @@ void runprtscreen(HoldReport *h)
 					if(d->set_lpp!=NULL) Rfree(d->set_lpp);
 					d->set_lpp=stralloc(temp);
 					d->set_lpp_eval=FALSE;
-					if(!strncmp(d->set_lpp,"rdareportcd",11) || !strncmp(d->set_lpp,"outputemail",11))
-					{
-						sprintf(stemp,"%.11s.lnx",d->set_lpp);
-						pdev=RDApdevNEW(stemp);
-					} else if((!strncmp(d->set_lpp,"AUTOARCHIVE",11)) && (XPERT_SETUP->ARCHIVE==TRUE))
+					if((!strncmp(d->set_lpp,"AUTOARCHIVE",11)) && (XPERT_SETUP->ARCHIVE==TRUE))
 					{
 						ArchiveSource=6;
 #ifdef WIN32
@@ -2130,14 +2092,6 @@ void runprtscreen(HoldReport *h)
 						if(pdev->line_58==TRUE && r->display->dumprinter==TRUE)
 						{
 							r->display->page_length=9.9;
-						}
-						if(!strncmp(d->set_lpp,"rdareportcd",11) || !strncmp(d->set_lpp,"outputemail",11))
-						{
-							r->display->page_length=0;
-						}
-						if(!strncmp(d->set_lpp,"rdareportcd",11) || !strncmp(d->set_lpp,"outputemail",11))
-						{
-							r->display->page_length=0;
 						}
 /* needs to set the device variables HERE */
 						if(d->pvars!=NULL)
@@ -2892,7 +2846,6 @@ void xReportBackEnd(RDArunrpt *runrpt,RDAreport *rpt,int line,char *file)
 	int pdfpagetype=1;
 	int ret_int=0;
 
-	diagrptgen=TRUE;
 	CLSReportfiles(runrpt,FALSE);
 #ifdef USE_RDA_DIAGNOSTICS
 	if(diagrptgen_outall)

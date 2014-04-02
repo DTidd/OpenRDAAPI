@@ -268,6 +268,29 @@ void OpenRDALoadingIndicator::setMessage(const WString& text)
 extern OpenRDALoadingIndicator *myOpenRDALoadingIndicator;
 extern DiagnosticLoadingIndicator *myDiagnosticLoadingIndicator;
 
+char *RDA_EncodeWhiteSpace(char *temp1)
+{
+	int z=0;
+	char *temp_str=NULL,*temp=NULL;
+	
+	if(isEMPTY(temp1)) return(NULL);
+	temp_str=Rmalloc((RDAstrlen(temp1)*2)+1);
+	z=0;
+	for(temp=temp1;*temp;++temp)
+	{
+		if(*temp==' ') 
+		{
+			temp_str[z]=0xC2;
+			temp_str[z+1]=0xA0;
+			z+=2;
+		} else {
+			temp_str[z]=*temp;
+			++z;
+		}
+	}	
+	return(temp_str);
+}
+
 char *WT_GetAppRoot()
 {
 	char *temp=NULL;
@@ -336,7 +359,10 @@ int WT_RDA_SetEnv(char *name,char *value,int line,char *file)
 	setenv(name,value,TRUE);
 	myAPP=Wt::WApplication::instance();
 	n1=new string(name);
-	if(Skip_OpenRDA_Cookies==FALSE) addAPPlib(OpenRDA_Cookies,name);
+	if(Skip_OpenRDA_Cookies==FALSE) 
+	{
+		addAPPlib(OpenRDA_Cookies,name);
+	}
 	v1=new string(value);
 /*
 	p=new string("/xpert-mysql");
@@ -378,7 +404,10 @@ int WT_RDA_PutEnv(char *namevalue,int line,char *file)
 		*temp2=0;
 		++temp2;
 	}
-	if(Skip_OpenRDA_Cookies==FALSE) addAPPlib(OpenRDA_Cookies,name);
+	if(Skip_OpenRDA_Cookies==FALSE) 
+	{
+		addAPPlib(OpenRDA_Cookies,name);
+	}
 	myAPP=Wt::WApplication::instance();
 	n1=new string(name);
 	if((RDAstrlen(namevalue)-1)==RDAstrlen(name)) 
@@ -421,6 +450,7 @@ int WT_RDA_UnSetEnv(char *name,int line,char *file)
 	{
 		prterr("DIAG WT_RDA_UnSetEnv Cookie [%s] at line [%d] program [%s].",(name!=NULL ? name:""),line,(file!=NULL ? file:""));
 	}
+	if(isEMPTY(name)) return;
 	unsetenv(name);
 	myAPP=Wt::WApplication::instance();
 	n1=new string(name);
@@ -1047,14 +1077,6 @@ int main(int argc,char *argv[])
 
 	RDAMAINWIDGET=NULL;
 	Skip_OpenRDA_Cookies=FALSE;
-/*
-	diaggui=TRUE;diageval=TRUE;TRACE;
-	diagapps=TRUE;TRACE;
-	diagapps=TRUE;diaggui=TRUE;diageval=TRUE;diagmix=TRUE;diagvirtual=TRUE;TRACE;
-	diagalloc=TRUE;diaggui=TRUE;diageval=TRUE;diagnrd=TRUE;diagmix=TRUE;diagvirtual=TRUE;diagsec=TRUE;diagmisc=TRUE;TRACE;
-	diaggui=TRUE;TRACE;
-	diaggui=TRUE;diageval=TRUE;diagnrd=TRUE;diagmix=TRUE;diagvirtual=TRUE;diagsec=TRUE;diagmisc=TRUE;TRACE;
-*/
 
 	RDA_argc=argc;
 	RDA_argv=argv;
@@ -1177,11 +1199,8 @@ void xEXITGUI(int line,char *file)
 	std::string s1("http:/");
 	Wt::WString *c=NULL;
 	int x=0;
+
 #ifdef WT_FASTCGI
-/*
-	std::string closeWindowCmd=
-		("window.opener.focus(); window.close();");
-*/
 	std::string closeWindowCmd=
 		("window.close();");
 #endif
@@ -1204,14 +1223,6 @@ void xEXITGUI(int line,char *file)
 	if(BEGINNING_BALANCE_ACCOUNT!=NULL) FreeRDAacctmstr(BEGINNING_BALANCE_ACCOUNT);
 	if(CUSTOM_INPUTS_ACCOUNT!=NULL) FreeRDAacctmstr(CUSTOM_INPUTS_ACCOUNT);
 	if(CMAIN_ARGS!=NULL) freeapplib(CMAIN_ARGS);
-	if(RDAMAINWIDGET!=NULL)
-	{
-		c=new WString("We'll see you soon...");
-		RDAMAINWIDGET->loadingIndicator()->setMessage(*c);
-		c->~WString();
-		RDAMAINWIDGET->root()->clear();
-		RDAMAINWIDGET->quit();
-	}
 	if(OpenRDA_Cookies!=NULL)
 	{
 		for(x=0;x<OpenRDA_Cookies->numlibs;++x)
@@ -1220,6 +1231,14 @@ void xEXITGUI(int line,char *file)
 		}
 		freeapplib(OpenRDA_Cookies);
 		OpenRDA_Cookies=NULL;
+	}
+	if(RDAMAINWIDGET!=NULL)
+	{
+		c=new WString("We'll see you soon...");
+		RDAMAINWIDGET->loadingIndicator()->setMessage(*c);
+		c->~WString();
+		RDAMAINWIDGET->root()->clear();
+		RDAMAINWIDGET->quit();
 	}
 #ifdef WT_FASTCGI
 	if(!RDAstrcmp(PROGRAM_NAME,"openrda.lnx") || !RDAstrcmp(PROGRAM_NAME,"openrda.exe"))
@@ -1954,22 +1973,8 @@ short xupdatemember(RDArmem *member,int line,char *file)
 							{
 								wSI=new WStandardItem();
 								wSI->setFlags(wSI->flags() | Wt::ItemIsXHTMLText);
-								temp1=stralloc((*(member->list[0]+x)));
-								temp_str=Rmalloc((RDAstrlen(temp1)*2)+1);
-								z=0;
-								for(temp=temp1;*temp;++temp)
-								{
-									if(*temp==' ') 
-									{
-										temp_str[z]=0xC2;
-										temp_str[z+1]=0xA0;
-										z+=2;
-									} else {
-										temp_str[z]=*temp;
-										++z;
-									}
-								}	
-								if(temp1!=NULL) Rfree(temp1);
+								temp1=((*(member->list[0]+x)));
+								temp_str=RDA_EncodeWhiteSpace(temp1);
 								text = new Wt::WString(temp_str,UTF8);
 								if(temp_str!=NULL) Rfree(temp_str);
 								wSI->setText(*text);
@@ -2355,7 +2360,7 @@ short xupdatemember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 				break;
 			case SSHORTV:
-				value=uintamt(*member->value.short_value,
+				value=sintamt(*member->value.short_value,
 					(member->cols?member->cols:member->field_length));
 				unpad(value);
 				if(!USER_INTERFACE)
@@ -2431,7 +2436,7 @@ short xupdatemember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 				break;
 			case SLONGV:
-				value=uintamt(*member->value.integer_value,
+				value=sintamt(*member->value.integer_value,
 					(member->cols?member->cols:member->field_length));
 				if(!USER_INTERFACE)
 				{
@@ -4787,6 +4792,11 @@ void list_doubleclick_callback(RDArmem *member)
 		prterr("DIAG list_doubleclick_callback Executing the List Double-Click Callback for Resource [%s] on Screen [%s] [%s].",member->rscrname,rsrc->module,rsrc->screen);
 	}
 #endif /* USE_RDA_DIAGNOSTICS */
+	if(NoLosingFocus!=NULL && NoLosingFocus!=member)
+	{
+		ExecuteRDArmemFunction(NoLosingFocus);
+	}
+	NoLosingFocus=member;
 	if(member->editable && member->user_editable)
 	{
 		CB=(Wt::WComboBox *)member->w;
@@ -4817,6 +4827,11 @@ void list_callback(RDArmem *member)
 	{ 
 		prterr("DIAG list_callback Executing the List Callback for Resource [%s] on Screen [%s] [%s].",member->rscrname,rsrc->module,rsrc->screen);
 	}
+	if(NoLosingFocus!=NULL && NoLosingFocus!=member)
+	{
+		ExecuteRDArmemFunction(NoLosingFocus);
+	}
+	NoLosingFocus=member;
 #endif /* USE_RDA_DIAGNOSTICS */
 	if(rsrc->input_focus!=NULL) Rfree(rsrc->input_focus);
 	rsrc->input_focus=stralloc(member->rscrname);
@@ -4962,20 +4977,6 @@ void runfuncexitcallback(RDArmem *member)
 		--WindowCount;
 		if(WindowCount<1) 
 		{
-/* Thinking of using Javascript closeWindow() { window.close(); } */
-/* Thinking of using Javascript openWindow() { window.open(); } */
-/* Can use RDAMAINWIDGET->doJavaScript(); */
-/* use javascript to kill window */
-/*
-			if(RDAMAINWIDGET!=NULL)
-			{
-				c=new WString("We'll see you soon...");
-				RDAMAINWIDGET->loadingIndicator()->setMessage(*c);
-				c->~WString();
-				RDAMAINWIDGET->root()->clear();
-				RDAMAINWIDGET->quit();
-			}
-*/
 		}
 	}
 }

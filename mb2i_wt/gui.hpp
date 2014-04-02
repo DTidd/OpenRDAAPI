@@ -749,5 +749,6 @@ void DisplayRelativeFile(char *);
 #define UTF8famt(a,b)	xUTF8famt(a,b,__LINE__,__FILE__)
 char *xUTF8famt(double,int,int,char *);
 void GUI_OpenURL(char *);
+char *RDA_EncodeWhiteSpace(char *);
 
 #endif /* GUI_HPP */

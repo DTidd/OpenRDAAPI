@@ -1252,12 +1252,15 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 							if(!RDAstrcmp(member->rscrname,"BROWSE LIST")) hold=(Wt::WWidget *)member->w->parent();
 								else if((member->field_type==0 || member->field_type==1) && member->rtype>4) hold=(Wt::WWidget *)member->w->parent();
 								else hold=member->w;
+/*
 							if(wdgt->type==9)
 							{
 								lBox->addWidget((Wt::WWidget *)hold,0,Wt::AlignMiddle);
 							} else {
 								lBox->addWidget((Wt::WWidget *)hold);
 							}
+*/
+							lBox->addWidget((Wt::WWidget *)hold);
 							if(frame_style!=(-1))
 							{
 								FrameWidget((Wt::WWidget *)hold,frame_style);
@@ -1299,7 +1302,7 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 								{
 								if(!last)
 								{
-									hold =(Wt::WWidget *) new Wt::WText("<pre> </pre>",Wt::XHTMLText);
+									hold =(Wt::WWidget *) new Wt::WText(" ",PlainText);
 									mssc=ModuleScreenStyleClass(rsrc);
 									memset(GUIstemp,0,1024);
 									sprintf(GUIstemp,"OpenRDA %s LineStretch",mssc);
@@ -1417,10 +1420,9 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 					{
 						if(wdgt->label!=NULL)
 						{
-							tmpstr=Rmalloc(RDAstrlen(wdgt->label)+12);
-							sprintf(tmpstr,"<pre>%s</pre>",(wdgt->label!=NULL ? wdgt->label:""));
+							tmpstr=RDA_EncodeWhiteSpace(wdgt->label);
 						} else {
-							tmpstr=stralloc(" ");
+							tmpstr=stralloc("<pre> </pre>");
 						}
 						temp_xstr = new WString(tmpstr,UTF8);
 						dashes=adddashes(wdgt->label);
@@ -1559,7 +1561,7 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 					if(num)
 					{
 						rowsx=crtscrollwindow((WWidget *)*line,scn,rsrc,widgetcount,&hold);
-						lBox->addWidget((Wt::WWidget *)hold);
+						lBox->addWidget((Wt::WWidget *)hold,200);
 						last=TRUE;
 						if(frame_style!=(-1))
 						{
@@ -1710,11 +1712,14 @@ int xcrttoolbarcontainer(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *wid
 	sprintf(GUIstemp,"OpenRDA %s ToolBar PushButton PopupMenu",mssc);
 	if(mssc!=NULL) Rfree(mssc);
 	popMenu->addStyleClass(GUIstemp);
-	popMenu->setAutoHide(TRUE,1500);
+	popMenu->setAutoHide(TRUE,200);
 	c=new WString(wdgt->label);
 	B->setText(*c);
 	c->~WString();
 	B->setMenu(popMenu);
+	B->mouseWentOver().connect(std::bind([=] () {
+		B->menu()->popup(B);
+	}));
 	B->setDefault(FALSE);
 	rsrc->window_toolbar->addButton(B);
 	while((*widgetcount+1)<scn->numwdgts)
@@ -1805,7 +1810,7 @@ int xcrtpopup(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt
 		sprintf(GUIstemp,"OpenRDA %s PushButton PopupMenu",mssc);
 		if(mssc!=NULL) Rfree(mssc);
 		pB->addStyleClass(GUIstemp);
-		pB->setAutoHide(TRUE,1500);
+		pB->setAutoHide(TRUE,200);
 		*pop=(Wt::WWidget *)pB;
 		ppB=((Wt::WPopupMenu *)parent);		
 		ppB->addMenu(wdgt->label,(Wt::WPopupMenu *)pB);
@@ -1829,7 +1834,7 @@ int xcrtpopup(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt
 			*pop=(Wt::WWidget *)SB;
 			mssc=ModuleScreenStyleClass(rsrc);
 			memset(GUIstemp,0,1024);
-			sprintf(GUIstemp,"OpenRDA %s SplitButton",mssc);
+			sprintf(GUIstemp,"OpenRDA %s SplitButton btn-group-justified",mssc);
 			if(mssc!=NULL) Rfree(mssc);
 			SB->addStyleClass(GUIstemp);
 			c->~WString();
@@ -1845,13 +1850,19 @@ int xcrtpopup(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt
 		}
 		if(mssc!=NULL) Rfree(mssc);
 		pB->addStyleClass(GUIstemp);
-		pB->setAutoHide(TRUE,1500);
+		pB->setAutoHide(TRUE,200);
 		if(rtype==0)
 		{
 			B->setMenu(pB);
 			B->setDefault(FALSE);
+			B->mouseWentOver().connect(std::bind([=] () {
+				B->menu()->popup(B);
+			}));
 		} else {
 			SB->dropDownButton()->setMenu(pB);
+			SB->dropDownButton()->mouseWentOver().connect(std::bind([=] () {
+				SB->menu()->popup(B);
+			}));
 		}
 #ifdef FLAT_DOCK_BUTTON
 		if(rtype==0)
@@ -2124,12 +2135,15 @@ int xcrtbox(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt::
 							makefield((Wt::WWidget *)hBox,member,wdgt->label,wdgt->XHTML_Label,wdgt->pixmap,wdgt->rows,wdgt->cols,wdgt->rtype,NULL,0,0,0,0);
 							if(!RDAstrcmp(member->rscrname,"BROWSE LIST")) hold=(Wt::WWidget *)member->w->parent();
 								else hold=member->w;
+/*
 							if(wdgt->type==9)
 							{
 								myGrid->addWidget((Wt::WWidget *)hold,row,col,AlignMiddle|AlignJustify);
 							} else {
 								myGrid->addWidget((Wt::WWidget *)hold,row,col,0);
 							}
+*/
+							myGrid->addWidget((Wt::WWidget *)hold,row,col,0);
 							++col;
 							if(member->field_type!=BOOLNS && Widest!=0)
 							{
@@ -3089,6 +3103,7 @@ int xcrtpanel(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 				if(rowsx>0)
 				{
 					vb->addWidget((Wt::WWidget *)line_widget,(rowsx>0 ? rowsx-1:0),Wt::AlignLeft | Wt::AlignJustify);
+					vb->setStretchFactor((Wt::WWidget *)line_widget,200);
 					++line_count;
 					hold_widget=line_widget;
 					if(frame_style!=(-1))
@@ -3161,7 +3176,12 @@ int xcrtscrollwindow(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 	{
 		L=Wt::WLength(wdgt->cols);
 		H=Wt::WLength(wdgt->rows);
-		VB->setMaximumSize(L,H);
+		if(rsrc->primary!=NULL)
+		{
+			VB->setMaximumSize(L,H);
+		} else {
+			VB->setMaximumSize(Wt::WLength::Auto,H);
+		}
 		VB->setMinimumSize(L,H);
 	}
 	vb1=new Wt::WHBoxLayout();
@@ -3386,6 +3406,7 @@ int xcrtscrollwindow(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 				if(rowsx>0)
 				{
 					vb->addWidget((Wt::WWidget *)line_widget,(rowsx>0 ? rowsx-1:0),Wt::AlignLeft | Wt::AlignJustify);
+					vb->setStretchFactor((Wt::WWidget *)line_widget,200);
 					++line_count;
 					hold_widget=line_widget;
 					if(frame_style!=(-1))
@@ -3919,6 +3940,7 @@ void crtwdgts(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsc,char *label)
 						CW->addWidget(line_widget);
 					} else {
 						vb->addWidget((Wt::WWidget *)line_widget,(rowz>0 ? rowz-1:0),Wt::AlignLeft | Wt::AlignJustify);
+						vb->setStretchFactor((Wt::WWidget *)line_widget,200);
 					}
 #else 
 					CW->addWidget(line_widget);

@@ -1903,7 +1903,7 @@ void process_dataline(RDArunrpt *rrpt,RDAreport *rpt,RDAimage *image,
 	int x,y;
 	NRDfield *field=NULL,*field2=NULL,*field3=NULL,*field4=NULL,*field5=NULL,*field6=NULL;
 	RDApval *pval;
-	char *trnfield=NULL;
+	char *trnfield=NULL,xtemp[1024];
 	HoldReport *h=NULL;
 	RDATData *prev=NULL;
 
@@ -2227,7 +2227,9 @@ void process_dataline(RDArunrpt *rrpt,RDAreport *rpt,RDAimage *image,
 				{
 					if(!isEMPTY(field->data.string_value))
 					{
-						unlink(field->data.string_value);
+						memset(xtemp,0,1024);
+						sprintf(xtemp,"%s/%s",CURRENTDIRECTORY,field->data.string_value);
+						unlink(xtemp);
 					}
 				}
 				FreeNRDfieldvalue(field);

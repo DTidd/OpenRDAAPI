@@ -108,9 +108,6 @@ void WWWprocess_dataline(RDArunrpt *rrpt,RDAreport *rpt,RDAimage *image,
 		}
 		if(modx!=NULL) Rfree(modx);
 		if(filx!=NULL) Rfree(filx);
-	} else if(!strncmp(&image->line[0],"SENDATTACH-3",12) || 
-		!strncmp(&image->line[0],"sendattach-3",12))
-	{
 
 	} else if(!strncmp(&image->line[0],"SENDATTACH-1",12) || 
 		!strncmp(&image->line[0],"sendattach-1",12))

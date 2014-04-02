@@ -1165,5 +1165,6 @@ void OpenRDA_CaptureAutoComplete(char *,char *,char *,char *);
 short DoInitializeSecurity(void);
 #define LongestAccountCode(a)	xLongestAccountCode(a,__LINE__,__FILE__)
 short xLongestAccountCode(short type,int line,char *file);
+char *EscXHTMLLabel(char *,short);
 
 #endif /* MIX_H */

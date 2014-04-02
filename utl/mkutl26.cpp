@@ -294,6 +294,13 @@ static void SCN_GENERIC_SETUP_VARIABLES()
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,21,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,20,"","Menu Config","","",0,0,0,NULL,NULL,NULL,NULL);
+		if(XPERT_SETUP->software_type<2)
+		{
+		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,5,"","OpenRDA Style:","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,7,"OPENRDA STYLES","OpenRDA Style:","","",1,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		}
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,5,"","Used to denote whether or not to keep the main menu alive after launch of another menu.","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
@@ -2484,6 +2491,122 @@ static void GSV_DOMENU_STYLE_BLOCKS_TAB_BAR_ON_DOCK_WINDOW()
 	if(libx!=NULL) Rfree(libx);
 	if(gsv!=NULL) FreeRDAGenericSetup(gsv);
 }
+static void GSV_OPENRDA_STYLE()
+{
+	RDAGenericSetup *gsv=NULL;
+	char *temp1=NULL,*libx=NULL;
+
+	libx=Rmalloc(RDAstrlen(CURRENTDIRECTORY)+RDAstrlen(module)+11);
+#ifndef WIN32
+	sprintf(libx,"%s/rda/%s.GSV",CURRENTDIRECTORY,module);
+#endif
+#ifdef WIN32
+	sprintf(libx,"%s\\rda\\%s.GSV",CURRENTDIRECTORY,module);
+#endif
+
+	gsv=RDAGenericSetupNew("UTILITIES","OPENRDA STYLE");
+	if(gsv!=NULL)
+	{
+		if(getRDAGenericSetupbin(libx,gsv))
+		{
+			gsv->type=7;
+			gsv->length=2;
+			gsv->desc=stralloc("This output definition is used to define the style of OpenRDA implemented.  The style defines the location of the status bar and some other attributes of the OpenRDA Navigational Program.");
+			gsv->label=stralloc("OpenRDA Style:");
+			gsv->value.short_value=Rmalloc(sizeof(short));
+			*gsv->value.short_value=0;
+	
+			if(writeRDAGenericSetupbin(libx,gsv))
+			{
+				if(temp1!=NULL) Rfree(temp1);
+				if(libx!=NULL) Rfree(libx);
+				temp1=Rmalloc(13+9+110+1);
+				sprintf(temp1,"GENERIC SETUP VARIABLE WRITE ERROR: Module [UTILITIES] GSV [OPENRDA STYLE], Can Not Save Generic Setup Variable!");
+				prterr(temp1);
+				if(errorlist!=NULL)
+				{
+					addERRlist(&errorlist,temp1);
+				}
+				if(temp1!=NULL) Rfree(temp1);
+			}
+		}
+		if(temp1!=NULL) Rfree(temp1);
+	}
+	if(libx!=NULL) Rfree(libx);
+	if(gsv!=NULL) FreeRDAGenericSetup(gsv);
+}
+static void LST_OPENRDA_STYLES()
+{
+	RDAScrolledList *list=NULL;
+	char *defdir=NULL;
+	char *temp1=NULL;
+
+	list=RDAScrolledListNew("UTILITIES","OPENRDA STYLES");
+	if(list!=NULL)
+	{
+		list->vtype=0;
+		list->type=1;
+	temp1=Rmalloc(3+1);
+	sprintf(temp1,"%s",
+		"");
+		list->select_formula=stralloc(temp1);
+		if(temp1!=NULL) Rfree(temp1);
+		list->special_function=stralloc("");
+		list->num=0;
+		list->initfld=NULL;
+		list->ffield=stralloc("");
+		list->ffinfo=Rmalloc(sizeof(DFincvir));
+		list->ffinfo->module=stralloc("");
+		list->ffinfo->file=stralloc("");
+		list->ffinfo->keyname=stralloc("");
+		list->contype=1;
+		list->conmod=stralloc("OPENRDA STYLE");
+		list->confil=stralloc("");
+		list->confld=stralloc("");
+	temp1=Rmalloc(3+1);
+	sprintf(temp1,"%s",
+		"");
+		list->format_formula=stralloc(temp1);
+		if(temp1!=NULL) Rfree(temp1);
+	temp1=Rmalloc(3+1);
+	sprintf(temp1,"%s",
+		"");
+		list->reformat_formula=stralloc(temp1);
+		if(temp1!=NULL) Rfree(temp1);
+	temp1=Rmalloc(3+1);
+	sprintf(temp1,"%s",
+		"");
+		list->unformat_formula=stralloc(temp1);
+		if(temp1!=NULL) Rfree(temp1);
+		list->desc=stralloc("Lists the styles used by OpenRDA.");
+		list->timing=0;
+		list->list=APPlibNEW();
+		addAPPlib(list->list,"OpenRDA 3.0");
+		addAPPlib(list->list,"Accordion Status Bar");
+
+		defdir=Rmalloc(RDAstrlen(CURRENTDIRECTORY)+RDAstrlen(module)+12);
+#ifndef WIN32
+		sprintf(defdir,"%s/rda/%s.LST",CURRENTDIRECTORY,module);
+#endif
+#ifdef WIN32
+		sprintf(defdir,"%s\\rda\\%s.LST",CURRENTDIRECTORY,module);
+#endif
+		if(writeScrolledListbin(defdir,list))
+		{
+			if(temp1!=NULL) Rfree(temp1);
+			temp1=Rmalloc(14+9+100+1);
+			sprintf(temp1,"SCROLLED LIST WRITE ERROR: Module [UTILITIES] RDAScrolledList [OPENRDA STYLES], Can Not Save Scrolled List!");
+			prterr(temp1);
+			if(errorlist!=NULL)
+			{
+				addERRlist(&errorlist,temp1);
+			}
+			if(temp1!=NULL) Rfree(temp1);
+		}
+		if(defdir!=NULL) Rfree(defdir);
+		if(list!=NULL) FreeRDAScrolledList(list);
+	}
+}
 void UTLGSV()
 {
 	GSV_HTTP_PROXY();
@@ -2536,5 +2659,7 @@ void UTLGSV()
 		GSV_OPTIONAL_MODULE_GROUP_3();
 		GSV_OPTIONAL_MODULE_GROUP_4();
 		GSV_FIRST_DEMONSTRATION();
+		GSV_OPENRDA_STYLE();
+		LST_OPENRDA_STYLES();
 	}
 }

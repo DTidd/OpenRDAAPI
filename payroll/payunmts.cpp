@@ -680,7 +680,6 @@ int main(int argc,char **argv)
 			if(args!=NULL) freeapplib(args);
 		}
 		ShutdownSubsystems();
-		exit(0);
 	} else {
 		PAYID=NULL;
 		AUTO_UNDO=FALSE;

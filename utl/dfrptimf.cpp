@@ -546,16 +546,6 @@ static void linescreen(RDArsrc *mimgrsrc,int num,char *varname,char *fldname,
 	{
 		addAPPlib(fldnames,"FROM FILENAME");
 		addAPPlib(fldnames,"TO FILENAME");
-	} else if(!strncmp(&linex[0],"SENDATTACH-3",12) ||
-		!strncmp(&linex[0],"sendattach-3",12))
-	{
-		addAPPlib(fldnames,"NAME OF SENDER");
-		addAPPlib(fldnames,"SENDER EMAIL ADDRESS");
-		addAPPlib(fldnames,"SUBJECT");
-		addAPPlib(fldnames,"BODY");
-		addAPPlib(fldnames,"RECIPIENT EMAIL ADDRESS");
-		addAPPlib(fldnames,"FILENAMES TO BE ATTACHED");
-		addAPPlib(fldnames,"EMAIL ATTACHMENTS TO BE NAMED");
 	} else if(!strncmp(&linex[0],"SENDATTACH-1",12) ||
 		!strncmp(&linex[0],"sendattach-1",12))
 	{
@@ -882,7 +872,6 @@ static void lineaddabove(RDArsrc *mimgrsrc)
 		strncmp(&test[0],"SENDMAIL",8) &&
 		strncmp(&test[0],"EMAILUSERINFO",13) && 
 		strncmp(&test[0],"SENDATTACH-1",12) &&
-		strncmp(&test[0],"SENDATTACH-3",12) &&
 		strncmp(&test[0],"SEND EMAIL",10) &&
 		strncmp(&test[0],"WRITE BLOB",10) &&
 		strncmp(&test[0],"HTTP POST",9) &&
@@ -920,7 +909,6 @@ static void copyline(RDArsrc *mimgrsrc)
 		strncmp(&test[0],"SENDMAIL",8) &&
 		strncmp(&test[0],"EMAILUSERINFO",13) && 
 		strncmp(&test[0],"SENDATTACH-1",12) &&
-		strncmp(&test[0],"SENDATTACH-3",12) &&
 		strncmp(&test[0],"SEND EMAIL",10) &&
 		strncmp(&test[0],"WRITE BLOB",10) &&
 		strncmp(&test[0],"HTTP POST",9) &&
@@ -967,7 +955,6 @@ static void lineaddbelow(RDArsrc *mimgrsrc)
 		strncmp(&test[0],"SENDMAIL",8) &&
 		strncmp(&test[0],"EMAILUSERINFO",13) && 
 		strncmp(&test[0],"SENDATTACH-1",12) &&
-		strncmp(&test[0],"SENDATTACH-3",12) &&
 		strncmp(&test[0],"SEND EMAIL",10) &&
 		strncmp(&test[0],"WRITE BLOB",10) &&
 		strncmp(&test[0],"HTTP POST",9) &&
@@ -1078,7 +1065,6 @@ static void lineedit(RDArsrc *mimgrsrc)
 		strncmp(&test[0],"SENDMAIL",8) &&
 		strncmp(&test[0],"EMAILUSERINFO",13) && 
 		strncmp(&test[0],"SENDATTACH-1",12) &&
-		strncmp(&test[0],"SENDATTACH-3",12) &&
 		strncmp(&test[0],"SEND EMAIL",10) &&
 		strncmp(&test[0],"WRITE BLOB",10) &&
 		strncmp(&test[0],"HTTP POST",9) &&

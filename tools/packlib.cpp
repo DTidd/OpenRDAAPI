@@ -2,32 +2,6 @@
 #include <packlib.hpp>
 #include <mkmtn.hpp>
 
-char *EscXHTMLLabel(char *s)
-{
-	char *n=NULL,*temp=NULL;
-	int l=0,x=0,len=0;
-
-	if(isEMPTY(s)) return(NULL);
-	len=RDAstrlen(s)*2+1;
-	n=Rmalloc(len);
-	memset(n,0,len);
-	l=0;
-	for(x=0,temp=s;*temp && x<len;++temp,++x)
-	{
-		if(*temp=='\n')
-		{
-			sprintf(&n[l],"\\n");
-			l+=2;
-		} else if(*temp=='"')
-		{
-			sprintf(&n[l],"\\\"");
-			l+=2;
-		} else {
-			n[l++]=*temp;
-		}
-	}
-	return(n);
-}
 char *fixname(char *name)
 {
 	int str_length=0,x;

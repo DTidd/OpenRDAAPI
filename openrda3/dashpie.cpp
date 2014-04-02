@@ -138,7 +138,6 @@ short ReadExpenditureActivity()
 			ef=NXTNRD(fileno,1);
 		}
 		CLSNRD(fileno);
-		fprintf(RDA_STDERR,"count [%d] ",count);TRACE;
 		return((DID_STUFF==TRUE ? 0:(-2)));
 	} else {
 		return(-1);
@@ -181,7 +180,6 @@ Wt::WContainerWidget *UnPostedExpenditureActivity()
 	ExpenditureUnPosted->insertRows(ExpenditureUnPosted->rowCount(),numExpendAct);
 	for(x=0,e=myExpendAct;x<numExpendAct;++x,++e)
 	{
-		fprintf(RDA_STDERR,"x [%d] Source [%s] Count [%d] App [%.02f] Exp [%.02f] Enc [%.02f] ",x,e->source,e->count,e->app/100, e->exp/100,e->enc/100);TRACE;
 		ExpenditureUnPosted->setData(x,0,Wt::WString(e->source));
 		ExpenditureUnPosted->setData(x,1,e->count);
 		ExpenditureUnPosted->setData(x,2,e->app/100);
@@ -220,7 +218,6 @@ Wt::WContainerWidget *UnPostedExpenditureActivity()
 	xchart->resize(800,300);
 	xchart->setMargin(2,Wt::Side::Top | Wt::Side::Bottom);
 	xchart->setMargin(Wt::WLength::Auto,Wt::Side::Left | Wt::Side::Right);
-	SEE_ExpendAct();TRACE;
 	FreeExpendAct();
 	return(DashBoard);
 }

@@ -14,7 +14,7 @@
 #define MODE_RWXRWX___ (00770)
 #endif /* ifdef WIN32 */
 
-void PowerMasterButtonFunction(RDArsrc *,MaintainButton *);
+short PowerMasterButtonFunction(RDArsrc *,MaintainButton *);
 void PowerExecuteBrowseButtonFunc(RDArsrc *,MaintainButton *,void *,MTNPassableStruct *);
 void xMakePowerMasterBrowseButtons(RDArsrc *,MTNPassableStruct *,void (*)(...),int,char *);
 static void okBrowseButtonFunc(RDArsrc *,MaintainButton *);
@@ -43,8 +43,8 @@ static void getpreviouscb(RDArmem *,MTNPassableStruct *);
 static void getnextcb(RDArmem *,MTNPassableStruct *);
 static void SETID(RDArmem *,MTNPassableStruct *);
 static void SETFILES(RDArmem *,MTNPassableStruct *); 
-void MTNrun_prequit_buttonsmtn(RDArsrc *,MTNPassableStruct *,short);
-void MTNrun_prequit_buttonsbl(RDArsrc *,MTNPassableStruct *,short);
+short MTNrun_prequit_buttonsmtn(RDArsrc *,MTNPassableStruct *,short);
+short MTNrun_prequit_buttonsbl(RDArsrc *,MTNPassableStruct *,short);
 void MTNrun_presave_buttons(RDArsrc *,MTNPassableStruct *,short);
 void MTNrun_postsave_buttons(RDArsrc *,MTNPassableStruct *,short);
 void updateallMaintainII(RDArsrc *,MTNPassableStruct *,void *);
@@ -366,7 +366,7 @@ static void doexit_2(RDArsrc *rsrc,MTNPassableStruct *PSTRUCT)
 		if(rsrc!=NULL)
 		{
 			MTNMASTER->WindowCount-=1;
-			killwindow(rsrc);
+			if(IsScreenDisplayed(rsrc)) killwindow(rsrc);
 			free_rsrc(rsrc);
 		}
 		doexit(PSTRUCT,pn);
@@ -374,6 +374,7 @@ static void doexit_2(RDArsrc *rsrc,MTNPassableStruct *PSTRUCT)
 }
 static void doexitbl(MakeBrowseList *blist)
 {
+	short did_ya=FALSE;
 	MTNPassableStruct *PSTRUCT=NULL, *PSTRUCTbl=NULL;
 	MaintainMaster *MTNMASTER=NULL;
 	int level=0;
@@ -405,7 +406,7 @@ static void doexitbl(MakeBrowseList *blist)
 				if(MTNMASTER->WindowCount<2)
 				{
 					level=MTNMASTER->level;
-					MTNrun_prequit_buttonsbl(PSTRUCT->rsrc,PSTRUCT,TRUE);
+					did_ya=MTNrun_prequit_buttonsbl(PSTRUCT->rsrc,PSTRUCT,TRUE);
 					if(level!=0)
 					{
 /*lint -e746 */
@@ -416,9 +417,10 @@ static void doexitbl(MakeBrowseList *blist)
 				if(blist->mainrsrc!=NULL)
 				{
 					MTNMASTER->WindowCount-=1;
+					if(IsScreenDisplayed(blist->mainrsrc)) killwindow(blist->mainrsrc);
 					free_rsrc(blist->mainrsrc);
 				}
-				doexit(PSTRUCT,pn);
+				if(!did_ya) doexit(PSTRUCT,pn);
 			}
 		}
 	}
@@ -578,11 +580,6 @@ void xPowerExecuteListFunc(RDArsrc *mainrsrc,int listnum,void *targetkey,
 							}
 							if(!RDAstrcmp(button->progname,"RUNREPORT") || !RDAstrcmp(button->progname,"runreport"))
 							{
-
-/* This removes the environment variables before they can be read when there is a range screen
-*/
-								blank_envpx1=TRUE;
-
 								if(envpx!=NULL)
 								{
 									for(x=0;x<envpx->numlibs;++x)
@@ -717,10 +714,6 @@ void PowerExecuteBrowseButtonFunc(RDArsrc *brsrc,MaintainButton *button,void *ta
 							}
 							if(!RDAstrcmp(button->progname,"RUNREPORT") || !RDAstrcmp(button->progname,"runreport"))
 							{
-
-/* This removes the environment variables before they can be read when there is a range screen
-*/
-								blank_envpx1=TRUE;
 								if(envpx!=NULL)
 								{
 									for(x=0;x<envpx->numlibs;++x)
@@ -893,10 +886,6 @@ void PostSaveButtonFunction(RDArsrc *mainrsrc,MaintainButton *button)
 					}
 					if(!RDAstrcmp(button->progname,"RUNREPORT") || !RDAstrcmp(button->progname,"runreport"))
 					{
-
-/* This removes the environment variables before they can be read when there is a range screen
-*/
-						blank_envpx1=TRUE;
 						if(envpx!=NULL)
 						{
 							for(x=0;x<envpx->numlibs;++x)
@@ -1006,10 +995,6 @@ void PostSaveButtonFunction(RDArsrc *mainrsrc,MaintainButton *button)
 						} else {
 							ADVExecute2Program(button->progname,newargs,envpx);
 						}
-/* remember can't free this because it is passed to the shell's environment by address and that memory used by the shell, SCO, DOS, and UNIXWARE will memoryfault sometimes- we might need to do stralloc and pass that value so we can delete tthe applib since it has more items other then the strings? */
-/*
-						if(envpx!=NULL) freeapplib(envpx);
-*/
 					}
 					if(envpx1!=NULL)
 					{
@@ -1033,8 +1018,9 @@ void PostSaveButtonFunction(RDArsrc *mainrsrc,MaintainButton *button)
 		}
 	}
 }
-void PowerMasterButtonFunction(RDArsrc *mainrsrc,MaintainButton *button)
+short PowerMasterButtonFunction(RDArsrc *mainrsrc,MaintainButton *button)
 {
+	short did_ya=FALSE;
 	APPlib *envpx=NULL,*newargs=NULL,*envpx1=NULL;
 	int x,ret_int=0;
 	char *value=NULL,*ret_string=NULL,blank_envpx1=FALSE;
@@ -1085,10 +1071,6 @@ void PowerMasterButtonFunction(RDArsrc *mainrsrc,MaintainButton *button)
 					}
 					if(!RDAstrcmp(button->progname,"RUNREPORT") || !RDAstrcmp(button->progname,"runreport"))
 					{
-
-/* This removes the environment variables before they can be read when there is a range screen
-*/
-						blank_envpx1=TRUE;
 						if(envpx!=NULL)
 						{
 							for(x=0;x<envpx->numlibs;++x)
@@ -1097,6 +1079,7 @@ void PowerMasterButtonFunction(RDArsrc *mainrsrc,MaintainButton *button)
 							}
 						}
 						RUNREPORTADV2(newargs->libs[0],newargs->libs[1],NULL,NULL,TRUE,2,NULL,button->func,mainrsrc,(void *)PSTRUCT,(MTNMASTER->level+1));
+						did_ya=TRUE;
 					} else if(!RDAstrcmp(button->progname,"RUNPOWERADD") || !RDAstrcmp(button->progname,"runpoweradd"))
 					{
 						blank_envpx1=TRUE;
@@ -1108,6 +1091,7 @@ void PowerMasterButtonFunction(RDArsrc *mainrsrc,MaintainButton *button)
 							}
 						}
 						RUNPOWERADDADV(newargs->libs[0],newargs->libs[1],(MTNMASTER->level+1),button->func,mainrsrc,(void *)PSTRUCT,TRUE);
+						did_ya=TRUE;
 					} else if(!RDAstrcmp(button->progname,"MULTIPOWERADD") || !RDAstrcmp(button->progname,"multipoweradd"))
 					{
 						blank_envpx1=TRUE;
@@ -1119,6 +1103,7 @@ void PowerMasterButtonFunction(RDArsrc *mainrsrc,MaintainButton *button)
 							}
 						}
 						MULTIPOWERADDADV(newargs->libs[0],newargs->libs[1],(MTNMASTER->level+1),button->func,mainrsrc,(void *)PSTRUCT,TRUE);
+						did_ya=TRUE;
 					} else if(!RDAstrcmp(button->progname,"RUNMAINTAIN") || !RDAstrcmp(button->progname,"runmaintain"))
 					{
 						blank_envpx1=TRUE;
@@ -1130,6 +1115,7 @@ void PowerMasterButtonFunction(RDArsrc *mainrsrc,MaintainButton *button)
 							}
 						}
 						RUNMAINTAINADV(newargs->libs[0],newargs->libs[1],(MTNMASTER->level+1),button->func,mainrsrc,(void *)PSTRUCT,TRUE);
+						did_ya=TRUE;
 					} else if(!RDAstrcmp(button->progname,"RMDIR") || !RDAstrcmp(button->progname,"rmdir"))
 					{
 						blank_envpx1=TRUE;
@@ -1219,6 +1205,7 @@ void PowerMasterButtonFunction(RDArsrc *mainrsrc,MaintainButton *button)
 			prterr("Error MTN Passable structure is NULL at line [%d] program [%s].",__LINE__,__FILE__);
 		}
 	}
+	return(did_ya);
 }
 void updateallMaintainII(RDArsrc *rsrc,MTNPassableStruct *PSTRUCT,void *v)
 {
@@ -1639,8 +1626,9 @@ static void readscreen(RDArsrc *mtnrsrc,MTNPassableStruct *PSTRUCT)
 		}
 	}
 }
-void MTNrun_prequit_buttonsmtn(RDArsrc *rsrc,MTNPassableStruct *PSTRUCT,short update)
+short MTNrun_prequit_buttonsmtn(RDArsrc *rsrc,MTNPassableStruct *PSTRUCT,short update)
 {
+	short did_ya=FALSE;
         int x;
         MaintainButton *button=NULL;
         char do_btn=FALSE;
@@ -1664,15 +1652,17 @@ void MTNrun_prequit_buttonsmtn(RDArsrc *rsrc,MTNPassableStruct *PSTRUCT,short up
 					{
 						button->func=updateallMaintainquitmtn;
 						button->parent=PSTRUCT;
-						PowerMasterButtonFunction(rsrc,button);
+						if(PowerMasterButtonFunction(rsrc,button)) did_ya=TRUE;
 					}
 				}
 			}
 		}
 	}
+	return(did_ya);
 }
-void MTNrun_prequit_buttonsbl(RDArsrc *rsrc,MTNPassableStruct *PSTRUCT,short update)
+short MTNrun_prequit_buttonsbl(RDArsrc *rsrc,MTNPassableStruct *PSTRUCT,short update)
 {
+	short did_ya=FALSE;
         int x;
         MaintainButton *button=NULL;
         char do_btn=FALSE;
@@ -1694,14 +1684,18 @@ void MTNrun_prequit_buttonsbl(RDArsrc *rsrc,MTNPassableStruct *PSTRUCT,short upd
 					} else do_btn=TRUE;
 					if(do_btn==TRUE)
 					{
+/*
 						button->func=updateallMaintainquitbl;
+*/
+						button->func=NULL;
 						button->parent=PSTRUCT;
-						PowerMasterButtonFunction(rsrc,button);
+						if(PowerMasterButtonFunction(rsrc,button)) did_ya=TRUE;
 					}
 				}
 			}
 		}
 	}
+	return(did_ya);
 }
 void MTNrun_presave_buttons(RDArsrc *rsrc,MTNPassableStruct *PSTRUCT,short update)
 {

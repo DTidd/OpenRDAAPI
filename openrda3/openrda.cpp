@@ -26,6 +26,8 @@
 /*CPP_OPART finmgtdash */
 /*CPP_OPART venpmtdash */
 /*CPP_OPART purorddash */
+/*CPP_OPART embedfeed */
+/*ADDLIB curl */
 /*ADDLIB add */
 /*ADDLIB rpt */
 /*ADDLIB mix */
@@ -37,7 +39,7 @@
 /*ADDLIB misc */
 
 
-short DOMENU_STYLE=0;
+short DOMENU_STYLE=0,OPENRDA_STYLE=0;
 
 APPlib *ENV_Start=NULL;
 Wt::WContainerWidget *MainWindow=NULL,*MainWindowCenter=NULL;
@@ -48,9 +50,11 @@ Wt::WPushButton *Reports_P=NULL,*Query_P=NULL;
 Wt::WPushButton *Maintenance_P=NULL,*Setup_P=NULL,*Other_P=NULL;
 Wt::WPopupMenu *FPOP=NULL,*Edit=NULL,*QueryPop=NULL,*Reports=NULL;
 Wt::WPopupMenu *Maintenance=NULL,*Setup=NULL,*Other=NULL,*Modules=NULL;
-Wt::WPopupMenu *Window=NULL;
+Wt::WPopupMenu *Window=NULL,*Finance_Pop=NULL;
+Wt::WStackedWidget *StatusWindowStack=NULL;
+Wt::WPushButton *Finance_P=NULL;
 extern Wt::WPopupMenu *ModuleDDL(short);
-short MODULE_FILENO=(-1),MENUITEM_FILENO=(-1);
+short MODULE_FILENO=(-1),MENUITEM_FILENO=(-1),OPENRDA_DATLOG=(-1);
 char *CURRENT_MODULE=NULL,*defmodule=NULL,*LAST_MODULE=NULL;
 char DISPLAY_FAST=FALSE,NO_NEWS=FALSE;
 int LAST_EXE=(-1),ARCHIVE_STYLE=0;
@@ -77,7 +81,7 @@ APPlib *ProcessList=NULL;
 APPlib *SysAdminModules=NULL,*SysAdminNames=NULL;
 APPlib *FinanceModules=NULL,*FNames=NULL,*PNames=NULL,*HNames=NULL,*RNames=NULL;
 APPlib *ProcurementModules=NULL,*HRModules=NULL,*RevenueModules=NULL;
-static void sign_out(void);
+static void sign_out(void),go_home(void);
 
 static char OpenRDA_POSTRKSWB()
 {
@@ -529,149 +533,24 @@ static void setcookie(Wt::WWidget *P)
 	APPlib *args=NULL;
 
 	args=APPlibNEW();
-	addAPPlib(args,"UTILITIES");
+	addAPPlib(args,"GUI");
 	addAPPlib(args,"SET COOKIE");
 	ExecuteProgram("doadd",args);
 	if(args!=NULL) freeapplib(args);
+}
+static void go_home()
+{
+	if(defmodule!=NULL) Rfree(defmodule);
+	defmodule=stralloc("HOME");
+	ChooseModule(defmodule);
 }
 static void sign_out()
 {
 	short ef=0;
 	char delflag=FALSE,*userid=NULL;
 	RDATData *prev=NULL;
-#ifdef XXXXX
-#ifndef WIN32
-	char stemp1[512],buffer[4096],*tmp=NULL;
-	char *temp=NULL;
-	int x=0,blen=0,y=0;
-	int start=0,end=0,p=0;
-	FILE *fp=NULL;
-	short retval=FALSE;
-	RDArsrc *Prsrc=NULL;
-
-	if(ProcessList!=NULL) freeapplib(ProcessList);
-	ProcessList=APPlibNEW();
-	memset(stemp1,0,512);
-	memset(buffer,0,4096);
-	sprintf(stemp1,"ps u --ppid %d | grep lnx ",RGETPID());
-	fp=popen(stemp1,"r");
-	if(fp!=NULL)
-	{
-		while(fread(&buffer[blen],1,1,fp))
-		{
-			++blen;
-			if(buffer[blen-1]=='\n') 
-			{
-				buffer[blen-1]=0;
-				if(!RDAstrstr(buffer,"grep")) 
-				{
-					if(RDAstrstr(buffer,"news.lnx"))
-					{
-						for(y=0;y<RDAstrlen(buffer);++y)
-						{
-							temp=buffer+y;
-							if(isdigit(*temp) && start==0)
-							{
-								start=y;
-							} else if(start!=0 && !isdigit(*temp))
-							{
-								end=y;
-							}
-							if(end!=0) break;
-						}
-						temp=stralloc(&buffer[start]);
-						temp[end-start]=0;
-						p=atoi(temp);
-						if(p!=0) kill(p,SIGTERM);
-						if(temp!=NULL) Rfree(temp);
-						memset(buffer,0,4096);
-						blen=0;
-					} else {
-						buffer[blen-1]=0;
-						if(!RDAstrstr(buffer,"grep")) 
-						{
-							addAPPlib(ProcessList,buffer);
-						}
-						memset(buffer,0,4096);
-						blen=0;
-					}
-				}
-			}
-		}
-		pclose(fp);
-	}
-	if(ProcessList->numlibs>0)
-	{
-			
-		Prsrc=RDArsrcNEW("UTILITIES","RUNNING PROCESSES");
-		Prsrc->scn=RDAscrnNEW("UTILITIES","RUNNING PROCESSES");
-		tmp=RDA_GetEnv("DEV_LICENSE");
-		addstdrsrc(Prsrc,"DEV_LICENSE",VARIABLETEXT,0,tmp,TRUE);
-		FINDRSCSETFUNC(Prsrc,"DEV_LICENSE",setdevlicense,NULL);
-		ADVaddwdgt(Prsrc->scn,1,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,3,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,1,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,5,"","The following processes are running or have been left open.","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,2,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,1,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,5,"","Please close the open processes or wait until the process completes before signing out.","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,2,"","","","",0,0,0,"","","","");
-#ifndef WIN32
-		ADVaddwdgt(Prsrc->scn,1,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,5,"","Use \"VNC Controls\" to raise minimized windows.","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,2,"","","","",0,0,0,"","","","");
-#endif
-		ADVaddwdgt(Prsrc->scn,1,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,5,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,2,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,1,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,11,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,2,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,1,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,5,"","The Development License is required to kill a rogue process.","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,2,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,1,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,5,"","A \"rogue\" process is one you can no longer raise or interact.","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,2,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,4,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,2,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,1,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,5,"","Development License:","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,0,"DEV_LICENSE","Development License","","",0,8,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,2,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,1,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,11,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,2,"","","","",0,0,0,"","","","");
-		x=0;
-		addlstrsrc(Prsrc,"RUNNING PROCESSES",&x,TRUE,NULL,ProcessList->numlibs,&ProcessList->libs,NULL);
-		ADVaddwdgt(Prsrc->scn,1,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,5,""," USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,2,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,1,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,7,"RUNNING PROCESSES","Running Processes","","",10,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,2,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,1,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,3,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,1,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,6,"KILL PROCESS","Kill Process","","",0,0,0,"","","([DEV_LICENSE]=TRUE)","");
-		ADVaddwdgt(Prsrc->scn,6,"QUIT","Cancel","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,6,"HELP","Help","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,2,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,4,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(Prsrc->scn,2,"","","","",0,0,0,"","","","");
-		addbtnrsrc(Prsrc,"KILL PROCESS",TRUE,killrunning,NULL);
-		addbtnrsrc(Prsrc,"QUIT",TRUE,quitrunning,NULL);
-		addbtnrsrc(Prsrc,"HELP",TRUE,screenhelp,NULL);
-		ADVmakescrn(Prsrc,FALSE);
-		return;
-	}
-	if(ProcessList!=NULL) freeapplib(ProcessList);
-	ShutdownSubsystems();
-#else
-	ShutdownSubsystems();
-#endif
-#else 
 	RDA_UnSetEnv("rdalogin");
+	CLSNRD(OPENRDA_DATLOG);
 	if(SEC_TOKEN_FILENO!=(-1))
 	{
 		ZERNRD(SEC_TOKEN_FILENO);
@@ -695,7 +574,6 @@ static void sign_out()
 		}
 	}
 	ShutdownSubsystems();
-#endif /* XXXXX */
 }
 static char *getopenselfserve()
 {
@@ -955,6 +833,34 @@ static void uimetric_all(Wt::WWidget *w)
 	ExecuteProgram("uimetric",args);
 	if(args!=NULL) freeapplib(args);
 }
+static void eDocumentStack()
+{
+	StatusWindowStack->setCurrentIndex(1);
+}
+static void MaintenanceStack()
+{
+}
+static void SetupStack()
+{
+}
+static void OtherStack()
+{
+}
+void CreateAccordionBar()
+{
+#ifdef XXXXXX
+	Wt::WStackedWidget *stack=NULL;
+	Wt::WContainerWidget *C=NULL;
+	Wt::WMenu *menu=NULL;
+
+	StatusWindowStack = new Wt::WStackedWidget(MainWindowStatus);
+	C = new Wt::WContainerWidget();
+	stack = new Wt::WStackedWidget(C);
+	menu=new Wt::WMenu(stack,Wt::Vertical,C);
+	menu->addItem("E-Documents",eDocumentStack);
+	menu->addItem("Maintenance",MaintenanceStack);
+#endif /* XXXXXX */
+}
 void CreateStatusBar()
 {
 	Wt::WVBoxLayout *MWSL=NULL;
@@ -974,7 +880,10 @@ void CreateStatusBar()
 	base64_encodestate enstate;
 	int count=0,y=0;
 
-	if(MainWindowStatus->count()>0) 
+	if(!RDAstrcmp(CURRENT_MODULE,"HOME"))
+	{
+		if(MainWindowStatus!=NULL) MainWindowStatus->clear();
+	} else if(MainWindowStatus->count()>0) 
 	{
 		if(Maintenance!=NULL) Maintenance->~WMenu();
 		Maintenance=ModuleDDL(2);
@@ -983,6 +892,11 @@ void CreateStatusBar()
 			Maintenance_P->setEnabled(FALSE);
 		} else {
 			Maintenance_P->setMenu(Maintenance);
+#ifdef __Use_mouseWentOver__ 
+			Maintenance_P->mouseWentOver().connect(std::bind([=] () {
+				Maintenance_P->menu()->popup(Maintenance);
+			}));
+#endif /* __USE_mouseWentOver__ */
 			Maintenance_P->setEnabled(TRUE);
 		}
 		if(Setup!=NULL) Setup->~WMenu();
@@ -992,6 +906,11 @@ void CreateStatusBar()
 			Setup_P->setEnabled(FALSE);
 		} else {
 			Setup_P->setMenu(Setup);
+#ifdef __Use_mouseWentOver__ 
+			Setup_P->mouseWentOver().connect(std::bind([=] () {
+				Setup_P->menu()->popup(Setup);
+			}));
+#endif /* __USE_mouseWentOver__ */
 			Setup_P->setEnabled(TRUE);
 		}
 		if(Other!=NULL) Other->~WMenu();
@@ -1001,11 +920,17 @@ void CreateStatusBar()
 			Other_P->setEnabled(FALSE);
 		} else {
 			Other_P->setMenu(Other);
+#ifdef __Use_mouseWentOver__ 
+			Other_P->mouseWentOver().connect(std::bind([=] () {
+				Other_P->menu()->popup(Other);
+			}));
+#endif /* __USE_mouseWentOver__ */
 			Other_P->setEnabled(TRUE);
 		}
 	} else {
 		MWSL=new Wt::WVBoxLayout();
 		MainWindowStatus->setLayout(MWSL);
+		MainWindowStatus->addStyleClass("OpenRDA ResourceBar");
 		MWSL->setSpacing(0);
 		daL=(Wt::WLayout *)MWSL;
 		daL->setContentsMargins(0,0,0,0);
@@ -1035,6 +960,11 @@ void CreateStatusBar()
 		c->~WString();
 		pop=new Wt::WPopupMenu();
 		P->setMenu(pop);
+#ifdef __Use_mouseWentOver__ 
+		P->mouseWentOver().connect(std::bind([=] () {
+			P->menu()->popup(pop);
+		}));
+#endif /* __USE_mouseWentOver__ */
 		P->setEnabled(TRUE);
 		pop->addItem("View E-Documents(s)")->triggered().connect(boost::bind(&FAST_Cabinet,P));
 		pop->addItem("Query E-Documents(s)")->triggered().connect(boost::bind(&FAST_QueryCabinet,P));
@@ -1251,6 +1181,11 @@ void CreateStatusBar()
 				c->~WString();
 				pop=new Wt::WPopupMenu();
 				P->setMenu(pop);
+#ifdef __Use_mouseWentOver__ 
+				P->mouseWentOver().connect(std::bind([=] () {
+					P->menu()->popup(pop);
+				}));
+#endif /* __USE_mouseWentOver__ */
 				P->setEnabled(TRUE);
 				for(y=0;y<SysAdminModules->numlibs;++y)
 				{
@@ -1265,7 +1200,6 @@ void CreateStatusBar()
 /* Open Self Service */
 			P=new Wt::WPushButton();
 			P->addStyleClass("OpenRDA ResourceBar OpenSelfServe");
-			StatusBarL->setColumnStretch(count,100);
 			StatusBarL->addWidget(P,0,count,0);
 			++count;
 			P->setDefault(FALSE);
@@ -1286,7 +1220,7 @@ int c_main(int argc,char **argv)
 int main(int argc,char **argv)
 #endif
 {
-	Wt::WContainerWidget *rC=NULL;
+	Wt::WContainerWidget *rC=NULL,*West=NULL;
 	Wt::WContainerWidget *ModuleNavigation=NULL;
 	Wt::WPushButton *P=NULL;
 	Wt::WContainerWidget *v1=NULL,*v2=NULL,*h=NULL;
@@ -1326,7 +1260,11 @@ int main(int argc,char **argv)
 	myMENUITEMS=fopen(stemp,"abc");
 #endif
 	dotrans=TRUE;
+#ifdef __NOT_USING_HOME__
 	CURRENT_MODULE=stralloc("FINMGT");
+#else
+	CURRENT_MODULE=stralloc("HOME");
+#endif /* __NOT_USING_HOME__ */
 	libx=Rmalloc(RDAstrlen(CURRENTDIRECTORY)+RDAstrlen("ARCHIVE")+11);
 #ifndef WIN32
 	sprintf(libx,"%s/rda/%s.GSV",CURRENTDIRECTORY,"ARCHIVE");
@@ -1357,6 +1295,15 @@ int main(int argc,char **argv)
 		if(!getRDAGenericSetupbin(libx,gsv))
 		{
 			DISPLAY_FAST=*gsv->value.string_value;
+		}
+	}
+	if(gsv!=NULL) FreeRDAGenericSetup(gsv);
+	gsv=RDAGenericSetupNew("UTILITIES","OPENRDA STYLE");
+	if(gsv!=NULL)
+	{
+		if(!getRDAGenericSetupbin(libx,gsv))
+		{
+			OPENRDA_STYLE=*gsv->value.short_value;
 		}
 	}
 	if(gsv!=NULL) FreeRDAGenericSetup(gsv);
@@ -1423,11 +1370,8 @@ int main(int argc,char **argv)
 	if(opt4!=NULL) Rfree(opt4);
 	MODULE_FILENO=OPNNRD("UTILITIES","MODULE");
 	MENUITEM_FILENO=OPNNRD("UTILITIES","MENUITEM");
+	OPENRDA_DATLOG=OPNNRD("DATABASE","DATLOG");
 	RDAMAINWIDGET->setTitle("OpenRDA 4.0");
-/*
-	RDAMAINWIDGET->styleSheet().addRule(".menu li ",
-				"display: inline-block;");
-*/
 	rC=RDAMAINWIDGET->root();
 	rC->addStyleClass("OpenRDA MainWindow");
 	MainBorderLayout=new Wt::WBorderLayout();
@@ -1442,17 +1386,32 @@ int main(int argc,char **argv)
 	MainWindow->setOverflow(Wt::WContainerWidget::OverflowVisible,Horizontal);
 	MainWindow->addStyleClass("OpenRDA MenuBar");
 	MainBorderLayout->addWidget((Wt::WWidget *)MainWindow,Wt::WBorderLayout::Position::North);
-	MainWindowDock=new Wt::WContainerWidget();
-	MainWindowDock->setOverflow(Wt::WContainerWidget::OverflowVisible,Vertical);
-	MainWindowDock->setOverflow(Wt::WContainerWidget::OverflowVisible,Horizontal);
-	MainWindowDock->addStyleClass("OpenRDA TaskBar");
-	MainBorderLayout->addWidget((Wt::WWidget *)MainWindowDock,Wt::WBorderLayout::Position::West);
-	MainWindowStatus=new Wt::WContainerWidget();
-	MainWindowStatus->setOverflow(Wt::WContainerWidget::OverflowVisible,Vertical);
-	MainWindowStatus->setOverflow(Wt::WContainerWidget::OverflowVisible,Horizontal);
-	MainWindowStatus->addStyleClass("OpenRDA ResourceBar");
-
-	MainBorderLayout->addWidget((Wt::WWidget *)MainWindowStatus,Wt::WBorderLayout::Position::South);
+	if(OPENRDA_STYLE==1)
+	{
+		West=new Wt::WContainerWidget();
+		West->setOverflow(Wt::WContainerWidget::OverflowVisible,Vertical);
+		West->setOverflow(Wt::WContainerWidget::OverflowVisible,Horizontal);
+		MainBorderLayout->addWidget((Wt::WWidget *)West,Wt::WBorderLayout::Position::West);
+		MainWindowStatus=new Wt::WContainerWidget(West);
+		MainWindowStatus->setOverflow(Wt::WContainerWidget::OverflowVisible,Vertical);
+		MainWindowStatus->setOverflow(Wt::WContainerWidget::OverflowVisible,Horizontal);
+		MainWindowStatus->addStyleClass("OpenRDA ResourceBar");
+		MainWindowDock=new Wt::WContainerWidget(West);
+		MainWindowDock->setOverflow(Wt::WContainerWidget::OverflowVisible,Vertical);
+		MainWindowDock->setOverflow(Wt::WContainerWidget::OverflowVisible,Horizontal);
+		MainWindowDock->addStyleClass("OpenRDA TaskBar");
+	} else {
+		MainWindowDock=new Wt::WContainerWidget();
+		MainWindowDock->setOverflow(Wt::WContainerWidget::OverflowVisible,Vertical);
+		MainWindowDock->setOverflow(Wt::WContainerWidget::OverflowVisible,Horizontal);
+		MainWindowDock->addStyleClass("OpenRDA TaskBar");
+		MainBorderLayout->addWidget((Wt::WWidget *)MainWindowDock,Wt::WBorderLayout::Position::West);
+		MainWindowStatus=new Wt::WContainerWidget();
+		MainWindowStatus->setOverflow(Wt::WContainerWidget::OverflowVisible,Vertical);
+		MainWindowStatus->setOverflow(Wt::WContainerWidget::OverflowVisible,Horizontal);
+		MainWindowStatus->addStyleClass("OpenRDA ResourceBar");
+		MainBorderLayout->addWidget((Wt::WWidget *)MainWindowStatus,Wt::WBorderLayout::Position::South);
+	}
 	MainWindowCenter=new Wt::WContainerWidget();
 	MainWindowCenter->addStyleClass("OpenRDA Workspace");
 	MainWindowCenter->setOverflow(Wt::WContainerWidget::OverflowAuto,Vertical);
@@ -1486,12 +1445,15 @@ int main(int argc,char **argv)
 	spc=Wt::WLength(0,Wt::WLength::Pixel);
 	v1->setPadding(spc,All);
 
-	OpenRDAImage=new Wt::WImage();
-	OpenRDAImage->setImageLink("resources/OpenRDA/rdalogo.png");
-	myA=new Wt::WAnchor();
-	myA->setLink("http://www.openrda.com");
-	myA->addWidget(OpenRDAImage);
-	mwh->addWidget(myA);
+	if(OPENRDA_STYLE==0)
+	{
+		OpenRDAImage=new Wt::WImage();
+		OpenRDAImage->setImageLink("resources/OpenRDA/rdalogo.png");
+		myA=new Wt::WAnchor();
+		myA->setLink("http://www.openrda.com");
+		myA->addWidget(OpenRDAImage);
+		mwh->addWidget(myA);
+	}
 
 	h=new Wt::WContainerWidget();
 	h->setContentAlignment(Wt::AlignLeft);
@@ -1512,25 +1474,20 @@ int main(int argc,char **argv)
 	hb->addWidget(text,500);
 
 	P=new Wt::WPushButton((Wt::WContainerWidget *)v2);
+	P->addStyleClass("OpenRDA Home");
+	hb->addWidget(P);
+	P->clicked().connect(boost::bind(&go_home));
+
+	P=new Wt::WPushButton((Wt::WContainerWidget *)v2);
 	P->addStyleClass("OpenRDA MySettings");
 	hb->addWidget(P);
 	P->setDefault(FALSE);
-/*
-	c=new Wt::WString("My Settings");
-	P->setText(*c);
-	c->~WString();
-*/
-
 	P->clicked().connect(boost::bind(&MyUserProfile));
+
 	P=new Wt::WPushButton((Wt::WContainerWidget *)v2);
 	P->addStyleClass("OpenRDA SignOut");
 	hb->addWidget(P);
 	P->setDefault(FALSE);
-/*
-	c=new Wt::WString("Sign Out");
-	P->setText(*c);
-	c->~WString();
-*/
 	P->clicked().connect(boost::bind(&sign_out));
 	
 
@@ -1569,23 +1526,27 @@ int main(int argc,char **argv)
 	{
 		if(FinanceModules->numlibs>0)
 		{
-			P=new Wt::WPushButton();
-			P->addStyleClass("OpenRDA ModuleNavigation Finance");
-			g->addWidget(P,0,count,0);
+			c=new Wt::WString("Finance");
+			Finance_P=new Wt::WPushButton(*c,(Wt::WContainerWidget *)ModuleNavigation);
+			c->~WString();
+			Finance_P->addStyleClass("OpenRDA ModuleNavigation Finance");
+			g->addWidget(Finance_P,0,count,0);
 			g->setRowStretch(count,100);
 			++count;
-			P->setDefault(FALSE);
-			c=new Wt::WString("Finance");
-			P->setText(*c);
-			c->~WString();
-			pop=new Wt::WPopupMenu();
-			pop->setAutoHide(TRUE,1500);
-			P->setMenu(pop);
+			Finance_P->setDefault(FALSE);
+			Finance_Pop=new Wt::WPopupMenu();
+			Finance_Pop->setAutoHide(TRUE,200);
+			Finance_P->setMenu(Finance_Pop);
 
 			for(y=0;y<FinanceModules->numlibs;++y)
 			{
-				pop->addItem(FNames->libs[y])->triggered().connect(boost::bind(&ChooseModule,FinanceModules->libs[y]));
+				Finance_Pop->addItem(FNames->libs[y])->triggered().connect(boost::bind(&ChooseModule,FinanceModules->libs[y]));
 			}
+#ifdef __Use_mouseWentOver__ 
+			Finance_P->mouseWentOver().connect(std::bind([=] () {
+				Finance_P->menu()->popup(Finance_Pop);
+			}));
+#endif /* __USE_mouseWentOver__ */
 		}
 	}
 /* Procurement */
@@ -1604,8 +1565,13 @@ int main(int argc,char **argv)
 			P->setText(*c);
 			c->~WString();
 			pop=new Wt::WPopupMenu();
-			pop->setAutoHide(TRUE,1500);
+			pop->setAutoHide(TRUE,200);
 			P->setMenu(pop);
+#ifdef __Use_mouseWentOver__ 
+			P->mouseWentOver().connect(std::bind([=] () {
+				P->menu()->popup(pop);
+			}));
+#endif /* __USE_mouseWentOver__ */
 			for(y=0;y<ProcurementModules->numlibs;++y)
 			{
 				pop->addItem(PNames->libs[y])->triggered().connect(boost::bind(&ChooseModule,ProcurementModules->libs[y]));
@@ -1628,8 +1594,13 @@ int main(int argc,char **argv)
 			P->setText(*c);
 			c->~WString();
 			pop=new Wt::WPopupMenu();
-			pop->setAutoHide(TRUE,1500);
+			pop->setAutoHide(TRUE,200);
 			P->setMenu(pop);
+#ifdef __Use_mouseWentOver__ 
+			P->mouseWentOver().connect(std::bind([=] () {
+				P->menu()->popup(pop);
+			}));
+#endif /* __USE_mouseWentOver__ */
 			for(y=0;y<HRModules->numlibs;++y)
 			{
 				pop->addItem(HNames->libs[y])->triggered().connect(boost::bind(&ChooseModule,HRModules->libs[y]));
@@ -1659,8 +1630,13 @@ int main(int argc,char **argv)
 				P->setText(*c);
 				c->~WString();
 				pop=new Wt::WPopupMenu();
-				pop->setAutoHide(TRUE,1500);
+				pop->setAutoHide(TRUE,200);
 				P->setMenu(pop);
+#ifdef __Use_mouseWentOver__ 
+				P->mouseWentOver().connect(std::bind([=] () {
+					P->menu()->popup(pop);
+				}));
+#endif /* __USE_mouseWentOver__ */
 
 				for(y=0;y<RevenueModules->numlibs;++y)
 				{
@@ -1685,8 +1661,13 @@ int main(int argc,char **argv)
 				P->setText(*c);
 				c->~WString();
 				pop=new Wt::WPopupMenu();
-				pop->setAutoHide(TRUE,1500);
+				pop->setAutoHide(TRUE,200);
 				P->setMenu(pop);
+#ifdef __Use_mouseWentOver__ 
+				P->mouseWentOver().connect(std::bind([=] () {
+					P->menu()->popup(pop);
+				}));
+#endif /* __USE_mouseWentOver__ */
 
 				for(y=0;y<RevenueModules->numlibs;++y)
 				{
@@ -1708,8 +1689,13 @@ int main(int argc,char **argv)
 				P->setText(*c);
 				c->~WString();
 				pop=new Wt::WPopupMenu();
-				pop->setAutoHide(TRUE,1500);
+				pop->setAutoHide(TRUE,200);
 				P->setMenu(pop);
+#ifdef __Use_mouseWentOver__ 
+				P->mouseWentOver().connect(std::bind([=] () {
+					P->menu()->popup(pop);
+				}));
+#endif /* __USE_mouseWentOver__ */
 
 				for(y=0;y<RevenueModules->numlibs;++y)
 				{
@@ -1736,6 +1722,7 @@ int main(int argc,char **argv)
 	}
 
 /* End of Main Navigational Window */
+#ifdef __NOT_USING_HOME__
 
 	FINDFLDSETSTRING(SEC_USERS_FILENO,"USER IDENTIFICATION",USERLOGIN);
 	if(EQLNRD(SEC_USERS_FILENO,1)) KEYNRD(SEC_USERS_FILENO,1);
@@ -1746,5 +1733,9 @@ int main(int argc,char **argv)
 		defmodule=stralloc(CURRENT_MODULE);
 	}
 	ChooseModule(defmodule);
+#else 
+	defmodule=stralloc("HOME");
+	ChooseModule(defmodule);
+#endif /* __NOT_USING_HOME__ */
 	rC->show();
 }

@@ -40,12 +40,12 @@ char *GUIfamtncents(double amount,int len,char padchar)
 	if(tmp!=NULL) Rfree(tmp);
 	return(tmp1);
 }
-char *GUIuintamt(long amount,int len)
+char *GUIsintamt(long amount,int len)
 {
 	char *tmp=NULL,*tmp1=NULL,*temp=NULL;
 	char negflag=FALSE;
 	
-	tmp=uintamt(amount,len);
+	tmp=sintamt(amount,len);
 	if(tmp==NULL) return(NULL);
 	unpad(tmp);
 	tmp1=Rmalloc(RDAstrlen(tmp)+2);
@@ -81,14 +81,8 @@ char *GUIfloatamt(double amount,int len)
 /* famt- format regular dollar string */
 char *famt(double amount,int len)
 {
-	
-	int x,y;
-	int length;
-	int neg_flag=FALSE;
+	int x,y,length,neg_flag=FALSE;
 	char *ret_string=NULL, *val_string=NULL;
-/*
-	char currtype='$';
-*/
 
 	if(amount<0)
 	{
@@ -112,9 +106,7 @@ char *famt(double amount,int len)
 		{
 			if(x==(len-2)) break;
 			val_string[x++]=',';
-		}
-		else 
-		{
+		} else {
 			val_string[x++]=ret_string[y--];
 		}
 	}
@@ -133,17 +125,14 @@ char *famt(double amount,int len)
 	}
 	for(;y>0;--y) ret_string[y]=' ';
 	ret_string[len-1]=(neg_flag?'-':' ');
-/*
-	ret_string[0]=currtype;
-*/
 	ret_string[0]=RDA_CURRENCY_SYMBOL;
 	for(x=0;x<len;++x) val_string[x]=ret_string[x];
 	val_string[len]=0;
 	if(ret_string!=NULL) Rfree(ret_string);
 	return(val_string);
 }
-/* uintamt - format integer with negitive ability */
-char *uintamt(long amount,int len)
+/* sintamt - format integer with negitive ability */
+char *sintamt(long amount,int len)
 {
 	int x;
 	int neg_flag=FALSE;
@@ -299,9 +288,6 @@ char *famtncents(double amount,int len,char padchar)
 	}
         for(;y>0;--y) ret_string[y]=padchar;
 	ret_string[len-1]=(neg_flag?'-':' ');
-/*
-	ret_string[0]=currtype;
-*/
 	ret_string[0]=RDA_CURRENCY_SYMBOL;
 	for(x=0;x<len;++x) val_string[x]=ret_string[x];
 	val_string[len]=0;
@@ -358,9 +344,6 @@ char *famtpad(double amount,int len,char pad)
 	}
         for(;y>0;--y) ret_string[y]=pad;
 	ret_string[len-1]=(neg_flag?'-':' ');
-/*
-	ret_string[0]=currtype;
-*/
 	ret_string[0]=RDA_CURRENCY_SYMBOL;
 	for(x=0;x<len;++x) val_string[x]=ret_string[x];
 	val_string[len]=0;

@@ -1,7 +1,3 @@
-#include <powadd.hpp>
-#include <curl/curl.h>
-#include <curl/easy.h>
-#include <rptgen.hpp>
 #include <misc.hpp>
 #include <gui.hpp>
 #include <guip.hpp>
@@ -22,11 +18,12 @@ extern short ExpendActShowTable,RevenueActShowTable;
 extern int JournalEntryValuetoVisual,ReceiptValuetoVisual;
 extern short JournalEntryShowTable,ReceiptShowTable;
 extern int GenLdgrActValuetoVisual;
-extern short GenLdgrActShowTable;
+extern short GenLdgrActShowTable,OPENRDA_DATLOG;
 extern int VoucherStatusValuetoVisual;
-extern short VoucherStatusShowTable;
+extern short VoucherStatusShowTable,OPENRDA_STYLE;
 extern int OpenPObyVendorValuetoVisual;
 extern short OpenPObyVendorShowTable;
+extern Wt::WContainerWidget *CreateFeed(char *);
 
 extern FILE *myMENUITEMS;
 extern Wt::WPushButton *Reports_P,*Query_P;
@@ -47,7 +44,7 @@ extern char *CURRENT_MODULE,*LAST_MODULE;
 extern int LAST_EXE,ARCHIVE_STYLE;
 extern short MODULE_FILENO,MENUITEM_FILENO;
 extern char IGNORE_RESTRICTED;
-extern void CreateStatusBar(void);
+extern void CreateStatusBar(void),CreateAccordionBar(void);
 
 extern RDArsrc *DockRSRC;
 Wt::WGridLayout *CenterLayout=NULL;
@@ -664,30 +661,59 @@ char HasSecurity(int w)
 #ifndef WIN32
 short ExamineRunningProcesses(char *name,APPlib *args)
 {
-	char stemp1[4096],stemp2[512],buffer[1024];
-	int x=0,len=0;
-	FILE *fp=NULL;
-	short retval=FALSE;
+	short ef=FALSE,r=FALSE;
+	int x=0,count=0;
+	char *u=NULL,*m=NULL,*p=NULL,delflag=FALSE;
+	char *mM=NULL,*pP=NULL,*ed=NULL;
 
-	memset(buffer,0,512);
-	memset(stemp1,0,4096);
-	sprintf(stemp1,"ps uU %s | grep %s ",USERLOGIN,name);
-	for(x=0;x<args->numlibs;++x)
+	if(OPENRDA_DATLOG!=(-1))
 	{
-		memset(stemp2,0,512);
-		sprintf(stemp2,"| grep \"%s\" ",args->libs[x]);
-		strcat(stemp1,stemp2);
-	}
-	fp=popen(stemp1,"r");
-	if(fp!=NULL)
-	{
-		while((len=readline(fp,buffer,sizeof(buffer)))!=(-1)) 
+		ZERNRD(OPENRDA_DATLOG);
+		FINDFLDSETSTRING(OPENRDA_DATLOG,"USER IDENTIFICATION",USERLOGIN);
+		FINDFLDSETINT(OPENRDA_DATLOG,"LOG NUMBER",INT_MAX-1);
+		for(x=0;x<args->numlibs;++x)
 		{
-			if(!RDAstrstr(buffer,"grep")) retval=TRUE;
+			if(!RDAstrcmp(args->libs[x],"-s")) 
+			{
+			} else if(count==0)
+			{
+				FINDFLDSETSTRING(OPENRDA_DATLOG,"MODULE",args->libs[x]);
+				mM=args->libs[x];
+				++count;
+			} else if(count>0)
+			{
+				pP=args->libs[x];
+				break;
+			}
 		}
-		pclose(fp);
+		ef=LTENRD(OPENRDA_DATLOG,1);
+		while(!ef)
+		{
+			FINDFLDGETSTRING(OPENRDA_DATLOG,"MODULE",&m);
+			FINDFLDGETSTRING(OPENRDA_DATLOG,"USER IDENTIFICATION",&u);
+			if(RDAstrcmp(m,mM) || RDAstrcmp(u,USERLOGIN)) break;
+			FINDFLDGETCHAR(OPENRDA_DATLOG,"DELETEFLAG",&delflag);
+			if(!delflag)
+			{
+				FINDFLDGETSTRING(OPENRDA_DATLOG,"PROCESS NAME",&p);
+				if(!RDAstrcmp(p,pP))
+				{
+					FINDFLDGETSTRING(OPENRDA_DATLOG,"END DATE",&ed);
+					if(isEMPTY(ed))
+					{
+						r=TRUE; 
+					} else r=FALSE;
+					break;
+				}
+			}
+			ef=PRVNRD(OPENRDA_DATLOG,1);
+		}
+		if(ed!=NULL) Rfree(ed);
+		if(m!=NULL) Rfree(m);
+		if(p!=NULL) Rfree(p);
+		if(u!=NULL) Rfree(u);
 	}
-	return(retval);
+	return(r);
 }
 #endif
 void ExecuteOption(int w)
@@ -991,7 +1017,7 @@ Wt::WPopupMenu *MySubMenu(Wt::WWidget *Parent_Widget,short ddl,int p,char *namex
 
 
 	pop=new Wt::WPopupMenu();
-	pop->setAutoHide(TRUE,1500);
+	pop->setAutoHide(TRUE,200);
 	pop1=(Wt::WWidget *)Parent_Widget;
 	pop1->addMenu(namex,(Wt::WMenu *)pop);
 	ZERNRD(MENUITEM_FILENO);
@@ -1071,7 +1097,7 @@ Wt::WPopupMenu *ModuleDDL(short ddl)
 	short ef=0;
 
 	WHICH=new Wt::WPopupMenu();
-	WHICH->setAutoHide(TRUE,1500);
+	WHICH->setAutoHide(TRUE,200);
 	ZERNRD(MENUITEM_FILENO);
 	FINDFLDSETSTRING(MENUITEM_FILENO,"MODULE NAME",CURRENT_MODULE);
 	FINDFLDSETSHORT(MENUITEM_FILENO,"DROP DOWN LIST",ddl);
@@ -1159,11 +1185,8 @@ void CreateDockRSRC(char *modname)
 	if(DockRSRC!=NULL)
 	{
 		free_rsrc(DockRSRC);
+		DockRSRC=NULL;
 	} 
-	memset(stemp,0,101);
-	sprintf(stemp,"%s DOCK WINDOW",(!isEMPTY(modname) ? modname:"FINMGT"));
-	count=0;
-	DockRSRC=RDArsrcNEW(CURRENT_MODULE,stemp);
 	if(MainWindowDock!=NULL)
 	{
 		MainWindowDock->clear();
@@ -1172,6 +1195,11 @@ void CreateDockRSRC(char *modname)
 		QueryPop=NULL;
 		Reports=NULL;
 	}
+	if(!RDAstrcmp(modname,"HOME")) return;
+	memset(stemp,0,101);
+	sprintf(stemp,"%s DOCK WINDOW",(!isEMPTY(modname) ? modname:"FINMGT"));
+	count=0;
+	DockRSRC=RDArsrcNEW(CURRENT_MODULE,stemp);
 
 /* Module Description */
 	spc=Wt::WLength(2,Wt::WLength::Pixel);
@@ -1218,6 +1246,11 @@ void CreateDockRSRC(char *modname)
 		Query_P->setEnabled(FALSE);
 	} else {
 		Query_P->setMenu(QueryPop);
+#ifdef __Use_mouseWentOver__ 
+		Query_P->mouseWentOver().connect(std::bind([=] () {
+			Query_P->menu()->popup(QueryPop);
+		}));
+#endif /* __USE_mouseWentOver__ */
 		Query_P->setEnabled(TRUE);
 	}
 
@@ -1234,6 +1267,11 @@ void CreateDockRSRC(char *modname)
 		Reports_P->setEnabled(FALSE);
 	} else {
 		Reports_P->setMenu(Reports);
+#ifdef __Use_mouseWentOver__ 
+		Reports_P->mouseWentOver().connect(std::bind([=] () {
+			Reports_P->menu()->popup(Reports);
+		}));
+#endif /* __USE_mouseWentOver__ */
 		Reports_P->setEnabled(TRUE);
 	}
 
@@ -1292,6 +1330,7 @@ void CreateCenterPanel()
 	Wt::WTabWidget *tabW=NULL;
 	Wt::WMenuItem *tab=NULL;
 	Wt::WContainerWidget *w=NULL;
+	Wt::WHBoxLayout *hbox=NULL;
 
 	ExpendActShowTable=FALSE;
 	ExpendActValuetoVisual=0;
@@ -1331,6 +1370,18 @@ void CreateCenterPanel()
 		tabW=new Wt::WTabWidget(MainWindowCenter);
 		w=OpenPObyVendorDisplayDashBoard();
 		tabW->addTab(w,"Open PO's by Vendor",Wt::WTabWidget::PreLoading);
+	} else if(!RDAstrcmp(CURRENT_MODULE,"HOME"))
+	{
+/*
+		tabW=new Wt::WTabWidget(MainWindowCenter);
+		w=CreateFeed("http://www.openrda.com/feed/");
+		tabW->addTab(w,"Blogs",Wt::WTabWidget::PreLoading);
+		tabW->addTab(w,"News",Wt::WTabWidget::PreLoading);
+*/
+		hbox=new Wt::WHBoxLayout();
+		MainWindowCenter->setLayout(hbox);
+		w=CreateFeed("http://www.openrda.net/OpenRDALandingPage.php");
+		hbox->addWidget(w,500);
 	}
 }
 void ChooseModule(char *modname)
@@ -1360,7 +1411,8 @@ void ChooseModule(char *modname)
 		GTENRD(MODULE_FILENO,2);
 		FINDFLDGETSTRING(MODULE_FILENO,"DESCRIPTION",&temp);
 		CreateDockRSRC(modname);
-		CreateStatusBar();
+		if(!OPENRDA_STYLE) CreateStatusBar();
+			else CreateAccordionBar();
 		CreateCenterPanel();
 	}
 }

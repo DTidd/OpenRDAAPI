@@ -56,32 +56,9 @@ extern void HP_LASER_JET_III(void),CASHDRAWER(void);
 extern void HP_LASER_8000n(void);
 extern void HP_LASER_4000(void);
 extern void TXT2PS(void);
-extern void HP_DESKJET_600(void);
-extern void HP_DESKJET_520(void);
-extern void PRT_ANADEX(void);
-extern void PRT_BROTHER(void);
-extern void PRT_C_ITOH_ELECTRONICS(void);
-extern void PRT_CENTRONICS(void);
-extern void PRT_DATA_ROYAL(void);
-extern void PRT_DATA_SOUTH(void);
-extern void PRT_IBM(void);
-extern void PRT_NEC(void);
-extern void PRT_OKIDATA(void);
-extern void PRT_TANDY(void);
-extern void PRT_TEXAS_INSTRUMENTS(void);
-extern void PRT_TOSHIBA(void);
-extern void PRT_ZEROX_LETTER_QUALITY(void);
-extern void PRT_HP_LASER_JET_1100(void),PRT_OfficeJet(void);
 extern void CONVERT_MICROBUDGET_REPORTS(void),SETPRT(void);
 extern void MAKE_COA_EZ_VIRTUAL_FIELDS(void);
 extern void PRT_rdaout(void);
-#ifndef WIN32
-extern void PRT_outputemail_lnx(void),PRT_rdareportcd_lnx(void);
-extern void PRT_sendattach2lnx(void);
-extern void SCRIPT_sendattach_2_lnx(void);
-extern void SCRIPT_rdareportcd_lnx(void),SCRIPT_outputemail_lnx(void);
-extern void SCRIPT_sendmail_lnx(void);
-#endif
 
 
 struct RPTSTRUCTs RptAvl[]=
@@ -95,42 +72,12 @@ struct RPTSTRUCTs RptAvl[]=
 	{"DFPRT               ","Define Output Devices",mk_dfprt},
 	{"SETPRT              ","Setup Output Devices",SETPRT},
 	{"RPT MENU            ","Report Generator Menu",REPORT_GENERATOR},
-	{"EPSON_OLD_DOT_MATRIX","Epson Old Dot Matrix Printer Definition",EPSON_OLD_DOT_MATRIX},
-	{"EPSON_DFX1          ","Epson DFX1 Printer Definition",EPSON_DFX1},
 	{"EPSON EMULATION     ","Epson Emulation Printer Definition",EPSON_EMULATION},
-	{"IBM EMULATION       ","IBM Emulation Printer Definition",IBM_EMULATION},
-	{"EPSON STARNX1000C   ","Epson Start NX1000C Printer Definition",EPSON_STAR_NX1000C},
 	{"HP LASER JET III    ","HP LaserJet III Printer Definition",HP_LASER_JET_III},
 	{"HP LASER 8000n      ","HP LaserJet 8000n Printer Definition",HP_LASER_8000n},
 	{"HP LASER 4000       ","HP LaserJet 4000  Printer Definition",HP_LASER_4000},
 	{"TXT2PS              ","TXT2PS Printer Definition",TXT2PS},
-	{"HP DESKJET 600      ","HP DeskJet 600 Printer Definition",HP_DESKJET_600},
-	{"HP DESKJET 520      ","HP DeskJet 520 Printer Definition",HP_DESKJET_520},
-	{"PRT_ANADEX          ","Anadex Printer Definition",PRT_ANADEX},
-	{"PRT_BROTHER         ","Brother Printer Definition",PRT_BROTHER},
-	{"PRT_C_ITOH_ELECTRONICS","C. Itoh Electronics Printer Definition",PRT_C_ITOH_ELECTRONICS},
-	{"PRT_CENTRONICS      ","Centronics Printer Definition",PRT_CENTRONICS},
-	{"PRT_DATA_ROYAL      ","Data Royal Printer Definition",PRT_DATA_ROYAL},
-	{"PRT_DATA_SOUTH      ","Data South Printer Definition",PRT_DATA_SOUTH},
-	{"PRT_IBM             ","IBM Printer Definition",PRT_IBM},
-	{"PRT_NEC             ","NEC Printer Definition",PRT_NEC},
-	{"PRT_OfficeJet       ","OfficeJet 1170 cxi",PRT_OfficeJet},
-	{"PRT_OKIDATA         ","Okidata Printer Definition",PRT_OKIDATA},
-	{"PRT_TANDY           ","Tandy Printer Definition",PRT_TANDY},
-	{"PRT_TEXAS_INSTRUMENTS","Texas Instruments Printer Definition",PRT_TEXAS_INSTRUMENTS},
-	{"PRT_TOSHIBA         ","Toshiba Printer Definition",PRT_TOSHIBA},
-	{"PRT_ZEROX_LETTER_QUALITY","Zerox Letter Quality Printer Definition",PRT_ZEROX_LETTER_QUALITY},
-	{"PRT_HP_LASER_JET_1100","HP Laser Jet 1100 Printer Definition",PRT_HP_LASER_JET_1100},
 	{"rdaout              ","Printer Definition for RDA Text Browser",PRT_rdaout},
-#ifndef WIN32
-	{"outputemail.lnx     ","Printer Definition for outputemail.lnx Script",PRT_outputemail_lnx},
-	{"rdareportcd.lnx     ","Printer Definition for rdareportcd.lnx Script",PRT_rdareportcd_lnx},
-	{"sendattach-2.lnx     ","Printer Definition for sendattach-2.lnx Script",PRT_sendattach2lnx},
-	{"SCRIPT sendattach-2 ","Actual sendattach-2.lnx Script",SCRIPT_sendattach_2_lnx},
-	{"SCRIPT rdareportcd  ","Actual rdareportcd.lnx Script",SCRIPT_rdareportcd_lnx},
-	{"SCRIPT outputemail  ","Actual outputemail.lnx Script",SCRIPT_outputemail_lnx},
-	{"SCRIPT sendmail     ","Actual sendmail.lnx Script",SCRIPT_sendmail_lnx},
-#endif
 	{"CASHDRAWER          ","Cash Drawer / Receipt Printer",CASHDRAWER},
 	{"MB2EZRPT Screen     ","CONVERT MICROBUDGET REPORTS",CONVERT_MICROBUDGET_REPORTS},
 };

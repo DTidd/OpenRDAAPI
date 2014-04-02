@@ -23,6 +23,7 @@ void xFreeRangeScreen(RangeScreen *r,int line,char *file)
 	int x;
 	FileRangeStruct *frs;
 
+	if(r==NULL) return;
 #ifdef USE_RDA_DIAGNOSTICS
 	if(diagmix)
 	{

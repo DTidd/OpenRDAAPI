@@ -315,6 +315,10 @@ void losingfocusfunction(RDArmem *member)
 */
 	Wt::WLineEdit *LE=NULL;
 
+	if(member!=NoLosingFocus)
+	{
+		return;
+	}
 	if(member->editable==FALSE || member->user_editable==FALSE) return;
 	if(member->app_update==TRUE) return;
 	rsrc=(RDArsrc *)member->parent;
@@ -556,15 +560,6 @@ void gainingfocusfunction(RDArmem *member)
 	wFormW=(Wt::WFormWidget *)member->w;
 	if(NoLosingFocus!=NULL && NoLosingFocus!=member)
 	{
-		if(NoLosingFocus->Table!=NULL)
-		{
-#ifdef USE_RDA_DIAGNOSTICS
-			if(diaggui)
-			{
-				prterr("DIAG ExecuteRDArmemFunction for member->rscrname [%s] within a Table Widget.",NoLosingFocus->rscrname);
-			}
-#endif /* USE_RDA_DIAGNOSTICS */
-		}
 		ExecuteRDArmemFunction(NoLosingFocus);
 	}
 	NoLosingFocus=member;
@@ -684,6 +679,11 @@ void toggleactivatefunction(RDArmem *member)
 
 	if(member->app_update==TRUE) return;
 	member->app_update=TRUE;
+	if(NoLosingFocus!=NULL && NoLosingFocus!=member)
+	{
+		ExecuteRDArmemFunction(NoLosingFocus);
+	}
+	NoLosingFocus=member;
 	if(member->editable==FALSE || member->user_editable==FALSE) 
 	{
 		updatemember(member);
@@ -1391,7 +1391,7 @@ short xmakescrn(RDArsrc  *scrnrscr,short modalx,short (*EvalFunc)(...),void *Eva
 #ifdef _USE_GOOGLE_ANALYTICS_ 
 		RDAMAINWIDGET->doJavaScript(googleCmd);
 #endif /* _USE_GOOGLE_ANALYTICS_  */
-		if(rC->count()!=0 && inside_rfkw==TRUE)
+		if(rC->count()!=0 && inside_rfkw==TRUE && WindowCount==1)
 		{
 			rfkw_rsrc->swidget->clear();
 			NULL_RSCS(rfkw_rsrc);
@@ -1444,12 +1444,6 @@ short xmakescrn(RDArsrc  *scrnrscr,short modalx,short (*EvalFunc)(...),void *Eva
 			scrnrscr->swidget->setOverflow(WContainerWidget::OverflowAuto,Horizontal);	
 #endif /* __NEED_WDIALOG_LAYOUT__ */
 		}
-		WWeb=(Wt::WWebWidget *)scrnrscr->swidget;
-		cDS=WWeb->decorationStyle();
-		wF=cDS.font();
-		wF.setFamily(Wt::WFont::GenericFamily::Monospace);
-		cDS.setFont(wF);
-		WWeb->setDecorationStyle(cDS);
 		scrnrscr->has_large_table=FALSE;
 /*setup screen*/
 		crtwdgts((WWidget *)scrnrscr->swidget,scrnrscr->scn,scrnrscr,temp);

@@ -1222,9 +1222,11 @@ APPlib *mk_define_list(RDArsrc *definelist,short nofields,NRDfield *fields,
 	{
 		
 		d=finddefaultbin(definelist->module,definelist->screen);
-		if(d!=NULL) has_defaults=TRUE;
-		else has_defaults=FALSE;
-		FreeRDAdefault(d);
+		if(d!=NULL) 
+		{
+			has_defaults=TRUE;
+			FreeRDAdefault(d);
+		} else has_defaults=FALSE;
 	}
 	for(x=0,field=fields;x<nofields;++x,++field)
 	{
@@ -1435,10 +1437,13 @@ Browse */
 /*lint +e746 */
 		}
 		if(b->keysavl!=NULL) freeapplib(b->keysavl);
-		if(b->b->list!=NULL) RDAbrowseFREE(b->b->list);
-		if(b->b->rs!=NULL) FreeRangeScreen(b->b->rs);
-		if(b->b->query!=NULL) Rfree(b->b->query);
-		if(b->b!=NULL) Rfree(b->b);
+		if(b->b!=NULL)
+		{
+			if(b->b->list!=NULL) RDAbrowseFREE(b->b->list);
+			if(b->b->rs!=NULL) FreeRangeScreen(b->b->rs);
+			if(b->b->query!=NULL) Rfree(b->b->query);
+			Rfree(b->b);
+		}
 		b->b=NULL;
 		if(b->l!=NULL) Rfree(b->l);
 		if(b->bf!=NULL) Rfree(b->bf);
@@ -1493,6 +1498,7 @@ void dosmake(RDArsrc *parent,MakeBrowseList *b)
 	readallwidgets(b->searchrsrc);
 	GET_RANGESCREEN_EXPRESSION_VIRTUALS(b->searchrsrc);
 	if(b->rs!=NULL) FreeRangeScreen(b->rs);
+	b->rs=NULL;
 /* reallocating a new range screen structure */
 	b->rs=RangeScreenNew(b->searchrsrc);
 /* establishing the range screen structure */
@@ -1653,8 +1659,7 @@ void search_field_func(RDArsrc *mainrsrc,MakeBrowseList *b)
 		Rfree(valuex);
 	} else {
 /* when target is NULL, set BROWSE LIST to the 1st element */
-		x=0;
-		if(!FINDRSCSETINT(mainrsrc,"BROWSE LIST",x))
+		if(!FINDRSCSETINT(mainrsrc,"BROWSE LIST",current_value))
 			updatersrc(mainrsrc,"BROWSE LIST");
 	}
 	BF=Rmalloc(sizeof(Browse_Function));
@@ -1973,7 +1978,7 @@ void lpm_field_func(RDArsrc *mainrsrc,MakeBrowseList *b)
 		Rfree(valuex);
 	} else {
 /* when target is NULL, set BROWSE LIST to the 1st element */
-		x=0;
+		x=current_value;
 		if(!FINDRSCSETINT(mainrsrc,"BROWSE LIST",x))
 			updatersrc(mainrsrc,"BROWSE LIST");
 	}
@@ -2023,6 +2028,7 @@ void ClearSearchSelect(RDArsrc *parent,MakeBrowseList *b)
 		} 
 	} 
 	if(b->rs!=NULL) FreeRangeScreen(b->rs);
+	b->rs=NULL;
 /* Allocating a Range Screen Structure */
 	b->rs=RangeScreenNew(b->searchrsrc);
 /* Reading Range Screen structure */
@@ -2237,6 +2243,7 @@ MakeBrowseList *xbrowse(short fileno,short keyno,RDArsrc *mainrsrc,
 	FINDRSCSETFUNC(mainrsrc,"BROWSE LIST LPM",lpm_field_func,b);
 	FINDRSCSETINPUTFOCUS(mainrsrc,"BROWSE LIST LPM");
 	if(b->rs!=NULL) FreeRangeScreen(b->rs);
+	b->rs=NULL;
 /* Allocating a Range Screen Structure */
 	b->rs=RangeScreenNew(b->searchrsrc);
 /* Reading Range Screen structure */
@@ -2565,6 +2572,7 @@ void xFreeBrowseExit(Browse_Exit *BE,int line,char *file)
 		if(BE->keysavl!=NULL) freeapplib(BE->keysavl);
 		if(BE->b->list!=NULL) RDAbrowseFREE(BE->b->list);
 		if(BE->b->rs!=NULL) FreeRangeScreen(BE->b->rs);
+		BE->b->rs=NULL;
 		if(BE->b!=NULL) Rfree(BE->b);
 		BE->b=NULL;
 		if(BE->l!=NULL) Rfree(BE->l);
