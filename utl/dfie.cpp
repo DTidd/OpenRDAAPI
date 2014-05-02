@@ -1903,6 +1903,7 @@ static void quitdfiex(RDArsrc *r)
 	defsavl=NULL;
 	if(r!=NULL) free_rsrc(r);
 	r=NULL;
+	ShutdownSubsystems();
 }
 #ifdef CPPMAIN
 int c_main(int argc,char **argv)

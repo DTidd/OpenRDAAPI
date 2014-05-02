@@ -407,7 +407,7 @@ void OPTIONAL_SCREEN_FUNC(RDArsrc *parent,RDArmem *member)
 }
 void addoswidgets(RDArsrc *r)
 {
-	RDArmem *member;
+	RDArmem *member,*mem2;
 	RDAwdgt *w;
 	int x,y;
 	
@@ -421,6 +421,28 @@ void addoswidgets(RDArsrc *r)
 	{
 		prterr("Error Resource Structure passed to addoswidgets is NULL.");
 		return;
+	}
+	addbtnrsrc(r,"CLOSE WINDOW",TRUE,NULL,NULL);
+	x=FINDRSC(r,"QUIT");
+	y=FINDRSC(r,"CLOSE WINDOW");
+	if(x>(-1) && y>(-1))
+	{
+		member=r->rscs+x;
+		mem2=r->rscs+y;
+		mem2->function=member->function;
+		mem2->function_type=member->function_type;
+		mem2->rtype=member->rtype;
+		mem2->type=member->type;
+		mem2->type=member->type;
+		mem2->callbacktype=member->callbacktype;
+		mem2->editable_expression=stralloc(member->editable_expression);
+		mem2->sensitive_expression=stralloc(member->sensitive_expression);
+		mem2->editable=member->editable;
+		mem2->sensitive=member->sensitive;
+		mem2->user_editable=member->user_editable;
+		mem2->label=stralloc(member->label);	
+		mem2->arglist=member->arglist;
+		mem2->parent=member->parent;
 	}
 	for(x=0,w=r->scn->wdgts;x<r->scn->numwdgts;++x,++w)
 	{

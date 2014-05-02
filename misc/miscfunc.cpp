@@ -599,8 +599,6 @@ int xRDAMoveFile(char *fromfile,char *tofile,short type,int line,char *file)
 
 	from=fopen(absfromfile,"r+b");
 	to=fopen(abstofile,"w+b");
-	if(absfromfile!=NULL) Rfree(absfromfile);
-	if(abstofile!=NULL) Rfree(abstofile);
 	if(from!=NULL && to!=NULL)
 	{
 		while(!feof(from)) 
@@ -608,49 +606,66 @@ int xRDAMoveFile(char *fromfile,char *tofile,short type,int line,char *file)
 			x=fread(buffer,1,4096,from);
 			if((ferror(from))!=0)
 			{
-				prterr("Error:  Reading %d bytes of %d.\n",y,x,tofile);
+				prterr("Error:  Reading %d bytes of %d.\n",y,x,abstofile);
 				if(x>0)
 				{
 					y=fwrite(buffer,1,x,to);
 					if((ferror(to))!=0)
 					{
-						prterr("Error:  Copying %d bytes of %d to [%s].\n",y,x,tofile);
+						prterr("Error:  Copying %d bytes of %d to [%s].\n",y,x,abstofile);
 						fclose(from);
 						fclose(to);
+						if(absfromfile!=NULL) Rfree(absfromfile);
+						if(abstofile!=NULL) Rfree(abstofile);
 						return (5);
 					}
 				}
 				fclose(from);
 				fclose(to);
+				if(absfromfile!=NULL) Rfree(absfromfile);
+				if(abstofile!=NULL) Rfree(abstofile);
 				return (3);
 				break;
 			}
 			y=fwrite(buffer,1,x,to);
 			if((ferror(to))!=0)
 			{
-				prterr("Error:  Copying %d bytes of %d to [%s].\n",y,x,tofile);
+				prterr("Error:  Copying %d bytes of %d to [%s].\n",y,x,abstofile);
 				fclose(from);
 				fclose(to);
+				if(absfromfile!=NULL) Rfree(absfromfile);
+				if(abstofile!=NULL) Rfree(abstofile);
 				return (4);
 				break;
 			}
 		}
 		fclose(from);
 		fclose(to);
-		if((unlink(fromfile))==0)
+		if((unlink(absfromfile))==0)
 		{
+			if(absfromfile!=NULL) Rfree(absfromfile);
+			if(abstofile!=NULL) Rfree(abstofile);
 			return (0);
 		} else {
+			prterr("Error:  Could not remove file [%s].\n",absfromfile);
+			if(absfromfile!=NULL) Rfree(absfromfile);
+			if(abstofile!=NULL) Rfree(abstofile);
 			return (6);
 		}
 	} else if(from==NULL)
 	{
-		prterr("Error:  Couldn't open from file [%s] for copying.\n",fromfile);
+		prterr("Error:  Couldn't open from file [%s] for copying.\n",absfromfile);
 		fclose(to);
+		if(absfromfile!=NULL) Rfree(absfromfile);
+		if(abstofile!=NULL) Rfree(abstofile);
+		return (7);
 	} else if(to==NULL)
 	{
-		prterr("Error:  Couldn't open to file [%s] for copying.\n",tofile);
+		prterr("Error:  Couldn't open to file [%s] for copying.\n",abstofile);
 		fclose(from);
+		if(absfromfile!=NULL) Rfree(absfromfile);
+		if(abstofile!=NULL) Rfree(abstofile);
+		return (8);
 	}
 
 }
@@ -672,8 +687,6 @@ int xRDACopyFile(char *fromfile,char *tofile,short type,int line,char *file)
 	}
 	from=fopen(absfromfile,"r+b");
 	to=fopen(abstofile,"w+b");
-	if(absfromfile!=NULL) Rfree(absfromfile);
-	if(abstofile!=NULL) Rfree(abstofile);
 	if(from!=NULL && to!=NULL)
 	{
 		while(!feof(from)) 
@@ -681,46 +694,56 @@ int xRDACopyFile(char *fromfile,char *tofile,short type,int line,char *file)
 			x=fread(buffer,1,4096,from);
 			if((ferror(from))!=0)
 			{
-				prterr("Error:  Reading %d bytes of %d.\n",y,x,tofile);
+				prterr("Error:  Reading %d bytes of %d.\n",y,x,abstofile);
 				if(x>0)
 				{
 					y=fwrite(buffer,1,x,to);
 					if((ferror(to))!=0)
 					{
-						prterr("Error:  Copying %d bytes of %d to [%s].\n",y,x,tofile);
+						prterr("Error:  Copying %d bytes of %d to [%s].\n",y,x,abstofile);
 						fclose(from);
 						fclose(to);
+						if(absfromfile!=NULL) Rfree(absfromfile);
+						if(abstofile!=NULL) Rfree(abstofile);
 						return (5);
 					}
 				}
 				fclose(from);
 				fclose(to);
+				if(absfromfile!=NULL) Rfree(absfromfile);
+				if(abstofile!=NULL) Rfree(abstofile);
 				return (3);
-				break;
 			}
 			y=fwrite(buffer,1,x,to);
 			if((ferror(to))!=0)
 			{
-				prterr("Error:  Copying %d bytes of %d to [%s].\n",y,x,tofile);
+				prterr("Error:  Copying %d bytes of %d to [%s].\n",y,x,abstofile);
 				fclose(from);
 				fclose(to);
+				if(absfromfile!=NULL) Rfree(absfromfile);
+				if(abstofile!=NULL) Rfree(abstofile);
 				return (4);
-				break;
 			}
 		}
 		
 		fclose(from);
 		fclose(to);
+		if(absfromfile!=NULL) Rfree(absfromfile);
+		if(abstofile!=NULL) Rfree(abstofile);
 		return(0);
 	} else if(from==NULL)
 	{
-		prterr("Error:  Couldn't open from file [%s] for copying.\n",fromfile);
+		prterr("Error:  Couldn't open from file [%s] for copying.\n",absfromfile);
 		fclose(to);
+		if(absfromfile!=NULL) Rfree(absfromfile);
+		if(abstofile!=NULL) Rfree(abstofile);
 		return(1);
 	} else if(to==NULL)
 	{
-		prterr("Error:  Couldn't open to file [%s] for copying.\n",tofile);
+		prterr("Error:  Couldn't open to file [%s] for copying.\n",abstofile);
 		fclose(from);
+		if(absfromfile!=NULL) Rfree(absfromfile);
+		if(abstofile!=NULL) Rfree(abstofile);
 		return(2);
 	}
 

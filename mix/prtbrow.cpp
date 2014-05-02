@@ -783,20 +783,16 @@ void browselistcsv(RDArsrc *r,MakeBrowseList *m)
 	int x=0,cur=0,k=0,count=0,z=0;
 	RDArsrc *definelist=NULL;
 	RDArsrc *mainrsrc=NULL;
-	char *temp=NULL;
+	char *temp=NULL,tempx[1024];
 	char *s=NULL;
 	RDArmem *len_member,*pos_member;
-	APPlib *args=NULL;
 	NRDfield *field=NULL;
 	RDAvirtual *v=NULL;
 
-	memset(stemp,0,101);
-	sprintf(stemp,"%d.csv",RGETPID());
-	unlink(stemp);
-	args=APPlibNEW();
-	addAPPlib(args,stemp);
-	addAPPlib(args,"csv");
-	fp=fopen(stemp,"w");
+	memset(tempx,0,1024);
+	sprintf(tempx,"%s/%d.csv",CURRENTDIRECTORY,RGETPID());
+	unlink(tempx);
+	fp=fopen(tempx,"w");
 	if(fp!=NULL)
 	{
 		mainrsrc=m->mainrsrc;
@@ -1068,8 +1064,9 @@ void browselistcsv(RDArsrc *r,MakeBrowseList *m)
 			fprintf(fp,"\r\n");
 		}
 		fclose(fp);
-		Execute2Program("doarchive",args);
+		memset(stemp,0,101);
+		sprintf(stemp,"%d.csv",RGETPID());
+		DisplayFile(stemp);
 	}
 	if(s!=NULL) Rfree(s);
-	if(args!=NULL) freeapplib(args);
 }

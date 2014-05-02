@@ -127,7 +127,6 @@ void initrdadiag()
 #ifndef WIN32
 	RDA_STDERR=stderr;
 #endif
-	if(AlreadyInitialized) return;
 	tmp=RDA_GetEnv("RDADIAG");
 	if(tmp!=NULL)
 	{

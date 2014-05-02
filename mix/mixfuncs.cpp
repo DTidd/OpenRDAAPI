@@ -18,6 +18,38 @@
 
 short GUI_AUTO_COMPLETE=(-1);
 
+void SetModuleGroup(char *m)
+{
+	MODULE_GROUP=0;
+	if(!RDAstrcmp(m,"FINMGT") || !RDAstrcmp(m,"BNKREC") || 
+		!RDAstrcmp(m,"BUDPREP") || !RDAstrcmp(m,"FIXASS"))
+	{
+		MODULE_GROUP=1;
+	} else if(!RDAstrcmp(m,"VENPMT") || !RDAstrcmp(m,"PURORD") ||
+		!RDAstrcmp(m,"INVCTL"))
+	{
+		MODULE_GROUP=2;
+	} else if(!RDAstrcmp(m,"PRSNNL") || !RDAstrcmp(m,"PAYROLL") ||
+		!RDAstrcmp(m,"LVEMGT") || !RDAstrcmp(m,"SUBMGT") || 
+		!RDAstrcmp(m,"EMPABS") || !RDAstrcmp(m,"POSTRK") ||
+		!RDAstrcmp(m,"APPMGT") || !RDAstrcmp(m,"OPENSS"))
+	{
+		MODULE_GROUP=3;
+	} else if(!RDAstrcmp(m,"PROPERTY") || !RDAstrcmp(m,"RLSTMGT"))
+	{
+		MODULE_GROUP=4;
+	} else if(!RDAstrcmp(m,"OCCTAX") || !RDAstrcmp(m,"BLDPRMT") ||
+		!RDAstrcmp(m,"MISCBILL"))
+	{
+		MODULE_GROUP=5;
+	} else if(!RDAstrcmp(m,"UTLBLL"))
+	{
+		MODULE_GROUP=6;
+	} else if(!RDAstrcmp(m,"CSHDWR"))
+	{
+		MODULE_GROUP=7;
+	}
+}
 void xmakefieldrsrc(RDArsrc *rsrc,char *name,short type,unsigned len,char editable,short Rmem)
 {
 	short defshort=0;
@@ -1006,7 +1038,6 @@ void xrsrc2filerecord(short fileno,RDArsrc *rsrc,short type,int line,char *file)
 void ShutdownOnError()
 {
 	ShutdownSubsystems();
-	std::exit;
 }
 short DoPROCsecurity(char *module,char *process)
 {
@@ -1127,13 +1158,15 @@ short xInitializeSubsystems(int argc,char **argv,char *module,char *process,int 
 	XPERT_SETUP=XPERTstpNEW();
 	x=getXPERTbin(XPERT_SETUP);
 	MyDir2Use=XPERT_SETUP->DataDir;
-	temp=RDA_GetEnv("DEV_LICENSE");
+	temp=getenv("DEV_LICENSE");
+	if(temp==NULL) temp=RDA_GetEnv("DEV_LICENSE");
 	if(temp!=NULL)
 	{
 		temp1=strtok(temp," ");
 		if(CheckDevLicense(temp1)) MyDir2Use=CURRENTDIRECTORY;
 	}
 	INITGUI(argc,argv,MyDir2Use);
+	SetModuleGroup(module);
 	PP_translate_GUIFUNC=PP_translate_GUI;
 	PP_translate_GUIFUNCALL=PP_translate_GUIALL;
 	override_rdalic=FALSE;
@@ -1184,7 +1217,8 @@ short xInitializeSubsystems(int argc,char **argv,char *module,char *process,int 
 	if(libx!=NULL) Rfree(libx);
 	if(!RDAstrcmp(process,"XPERT SETUP"))
 	{
-		desc=RDA_GetEnv("DEV_LICENSE");
+		desc=getenv("DEV_LICENSE");
+		if(desc==NULL) desc=RDA_GetEnv("DEV_LICENSE");
 		if(desc!=NULL)
 		{
 			if(CheckDevLicense(desc))
@@ -2516,7 +2550,8 @@ void CheckDiskSpace()
 	temp=RDA_GetEnv("SKIP_DISK_CHECK");
 	if(temp!=NULL) return;
 
-	temp=RDA_GetEnv("DEV_LICENSE");
+	temp=getenv("DEV_LICENSE");
+	if(temp==NULL) temp=RDA_GetEnv("DEV_LICENSE");
 	if(temp!=NULL)
 	{
 		temp1=strtok(temp," ");

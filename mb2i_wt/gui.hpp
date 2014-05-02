@@ -23,7 +23,7 @@ using namespace Wt::Auth;
 #define USING_WT
 extern APPlib *CMAIN_ARGS,*OpenRDA_Cookies;
 extern Wt::WContainerWidget *QN2IT_PARENT;
-extern short QN2IT_PARENT_TYPE;
+extern short QN2IT_PARENT_TYPE,MODULE_GROUP;
 extern char *LastGroupDefault;
 
 extern char SIMPLE_SCREENS,SKIP_DOMENU_TRANSVERSAL,CENTER_WINDOWS;
@@ -295,6 +295,9 @@ struct RDAwdgts
 	char *sensitive_expression;
 	char *transversal_expression;
 	char *required_expression;
+	short bootstrap;
+	short vertical;
+	short horzontal;
 };
 typedef struct RDAwdgts RDAwdgt;
 
@@ -426,6 +429,9 @@ struct RDArmems
 	Wt::WPushButton *pfd;
 	Wt::WValidator *validobject;
 	Wt::WStandardItemModel *wSIM;
+	short bootstrap;
+	short vertical;
+	short horzontal;
 };
 typedef struct RDArmems RDArmem;
 

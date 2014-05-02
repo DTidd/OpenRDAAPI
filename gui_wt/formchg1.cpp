@@ -315,10 +315,6 @@ void losingfocusfunction(RDArmem *member)
 */
 	Wt::WLineEdit *LE=NULL;
 
-	if(member!=NoLosingFocus)
-	{
-		return;
-	}
 	if(member->editable==FALSE || member->user_editable==FALSE) return;
 	if(member->app_update==TRUE) return;
 	rsrc=(RDArsrc *)member->parent;
@@ -560,7 +556,7 @@ void gainingfocusfunction(RDArmem *member)
 	wFormW=(Wt::WFormWidget *)member->w;
 	if(NoLosingFocus!=NULL && NoLosingFocus!=member)
 	{
-		ExecuteRDArmemFunction(NoLosingFocus);
+		losingfocusfunction(NoLosingFocus);
 	}
 	NoLosingFocus=member;
 	switch(member->field_type)
@@ -681,7 +677,7 @@ void toggleactivatefunction(RDArmem *member)
 	member->app_update=TRUE;
 	if(NoLosingFocus!=NULL && NoLosingFocus!=member)
 	{
-		ExecuteRDArmemFunction(NoLosingFocus);
+		losingfocusfunction(NoLosingFocus);
 	}
 	NoLosingFocus=member;
 	if(member->editable==FALSE || member->user_editable==FALSE) 
@@ -1322,9 +1318,6 @@ short xmakescrn(RDArsrc  *scrnrscr,short modalx,short (*EvalFunc)(...),void *Eva
 	std::string *s1=NULL;
 	char using_js=FALSE,using_ajax=FALSE;
 	Wt::WWebWidget *WWeb=NULL;
-	Wt::WCssDecorationStyle cDS;
-	Wt::WFont wF;
-
 
 	if(RDA_NOGUI==TRUE)
 	{
@@ -1393,8 +1386,11 @@ short xmakescrn(RDArsrc  *scrnrscr,short modalx,short (*EvalFunc)(...),void *Eva
 #endif /* _USE_GOOGLE_ANALYTICS_  */
 		if(rC->count()!=0 && inside_rfkw==TRUE && WindowCount==1)
 		{
-			rfkw_rsrc->swidget->clear();
-			NULL_RSCS(rfkw_rsrc);
+			if(rfkw_rsrc!=NULL)
+			{
+				rfkw_rsrc->swidget->clear();
+				NULL_RSCS(rfkw_rsrc);
+			}
 			rfkw_rsrc=NULL;
 			inside_rfkw=(-1);
 		}
@@ -1428,10 +1424,10 @@ short xmakescrn(RDArsrc  *scrnrscr,short modalx,short (*EvalFunc)(...),void *Eva
 				scrnrscr->primary->setModal(TRUE);
 			}
 			if(qc!=NULL) qc->~WString();
-			scrnrscr->primary->setClosable(TRUE);
+			scrnrscr->primary->setClosable(FALSE);
 			scrnrscr->primary->setTitleBarEnabled(TRUE);
-#ifdef __NEED_WDIALOG_LAYOUT__
 			scrnrscr->primary->setInline(FALSE);
+#ifdef __NEED_WDIALOG_LAYOUT__
 			scrnrscr->primary->setResizable(FALSE);
 			scrnrscr->primary->setMaximumSize(Wt::WLength::Auto,Wt::WLength(98,Wt::WLength::Percentage));
 			scrnrscr->swidget=scrnrscr->primary->contents();

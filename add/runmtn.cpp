@@ -14,7 +14,7 @@
 #define MODE_RWXRWX___ (00770)
 #endif /* ifdef WIN32 */
 
-short PowerMasterButtonFunction(RDArsrc *,MaintainButton *);
+short PowerMasterButtonFunction(RDArsrc *,MaintainButton *,short);
 void PowerExecuteBrowseButtonFunc(RDArsrc *,MaintainButton *,void *,MTNPassableStruct *);
 void xMakePowerMasterBrowseButtons(RDArsrc *,MTNPassableStruct *,void (*)(...),int,char *);
 static void okBrowseButtonFunc(RDArsrc *,MaintainButton *);
@@ -270,6 +270,7 @@ static void doexit_forced(MTNPassableStruct *PSTRUCT)
 {
 	APPlib *args=NULL;
 	MaintainMaster *MTNMASTER=NULL;
+	char tempx[1024];
 	int level=0;
 
 	if(PSTRUCT!=NULL)
@@ -292,9 +293,9 @@ static void doexit_forced(MTNPassableStruct *PSTRUCT)
 			Rfree(PSTRUCT);
 			if(level==0)
 			{
-				memset(stemp,0,101);
-				sprintf(stemp,"%d.csv",RGETPID());
-				unlink(stemp);
+				memset(tempx,0,1024);
+				sprintf(tempx,"%s/%d.csv",CURRENTDIRECTORY,RGETPID());
+				unlink(tempx);
 				ShutdownSubsystems();
 			} else {
 				return;
@@ -306,6 +307,7 @@ static void doexit(MTNPassableStruct *PSTRUCT,int ab)
 {
 	APPlib *args=NULL;
 	MaintainMaster *MTNMASTER=NULL;
+	char tempx[1024];
 	int level=0;
 
 	if(PSTRUCT!=NULL)
@@ -337,9 +339,9 @@ static void doexit(MTNPassableStruct *PSTRUCT,int ab)
 			}
 		}
 	}
-	memset(stemp,0,101);
-	sprintf(stemp,"%d.csv",RGETPID());
-	unlink(stemp);
+	memset(tempx,0,1024);
+	sprintf(tempx,"%s/%d.csv",CURRENTDIRECTORY,RGETPID());
+	unlink(tempx);
 }
 static void doexit_2(RDArsrc *rsrc,MTNPassableStruct *PSTRUCT)
 {
@@ -1018,7 +1020,7 @@ void PostSaveButtonFunction(RDArsrc *mainrsrc,MaintainButton *button)
 		}
 	}
 }
-short PowerMasterButtonFunction(RDArsrc *mainrsrc,MaintainButton *button)
+short PowerMasterButtonFunction(RDArsrc *mainrsrc,MaintainButton *button,short quit)
 {
 	short did_ya=FALSE;
 	APPlib *envpx=NULL,*newargs=NULL,*envpx1=NULL;
@@ -1078,7 +1080,12 @@ short PowerMasterButtonFunction(RDArsrc *mainrsrc,MaintainButton *button)
 								RDA_PutEnv(envpx->libs[x]);
 							}
 						}
-						RUNREPORTADV2(newargs->libs[0],newargs->libs[1],NULL,NULL,TRUE,2,NULL,button->func,mainrsrc,(void *)PSTRUCT,(MTNMASTER->level+1));
+						if(quit==FALSE)
+						{
+							RUNREPORTADV2(newargs->libs[0],newargs->libs[1],NULL,NULL,TRUE,2,NULL,button->func,mainrsrc,(void *)PSTRUCT,(MTNMASTER->level+1));
+						} else {
+							RUNREPORTADV2(newargs->libs[0],newargs->libs[1],NULL,NULL,TRUE,1,NULL,button->func,mainrsrc,(void *)PSTRUCT,0);
+						}
 						did_ya=TRUE;
 					} else if(!RDAstrcmp(button->progname,"RUNPOWERADD") || !RDAstrcmp(button->progname,"runpoweradd"))
 					{
@@ -1652,7 +1659,7 @@ short MTNrun_prequit_buttonsmtn(RDArsrc *rsrc,MTNPassableStruct *PSTRUCT,short u
 					{
 						button->func=updateallMaintainquitmtn;
 						button->parent=PSTRUCT;
-						if(PowerMasterButtonFunction(rsrc,button)) did_ya=TRUE;
+						if(PowerMasterButtonFunction(rsrc,button,TRUE)) did_ya=TRUE;
 					}
 				}
 			}
@@ -1689,7 +1696,7 @@ short MTNrun_prequit_buttonsbl(RDArsrc *rsrc,MTNPassableStruct *PSTRUCT,short up
 */
 						button->func=NULL;
 						button->parent=PSTRUCT;
-						if(PowerMasterButtonFunction(rsrc,button)) did_ya=TRUE;
+						if(PowerMasterButtonFunction(rsrc,button,TRUE)) did_ya=TRUE;
 					}
 				}
 			}
@@ -1722,7 +1729,7 @@ void MTNrun_presave_buttons(RDArsrc *rsrc,MTNPassableStruct *PSTRUCT,short updat
 					{
 						button->func=NULL;
 						button->parent=PSTRUCT;
-						PowerMasterButtonFunction(rsrc,button);
+						PowerMasterButtonFunction(rsrc,button,FALSE);
 					}
 				}
 			}

@@ -892,11 +892,6 @@ void CreateStatusBar()
 			Maintenance_P->setEnabled(FALSE);
 		} else {
 			Maintenance_P->setMenu(Maintenance);
-#ifdef __Use_mouseWentOver__ 
-			Maintenance_P->mouseWentOver().connect(std::bind([=] () {
-				Maintenance_P->menu()->popup(Maintenance);
-			}));
-#endif /* __USE_mouseWentOver__ */
 			Maintenance_P->setEnabled(TRUE);
 		}
 		if(Setup!=NULL) Setup->~WMenu();
@@ -906,11 +901,6 @@ void CreateStatusBar()
 			Setup_P->setEnabled(FALSE);
 		} else {
 			Setup_P->setMenu(Setup);
-#ifdef __Use_mouseWentOver__ 
-			Setup_P->mouseWentOver().connect(std::bind([=] () {
-				Setup_P->menu()->popup(Setup);
-			}));
-#endif /* __USE_mouseWentOver__ */
 			Setup_P->setEnabled(TRUE);
 		}
 		if(Other!=NULL) Other->~WMenu();
@@ -920,11 +910,6 @@ void CreateStatusBar()
 			Other_P->setEnabled(FALSE);
 		} else {
 			Other_P->setMenu(Other);
-#ifdef __Use_mouseWentOver__ 
-			Other_P->mouseWentOver().connect(std::bind([=] () {
-				Other_P->menu()->popup(Other);
-			}));
-#endif /* __USE_mouseWentOver__ */
 			Other_P->setEnabled(TRUE);
 		}
 	} else {
@@ -959,12 +944,8 @@ void CreateStatusBar()
 		P->setText(*c);
 		c->~WString();
 		pop=new Wt::WPopupMenu();
+		pop->addStyleClass("OpenRDA ResourceBar E-Documents WPopupMenu");
 		P->setMenu(pop);
-#ifdef __Use_mouseWentOver__ 
-		P->mouseWentOver().connect(std::bind([=] () {
-			P->menu()->popup(pop);
-		}));
-#endif /* __USE_mouseWentOver__ */
 		P->setEnabled(TRUE);
 		pop->addItem("View E-Documents(s)")->triggered().connect(boost::bind(&FAST_Cabinet,P));
 		pop->addItem("Query E-Documents(s)")->triggered().connect(boost::bind(&FAST_QueryCabinet,P));
@@ -998,6 +979,7 @@ void CreateStatusBar()
 		{
 			Maintenance_P->setEnabled(FALSE);
 		} else {
+			Maintenance->addStyleClass("OpenRDA ResourceBar Maintenance WPopupMenu");
 			Maintenance_P->setMenu(Maintenance);
 			Maintenance_P->setEnabled(TRUE);
 		}
@@ -1016,6 +998,7 @@ void CreateStatusBar()
 		{
 			Setup_P->setEnabled(FALSE);
 		} else {
+			Setup->addStyleClass("OpenRDA ResourceBar Setup WPopupMenu");
 			Setup_P->setMenu(Setup);
 			Setup_P->setEnabled(TRUE);
 		}
@@ -1034,6 +1017,7 @@ void CreateStatusBar()
 		{
 			Other_P->setEnabled(FALSE);
 		} else {
+			Other->addStyleClass("OpenRDA ResourceBar Other WPopupMenu");
 			Other_P->setMenu(Other);
 			Other_P->setEnabled(TRUE);
 		}
@@ -1049,6 +1033,7 @@ void CreateStatusBar()
 		P->setText(*c);
 		c->~WString();
 		pop=new Wt::WPopupMenu();
+		P->addStyleClass("OpenRDA ResourceBar RDAHelp WPopupMenu");
 		P->setMenu(pop);
 		P->setEnabled(TRUE);
 
@@ -1156,6 +1141,7 @@ void CreateStatusBar()
 		pop->addItem("Submit Suggestion")->triggered().connect(boost::bind(&rda_feedback,P));
 
 		pop1=new Wt::WPopupMenu();
+		pop1->addStyleClass("OpenRDA ResourceBar RDAHelp WPopupMenu EmailLog");
 		pop1->addItem("View")->triggered().connect(boost::bind(&msmtp_log,P));
 		pop1->addItem("Truncate")->triggered().connect(boost::bind(&msmtp_logdelete,P));
 		pop->addMenu("Email Log (msmtp.log)",pop1);
@@ -1180,12 +1166,8 @@ void CreateStatusBar()
 				P->setText(*c);
 				c->~WString();
 				pop=new Wt::WPopupMenu();
+				pop->addStyleClass("OpenRDA ResourceBar SystemAdministration WPopupMenu");
 				P->setMenu(pop);
-#ifdef __Use_mouseWentOver__ 
-				P->mouseWentOver().connect(std::bind([=] () {
-					P->menu()->popup(pop);
-				}));
-#endif /* __USE_mouseWentOver__ */
 				P->setEnabled(TRUE);
 				for(y=0;y<SysAdminModules->numlibs;++y)
 				{
@@ -1233,6 +1215,7 @@ int main(int argc,char **argv)
 	Wt::WImage *OpenRDAImage=NULL;
 	Wt::WPopupMenu *pop=NULL;
 	Wt::WLayout *daL=NULL;
+	Wt::WMenuItem *MenuI=NULL;
 	std::string *s1=NULL;
 	char *temp=NULL;
 	short x=0,height=0,y=0,z=0;
@@ -1397,12 +1380,12 @@ int main(int argc,char **argv)
 		MainWindowStatus->setOverflow(Wt::WContainerWidget::OverflowVisible,Horizontal);
 		MainWindowStatus->addStyleClass("OpenRDA ResourceBar");
 		MainWindowDock=new Wt::WContainerWidget(West);
-		MainWindowDock->setOverflow(Wt::WContainerWidget::OverflowVisible,Vertical);
+		MainWindowDock->setOverflow(Wt::WContainerWidget::OverflowAuto,Vertical);
 		MainWindowDock->setOverflow(Wt::WContainerWidget::OverflowVisible,Horizontal);
 		MainWindowDock->addStyleClass("OpenRDA TaskBar");
 	} else {
 		MainWindowDock=new Wt::WContainerWidget();
-		MainWindowDock->setOverflow(Wt::WContainerWidget::OverflowVisible,Vertical);
+		MainWindowDock->setOverflow(Wt::WContainerWidget::OverflowAuto,Vertical);
 		MainWindowDock->setOverflow(Wt::WContainerWidget::OverflowVisible,Horizontal);
 		MainWindowDock->addStyleClass("OpenRDA TaskBar");
 		MainBorderLayout->addWidget((Wt::WWidget *)MainWindowDock,Wt::WBorderLayout::Position::West);
@@ -1476,6 +1459,7 @@ int main(int argc,char **argv)
 	P=new Wt::WPushButton((Wt::WContainerWidget *)v2);
 	P->addStyleClass("OpenRDA Home");
 	hb->addWidget(P);
+	P->setDefault(FALSE);
 	P->clicked().connect(boost::bind(&go_home));
 
 	P=new Wt::WPushButton((Wt::WContainerWidget *)v2);
@@ -1535,18 +1519,15 @@ int main(int argc,char **argv)
 			++count;
 			Finance_P->setDefault(FALSE);
 			Finance_Pop=new Wt::WPopupMenu();
-			Finance_Pop->setAutoHide(TRUE,200);
+			Finance_Pop->addStyleClass("OpenRDA ModuleNavigation Finance WPopupMenu");
 			Finance_P->setMenu(Finance_Pop);
 
 			for(y=0;y<FinanceModules->numlibs;++y)
 			{
-				Finance_Pop->addItem(FNames->libs[y])->triggered().connect(boost::bind(&ChooseModule,FinanceModules->libs[y]));
+				MenuI=Finance_Pop->addItem(FNames->libs[y]);
+				MenuI->triggered().connect(boost::bind(&ChooseModule,FinanceModules->libs[y]));
+				MenuI->addStyleClass("OpenRDA ModuleNavigation Finance WPopupMenu");
 			}
-#ifdef __Use_mouseWentOver__ 
-			Finance_P->mouseWentOver().connect(std::bind([=] () {
-				Finance_P->menu()->popup(Finance_Pop);
-			}));
-#endif /* __USE_mouseWentOver__ */
 		}
 	}
 /* Procurement */
@@ -1565,16 +1546,13 @@ int main(int argc,char **argv)
 			P->setText(*c);
 			c->~WString();
 			pop=new Wt::WPopupMenu();
-			pop->setAutoHide(TRUE,200);
+			pop->addStyleClass("OpenRDA ModuleNavigation Procurement WPopupMenu");
 			P->setMenu(pop);
-#ifdef __Use_mouseWentOver__ 
-			P->mouseWentOver().connect(std::bind([=] () {
-				P->menu()->popup(pop);
-			}));
-#endif /* __USE_mouseWentOver__ */
 			for(y=0;y<ProcurementModules->numlibs;++y)
 			{
-				pop->addItem(PNames->libs[y])->triggered().connect(boost::bind(&ChooseModule,ProcurementModules->libs[y]));
+				MenuI=pop->addItem(PNames->libs[y]);
+				MenuI->triggered().connect(boost::bind(&ChooseModule,ProcurementModules->libs[y]));
+				MenuI->addStyleClass("OpenRDA ModuleNavigation Procurement WPopupMenu");
 			}
 		}
 	}
@@ -1594,16 +1572,13 @@ int main(int argc,char **argv)
 			P->setText(*c);
 			c->~WString();
 			pop=new Wt::WPopupMenu();
-			pop->setAutoHide(TRUE,200);
+			pop->addStyleClass("OpenRDA ModuleNavigation HR WPopupMenu");
 			P->setMenu(pop);
-#ifdef __Use_mouseWentOver__ 
-			P->mouseWentOver().connect(std::bind([=] () {
-				P->menu()->popup(pop);
-			}));
-#endif /* __USE_mouseWentOver__ */
 			for(y=0;y<HRModules->numlibs;++y)
 			{
-				pop->addItem(HNames->libs[y])->triggered().connect(boost::bind(&ChooseModule,HRModules->libs[y]));
+				MenuI=pop->addItem(HNames->libs[y]);
+				MenuI->triggered().connect(boost::bind(&ChooseModule,HRModules->libs[y]));
+				MenuI->addStyleClass("OpenRDA ModuleNavigation HR WPopupMenu");
 			}
 		}
 	}
@@ -1630,19 +1605,16 @@ int main(int argc,char **argv)
 				P->setText(*c);
 				c->~WString();
 				pop=new Wt::WPopupMenu();
-				pop->setAutoHide(TRUE,200);
+				pop->addStyleClass("OpenRDA ModuleNavigation Property WPopupMenu");
 				P->setMenu(pop);
-#ifdef __Use_mouseWentOver__ 
-				P->mouseWentOver().connect(std::bind([=] () {
-					P->menu()->popup(pop);
-				}));
-#endif /* __USE_mouseWentOver__ */
 
 				for(y=0;y<RevenueModules->numlibs;++y)
 				{
 					if(RDAstrstr(RevenueModules->libs[y],"PROP") || RDAstrstr(RevenueModules->libs[y],"RLST") || RDAstrstr(RevenueModules->libs[y],"DMV") || RDAstrstr(RevenueModules->libs[y],"IRMS"))
 					{
-						pop->addItem(RNames->libs[y])->triggered().connect(boost::bind(&ChooseModule,RevenueModules->libs[y]));
+						MenuI=pop->addItem(RNames->libs[y]);
+						MenuI->triggered().connect(boost::bind(&ChooseModule,RevenueModules->libs[y]));
+						MenuI->addStyleClass("OpenRDA ModuleNavigation Property WPopupMenu");
 					}
 				}
 			}
@@ -1661,19 +1633,16 @@ int main(int argc,char **argv)
 				P->setText(*c);
 				c->~WString();
 				pop=new Wt::WPopupMenu();
-				pop->setAutoHide(TRUE,200);
+				pop->addStyleClass("OpenRDA ModuleNavigation PermitsLicensesMisc WPopupMenu");
 				P->setMenu(pop);
-#ifdef __Use_mouseWentOver__ 
-				P->mouseWentOver().connect(std::bind([=] () {
-					P->menu()->popup(pop);
-				}));
-#endif /* __USE_mouseWentOver__ */
 
 				for(y=0;y<RevenueModules->numlibs;++y)
 				{
 					if(RDAstrstr(RevenueModules->libs[y],"BLDPRMT") || RDAstrstr(RevenueModules->libs[y],"MISC") || RDAstrstr(RevenueModules->libs[y],"OCCTAX"))
 					{
-						pop->addItem(RNames->libs[y])->triggered().connect(boost::bind(&ChooseModule,RevenueModules->libs[y]));
+						MenuI=pop->addItem(RNames->libs[y]);
+						MenuI->triggered().connect(boost::bind(&ChooseModule,RevenueModules->libs[y]));
+						MenuI->addStyleClass("OpenRDA ModuleNavigation PermitsLicensesMisc WPopupMenu");
 					}
 				}
 			}
@@ -1689,19 +1658,16 @@ int main(int argc,char **argv)
 				P->setText(*c);
 				c->~WString();
 				pop=new Wt::WPopupMenu();
-				pop->setAutoHide(TRUE,200);
+				pop->addStyleClass("OpenRDA ModuleNavigation Enterprise WPopupMenu");
 				P->setMenu(pop);
-#ifdef __Use_mouseWentOver__ 
-				P->mouseWentOver().connect(std::bind([=] () {
-					P->menu()->popup(pop);
-				}));
-#endif /* __USE_mouseWentOver__ */
 
 				for(y=0;y<RevenueModules->numlibs;++y)
 				{
 					if(RDAstrstr(RevenueModules->libs[y],"UTLBLL"))
 					{
-						pop->addItem(RNames->libs[y])->triggered().connect(boost::bind(&ChooseModule,RevenueModules->libs[y]));
+						MenuI=pop->addItem(RNames->libs[y]);
+						MenuI->triggered().connect(boost::bind(&ChooseModule,RevenueModules->libs[y]));
+						MenuI->addStyleClass("OpenRDA ModuleNavigation Enterprise WPopupMenu");
 					}
 				}
 			}

@@ -1,6 +1,7 @@
 #include<gui.hpp>
 #include<guip.hpp>
 
+#define __ONLY_SCREEN_NAME__
 #define __NEED_WDIALOG_LAYOUT__
 #define FLAT_DOCK_BUTTON
 
@@ -1712,14 +1713,10 @@ int xcrttoolbarcontainer(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *wid
 	sprintf(GUIstemp,"OpenRDA %s ToolBar PushButton PopupMenu",mssc);
 	if(mssc!=NULL) Rfree(mssc);
 	popMenu->addStyleClass(GUIstemp);
-	popMenu->setAutoHide(TRUE,200);
 	c=new WString(wdgt->label);
 	B->setText(*c);
 	c->~WString();
 	B->setMenu(popMenu);
-	B->mouseWentOver().connect(std::bind([=] () {
-		B->menu()->popup(B);
-	}));
 	B->setDefault(FALSE);
 	rsrc->window_toolbar->addButton(B);
 	while((*widgetcount+1)<scn->numwdgts)
@@ -1788,7 +1785,7 @@ int xcrtpopup(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt
 	Wt::WToolBar *tBar=NULL;
 	Wt::WWidget *hold=NULL;
 	Wt::WString *c=NULL;
-	Wt::WMenuItem *Item=NULL;
+	Wt::WMenuItem *Item=NULL,*MenuI=NULL;
 	RDAwdgt *wdgt=NULL;
 	RDArmem *member=NULL;
 	char *dashes=NULL,first_button=TRUE;
@@ -1810,7 +1807,6 @@ int xcrtpopup(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt
 		sprintf(GUIstemp,"OpenRDA %s PushButton PopupMenu",mssc);
 		if(mssc!=NULL) Rfree(mssc);
 		pB->addStyleClass(GUIstemp);
-		pB->setAutoHide(TRUE,200);
 		*pop=(Wt::WWidget *)pB;
 		ppB=((Wt::WPopupMenu *)parent);		
 		ppB->addMenu(wdgt->label,(Wt::WPopupMenu *)pB);
@@ -1850,19 +1846,12 @@ int xcrtpopup(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt
 		}
 		if(mssc!=NULL) Rfree(mssc);
 		pB->addStyleClass(GUIstemp);
-		pB->setAutoHide(TRUE,200);
 		if(rtype==0)
 		{
 			B->setMenu(pB);
 			B->setDefault(FALSE);
-			B->mouseWentOver().connect(std::bind([=] () {
-				B->menu()->popup(B);
-			}));
 		} else {
 			SB->dropDownButton()->setMenu(pB);
-			SB->dropDownButton()->mouseWentOver().connect(std::bind([=] () {
-				SB->menu()->popup(B);
-			}));
 		}
 #ifdef FLAT_DOCK_BUTTON
 		if(rtype==0)
@@ -1952,6 +1941,7 @@ int xcrtpopup(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt
 				{
 					++count;
 					pB->addMenu(wdgt->label,(Wt::WPopupMenu *)hold);
+					MenuI=pB->items().at(count-1);
 				}
 			} else if(wdgt->type==25) /* End Popup Menu */
 			{
@@ -3447,11 +3437,44 @@ int xcrtscrollwindow(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 /*---------------------------------------------------------------------------
 	crtwdgts - function to create widgets inside a window
 ---------------------------------------------------------------------------*/
+#define __USE_MAKESCREENHEADER__
 #ifdef __USE_MAKESCREENHEADER__
+void DefineHeaderCSS(char *mssc)
+{
+	memset(GUIstemp,0,1024);
+	switch(MODULE_GROUP)
+	{
+		default:
+		case 0: /* Systems Administration */
+			sprintf(GUIstemp,"OpenRDA %s SysAdminHeader",mssc);
+			break;
+		case 1: /* Finance */
+			sprintf(GUIstemp,"OpenRDA %s FinanceHeader",mssc);
+			break;
+		case 2: /* Procurement */
+			sprintf(GUIstemp,"OpenRDA %s ProcurementHeader",mssc);
+			break;
+		case 3: /* HR */
+			sprintf(GUIstemp,"OpenRDA %s HRHeader",mssc);
+			break;
+		case 4: /* Property */
+			sprintf(GUIstemp,"OpenRDA %s PropertyHeader",mssc);
+			break;
+		case 5: /* Misc */
+			sprintf(GUIstemp,"OpenRDA %s PermitLicenseMiscHeader",mssc);
+			break;
+		case 6: /* Enterprise */
+			sprintf(GUIstemp,"OpenRDA %s EnterpriseHeader",mssc);
+			break;
+		case 7: /* Collections */
+			sprintf(GUIstemp,"OpenRDA %s CollectionsHeader",mssc);
+			break;
+	}
+}
 #ifdef __NEED_WDIALOG_LAYOUT__
 static void MakeScreenHeader(Wt::WContainerWidget *parent,Wt::WVBoxLayout *vb,char *label,RDArsrc *rsc)
 #else
-static void MakeScreenHeader(Wt::WContainerWidget *parent,char *label)
+static void MakeScreenHeader(Wt::WContainerWidget *parent,char *label,RDArsrc *rsc)
 #endif /* __NEED_WDIALOG_LAYOUT__ */
 {
 	Wt::WContainerWidget *c=NULL;
@@ -3459,18 +3482,21 @@ static void MakeScreenHeader(Wt::WContainerWidget *parent,char *label)
 	Wt::WHBoxLayout *h=NULL;
 	Wt::WLayout *daL=NULL;
 	Wt::WLength spc;
+	Wt::WPushButton *pB=NULL;
+	Wt::WLink *WK=NULL;
+	int x=0;
+	RDArmem *member=NULL;
 	char *mssc=NULL;
 
+	mssc=ModuleScreenStyleClass(rsc);
+	DefineHeaderCSS(mssc);
 	c=new Wt::WContainerWidget();
+	c->addStyleClass(GUIstemp);
 #ifdef __NEED_WDIALOG_LAYOUT__
 	if(rsc->primary==NULL)
 	{
 		parent->addWidget(c);
 		t =(Wt::WWidget *) new Wt::WText(label);
-		mssc=ModuleScreenStyleClass(rsc);
-		memset(GUIstemp,0,1024);
-		sprintf(GUIstemp,"OpenRDA %s h4",mssc);
-		if(mssc!=NULL) Rfree(mssc);
 		t->addStyleClass(GUIstemp);
 #ifdef USE_RDA_DIAGNOSTICS
 		if(diagcss)
@@ -3489,10 +3515,7 @@ static void MakeScreenHeader(Wt::WContainerWidget *parent,char *label)
 		c->setPadding(spc,All);
 		c->setLayout(h);	
 		t =(Wt::WWidget *) new Wt::WText(label);
-		mssc=ModuleScreenStyleClass(rsc);
-		memset(GUIstemp,0,1024);
-		sprintf(GUIstemp,"OpenRDA %s h4",mssc);
-		if(mssc!=NULL) Rfree(mssc);
+		DefineHeaderCSS(mssc);
 		t->addStyleClass(GUIstemp);
 #ifdef USE_RDA_DIAGNOSTICS
 		if(diagcss)
@@ -3503,11 +3526,25 @@ static void MakeScreenHeader(Wt::WContainerWidget *parent,char *label)
 			}
 		}
 #endif /* USE_RDA_DIAGNOSTICS */
-		h->addWidget(t,100,Wt::AlignCenter);
+		h->addWidget(t,0,Wt::AlignLeft);
+		x=FINDRSC(rsc,"CLOSE WINDOW");
+		if(x>(-1))
+		{
+			member=rsc->rscs+x;	
+			pB=new Wt::WPushButton((Wt::WContainerWidget *)c);
+			h->addWidget(pB,0,Wt::AlignRight);
+			pB->clicked().connect(boost::bind(&xExecuteRDArmemFunction,member,__LINE__,__FILE__));
+			pB->setDefault(FALSE);
+			memset(GUIstemp,0,1024);
+			sprintf(GUIstemp,"OpenRDA %s CloseWindow PushButton",mssc);
+			pB->addStyleClass(GUIstemp);
+			WK = new WLink("resources/OpenRDA/closewindow.png");
+			pB->setIcon(*WK);
+		}
 	} else {
 		c->setOverflow(WContainerWidget::OverflowVisible,Vertical);
 		c->setOverflow(WContainerWidget::OverflowVisible,Horizontal);
-		vb->addWidget((Wt::WWidget *)c,0,Wt::AlignCenter | Wt::AlignJustify);
+		vb->addWidget((Wt::WWidget *)c,0,Wt::AlignLeft | Wt::AlignJustify);
 		h=new Wt::WHBoxLayout();
 		h->setSpacing(0);
 		daL=(Wt::WLayout *)h;
@@ -3516,12 +3553,23 @@ static void MakeScreenHeader(Wt::WContainerWidget *parent,char *label)
 		c->setPadding(spc,All);
 		c->setLayout(h);	
 		t =(Wt::WWidget *) new Wt::WText(label);
-		mssc=ModuleScreenStyleClass(rsc);
-		memset(GUIstemp,0,1024);
-		sprintf(GUIstemp,"OpenRDA %s h4",mssc);
-		if(mssc!=NULL) Rfree(mssc);
+		DefineHeaderCSS(mssc);
 		t->addStyleClass(GUIstemp);
-		h->addWidget(t,100,Wt::AlignCenter);
+		h->addWidget(t,0,Wt::AlignLeft);
+		x=FINDRSC(rsc,"CLOSE WINDOW");
+		if(x>(-1))
+		{
+			member=rsc->rscs+x;	
+			pB=new Wt::WPushButton((Wt::WContainerWidget *)c);
+			h->addWidget(pB,0,Wt::AlignRight);
+			pB->clicked().connect(boost::bind(&xExecuteRDArmemFunction,member,__LINE__,__FILE__));
+			pB->setDefault(FALSE);
+			memset(GUIstemp,0,1024);
+			sprintf(GUIstemp,"OpenRDA %s CloseWindow PushButton",mssc);
+			pB->addStyleClass(GUIstemp);
+			WK = new WLink("resources/OpenRDA/exit.png");
+			pB->setIcon(*WK);
+		}
 #ifdef USE_RDA_DIAGNOSTICS
 		if(diagcss)
 		{
@@ -3535,10 +3583,7 @@ static void MakeScreenHeader(Wt::WContainerWidget *parent,char *label)
 #else 
 	parent->addWidget(c);
 	t =(Wt::WWidget *) new Wt::WText(label);
-	mssc=ModuleScreenStyleClass(rsc);
-	memset(GUIstemp,0,1024);
-	sprintf(GUIstemp,"OpenRDA %s h4",mssc);
-	if(mssc!=NULL) Rfree(mssc);
+	DefineHeaderCSS(mssc);
 	t->addStyleClass(GUIstemp);
 #ifdef USE_RDA_DIAGNOSTICS
 	if(diagcss)
@@ -3557,10 +3602,7 @@ static void MakeScreenHeader(Wt::WContainerWidget *parent,char *label)
 	c->setPadding(spc,All);
 	c->setLayout(h);	
 	t =(Wt::WWidget *) new Wt::WText(label);
-	mssc=ModuleScreenStyleClass(rsc);
-	memset(GUIstemp,0,1024);
-	sprintf(GUIstemp,"OpenRDA %s h4",mssc);
-	if(mssc!=NULL) Rfree(mssc);
+	DefineHeaderCSS(mssc);
 	t->addStyleClass(GUIstemp);
 #ifdef USE_RDA_DIAGNOSTICS
 	if(diagcss)
@@ -3571,7 +3613,22 @@ static void MakeScreenHeader(Wt::WContainerWidget *parent,char *label)
 		}
 	}
 #endif /* USE_RDA_DIAGNOSTICS */
-	h->addWidget(t,100,Wt::AlignCenter);
+	h->addWidget(t,0,Wt::AlignLeft);
+	x=FINDRSC(rsc,"CLOSE WINDOW");
+	if(x>(-1))
+	{
+		member=rsc->rscs+x;	
+		pB=new Wt::WPushButton((Wt::WContainerWidget *)c);
+		h->addWidget(pB,0,Wt::AlignRight);
+		pB->clicked().connect(boost::bind(&xExecuteRDArmemFunction,member,__LINE__,__FILE__));
+		pB->setDefault(FALSE);
+		memset(GUIstemp,0,1024);
+		sprintf(GUIstemp,"OpenRDA %s CloseWindow PushButton",mssc);
+		pB->addStyleClass(GUIstemp);
+		WK = new WLink("resources/OpenRDA/exit.png");
+		pB->setIcon(*WK);
+	}
+	if(mssc!=NULL) Rfree(mssc);
 #endif /* __NEED_WDIALOG_LAYOUT__ */
 }
 #endif /* __USE_MAKESCREENHEADER__ */
@@ -3591,6 +3648,7 @@ void crtwdgts(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsc,char *label)
 	short last_wdgttype=(-1);
 	Wt::WLength spc;
 	Wt::WText *myText=NULL;
+	char *s=NULL,*temp=NULL,*temp1=0;
 #ifdef __NEED_WDIALOG_LAYOUT__
 	Wt::WVBoxLayout *vb=NULL;
 	Wt::WLayout *daL=NULL;
@@ -3636,11 +3694,59 @@ void crtwdgts(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsc,char *label)
 	if(rsc->primary==NULL && QN2IT_PARENT_TYPE==0)
 	{
 #ifdef __USE_MAKESCREENHEADER__
+#ifdef __ONLY_SCREEN_NAME__
+#ifdef __NEED_WDIALOG_LAYOUT__
+		s=stralloc(rsc->screen);
+		stolower(s);
+		for(h=0,temp=s;*temp;++temp,++h)
+		{
+			if(h>0) 
+			{
+				temp1=s+(h-1);
+			} else temp1=NULL;
+			if(h==0) 
+			{
+				s[h]=toupper(*temp);
+			} else if(temp1!=NULL)
+			{
+				if(*temp1==' ')
+				{
+					s[h]=toupper(*temp);
+				}
+			}
+		}
+		MakeScreenHeader(CW,vb,s,rsc);
+		if(s!=NULL) Rfree(s);
+#else
+		s=stralloc(rsc->screen);
+		stolower(s);
+		for(h=0,temp=s;*temp;++temp,++h)
+		{
+			if(h>0) 
+			{
+				temp1=s+(h-1);
+			} else temp1=NULL;
+			if(h==0) 
+			{
+				s[h]=toupper(*temp);
+			} else if(temp1!=NULL)
+			{
+				if(*temp1==' ')
+				{
+					s[h]=toupper(*temp);
+				}
+			}
+		}
+		MakeScreenHeader(CW,s,rsc);
+		if(s!=NULL) Rfree(s);
+#endif /* __NEED_WDIALOG_LAYOUT__ */
+#else 
 #ifdef __NEED_WDIALOG_LAYOUT__
 		MakeScreenHeader(CW,vb,label,rsc);
 #else
-		MakeScreenHeader(CW,label);
+		MakeScreenHeader(CW,label,rsc);
 #endif /* __NEED_WDIALOG_LAYOUT__ */
+#endif /* __ONLY_SCREEN_NAME__ */
 #endif /* __USE_MAKESCREENHEADER__ */
 	}
 	widgetcount=0;

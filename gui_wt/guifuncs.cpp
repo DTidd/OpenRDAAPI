@@ -35,7 +35,7 @@ extern void c_main(int,char **);
 char using_js=FALSE,using_ajax=FALSE;
 char inside_rfkw=FALSE; 
 RDArsrc *rfkw_rsrc=NULL;
-short USE_DIAGNOSTIC_SCREENS=TRUE;
+short USE_DIAGNOSTIC_SCREENS=TRUE,MODULE_GROUP=0;
 
 
 char *(*RDA_AutoComplete)(char *,char *,char *,char *);
@@ -341,7 +341,10 @@ char *WT_RDA_GetEnv(char *name,int line,char *file)
 			}
 		}
 		n1->~string();
-		WT_RDA_UnSetEnv(name,__LINE__,__FILE__);
+		if(RDAstrcmp(name,"RDADIAG"))
+		{
+			WT_RDA_UnSetEnv(name,__LINE__,__FILE__);
+		}
 		return(temp);
 	}
 }
@@ -451,7 +454,10 @@ int WT_RDA_UnSetEnv(char *name,int line,char *file)
 		prterr("DIAG WT_RDA_UnSetEnv Cookie [%s] at line [%d] program [%s].",(name!=NULL ? name:""),line,(file!=NULL ? file:""));
 	}
 	if(isEMPTY(name)) return;
-	unsetenv(name);
+	if(RDAstrcmp(name,"RDADIAG"))
+	{
+		unsetenv(name);
+	}	
 	myAPP=Wt::WApplication::instance();
 	n1=new string(name);
 	i=myAPP->environment().hostName();
@@ -460,7 +466,10 @@ int WT_RDA_UnSetEnv(char *name,int line,char *file)
 	hname=new string(temp);
 	if(temp!=NULL) Rfree(temp);
 	p=new string("/");
+	if(RDAstrcmp(name,"RDADIAG"))
+	{
 	myAPP->removeCookie(*n1,*hname,*p);
+	}
 	n1->~string();
 	hname->~string();
 	p->~string();
@@ -1068,7 +1077,9 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		if(x!=NULL) Rfree(x);
 	}
 	if(x!=NULL) Rfree(x);
-	return(WRun(a->numlibs,a->libs,&createApplication));
+	WRun(a->numlibs,a->libs,&createApplication);
+	sleep(5);
+	return(0);
 }
 #else
 int main(int argc,char *argv[])
@@ -1084,6 +1095,7 @@ int main(int argc,char *argv[])
 	Session::configureAuth();
 
 	WRun(argc,argv,&createApplication);
+	sleep(5);
 	return(0);
 }
 #endif
@@ -1094,6 +1106,7 @@ void xINITGUI(int argc,char *argv[],char *d,int line,char *file)
 	Wt::WString *c=NULL;
 
 	USE_DIAGNOSTIC_SCREENS=FALSE;
+	MODULE_GROUP=0;
 	inside_rfkw=FALSE;
 	rfkw_rsrc=NULL;
 	INSIDE_PASTE=FALSE;
@@ -1169,6 +1182,12 @@ void xINITGUI(int argc,char *argv[],char *d,int line,char *file)
 		c=new WString(temp);
 		RDAMAINWIDGET->setTitle(*c);
 		c->~WString();
+#define USE_CONFIRM_CLOSE_MESSAGE
+#ifdef USE_CONFIRM_CLOSE_MESSAGE
+		c=new WString("Closing the browser tab will abruptly stop your application and not close gracefully.  This will cause you problems restarting restricted processes.  Please use the \"Quit\" button within the application.");
+		RDAMAINWIDGET->setConfirmCloseMessage(*c);
+		c->~WString();
+#endif /* USE_CONFIRM_CLOSE_MESSAGE */
 		if(temp!=NULL) Rfree(temp);
 
 		USER_INTERFACE=FALSE;
@@ -1199,10 +1218,15 @@ void xEXITGUI(int line,char *file)
 	std::string s1("http:/");
 	Wt::WString *c=NULL;
 	int x=0;
+	
 
+#ifdef USE_CONFIRM_CLOSE_MESSAGE
+	c=new WString("");
+	RDAMAINWIDGET->setConfirmCloseMessage(*c);
+	c->~WString();
+#endif /* USE_CONFIRM_CLOSE_MESSAGE */
 #ifdef WT_FASTCGI
-	std::string closeWindowCmd=
-		("window.close();");
+	std::string closeWindowCmd=("window.close();");
 #endif
 
 #ifdef USE_RDA_DIAGNOSTICS
@@ -1232,14 +1256,6 @@ void xEXITGUI(int line,char *file)
 		freeapplib(OpenRDA_Cookies);
 		OpenRDA_Cookies=NULL;
 	}
-	if(RDAMAINWIDGET!=NULL)
-	{
-		c=new WString("We'll see you soon...");
-		RDAMAINWIDGET->loadingIndicator()->setMessage(*c);
-		c->~WString();
-		RDAMAINWIDGET->root()->clear();
-		RDAMAINWIDGET->quit();
-	}
 #ifdef WT_FASTCGI
 	if(!RDAstrcmp(PROGRAM_NAME,"openrda.lnx") || !RDAstrcmp(PROGRAM_NAME,"openrda.exe"))
 	{
@@ -1252,6 +1268,14 @@ void xEXITGUI(int line,char *file)
 	s1+RDAMAINWIDGET->environment().hostName();
 	RDAMAINWIDGET->redirect(s1);
 #endif
+	if(RDAMAINWIDGET!=NULL)
+	{
+		c=new WString("We'll see you soon...");
+		RDAMAINWIDGET->loadingIndicator()->setMessage(*c);
+		c->~WString();
+		RDAMAINWIDGET->root()->clear();
+		RDAMAINWIDGET->quit();
+	}
 	RDAMAINWIDGET=NULL;
 	if(LastGroupDefault!=NULL) Rfree(LastGroupDefault);
 }
@@ -4794,7 +4818,8 @@ void list_doubleclick_callback(RDArmem *member)
 #endif /* USE_RDA_DIAGNOSTICS */
 	if(NoLosingFocus!=NULL && NoLosingFocus!=member)
 	{
-		ExecuteRDArmemFunction(NoLosingFocus);
+		losingfocusfunction(NoLosingFocus);
+		NoLosingFocus=NULL;
 	}
 	NoLosingFocus=member;
 	if(member->editable && member->user_editable)
@@ -4829,7 +4854,8 @@ void list_callback(RDArmem *member)
 	}
 	if(NoLosingFocus!=NULL && NoLosingFocus!=member)
 	{
-		ExecuteRDArmemFunction(NoLosingFocus);
+		losingfocusfunction(NoLosingFocus);
+		NoLosingFocus=NULL;
 	}
 	NoLosingFocus=member;
 #endif /* USE_RDA_DIAGNOSTICS */
@@ -4927,7 +4953,7 @@ void runfuncexitcallback(RDArmem *member)
 	if(member->sensitive==FALSE || member->user_sensitive==FALSE) return;
 	if(NoLosingFocus!=NULL)
 	{
-		activatefunction(NoLosingFocus);
+		losingfocusfunction(NoLosingFocus);
 		NoLosingFocus=NULL;
 	}
 	rs=(RDArsrc *)member->parent;
@@ -5003,7 +5029,7 @@ void runfunckwincallback(RDArmem *member)
 	if(member->sensitive==FALSE || member->user_sensitive==FALSE) return;
 	if(NoLosingFocus!=NULL)
 	{
-		activatefunction(NoLosingFocus);
+		losingfocusfunction(NoLosingFocus);
 		NoLosingFocus=NULL;
 	}
 	rs=(RDArsrc *)member->parent;
@@ -5086,7 +5112,7 @@ void runfunctioncallback(RDArmem *member)
 	if(member->sensitive==FALSE || member->user_sensitive==FALSE) return;
 	if(NoLosingFocus!=NULL)
 	{
-		activatefunction(NoLosingFocus);
+		losingfocusfunction(NoLosingFocus);
 		NoLosingFocus=NULL;
 	}
 	rsrc=member->parent;

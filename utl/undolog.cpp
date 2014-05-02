@@ -695,6 +695,170 @@ void UndoLog()
 		}
 		ef=PRVNRD(dattrn,1);
 	}
+	if(!isEMPTY(last_chg_mod) && !isEMPTY(last_chg_fi))
+	{
+		if(fileno!=(-1))
+		{
+			if(last_npv==(-1))
+			{
+				WRTTRANS(fileno,0,NULL,prev);
+			}
+			CLSNRD(fileno);
+			fileno=(-1);
+		}
+		if(last_chg_mod!=NULL) Rfree(last_chg_mod);
+		if(last_chg_fi!=NULL) Rfree(last_chg_fi);
+		last_chg_mod=stralloc(chg_mod);
+		last_chg_fi=stralloc(chg_fi);
+		last_npv=(-1);
+		fileno=OPNNRDsec(chg_mod,chg_fi,TRUE,TRUE,FALSE);
+		memset(&kv1,0,sizeof(kv1));
+		memset(&kv2,0,sizeof(kv2));
+		ZERNRD(fileno);
+		for(x=0;x<9;++x)
+		{
+			memset(tempx,0,128);
+			memset(tempy,0,128);
+			sprintf(tempx,"KEY FIELD %d NAME",(x+1));
+			sprintf(tempy,"KEY FIELD %d VALUE",(x+1));
+			FINDFLDGETSTRING(dattrn,tempx,&kn);
+			if(isEMPTY(kn)) break;
+			FINDFLDGETSTRING(dattrn,tempy,&kv);
+			field=FLDNRD(fileno,kn);
+			sprintf(&kv1[x][0],"%s",(kv!=NULL ? kv:""));
+			if(field!=NULL)
+			{
+				switch(field->type)
+				{
+					case SCROLLEDTEXT:
+					case VARIABLETEXT:
+					case DATES:
+					case TIMES:
+					case SOCSECNUM:
+					case PLAINTEXT:
+					case ZIPCODE:
+					case PHONE:
+					case EXPENDITURE:
+					case REVENUE:
+					case BALANCESHEET:
+					case BEGINNINGBALANCE:
+					case OPTIONALFIELDS:
+					case CUSTOMTYPE:
+						FINDFLDSETSTRING(fileno,kn,kv);
+						break;
+					case CHARACTERS:
+						c=kv[0];
+						FINDFLDSETCHAR(fileno,kn,c);
+						break;
+					case BOOLNS:
+						if(!RDAstrcmp(kv,"TRUE")) c=TRUE;
+						else c==FALSE;
+						FINDFLDSETCHAR(fileno,kn,c);
+						break;
+					case DECIMALV:
+					case SDECIMALV:
+					case DOUBLEV:
+					case SDOUBLEV:
+					case DOLLARS_NOCENTS:
+						d=atof(kv);
+						FINDFLDSETDOUBLE(fileno,kn,d);
+						break;
+					case DOLLARS:
+						d=atof(kv)*100;
+						FINDFLDSETDOUBLE(fileno,kn,d);
+						break;
+					case SHORTV:
+					case SSHORTV:
+						s=atoi(kv);
+						FINDFLDSETSHORT(fileno,kn,s);
+						break;
+					case SCROLLEDLIST:
+					case LONGV:
+					case SLONGV:
+						i=atoi(kv);
+						FINDFLDSETSHORT(fileno,kn,i);
+						break;
+					default:
+						prterr("Error Key Field Type [%d] is invalid for Field [%s].",field->type,field->name);
+						break;
+				}
+			}	
+		}
+		if(EQLNRD(fileno,1)) 
+		{
+			KEYNRD(fileno,1);
+		} else if(npv==TRUE && last_npv==(-1))
+		{
+			prev=RDATDataNEW(fileno);
+			FINDFLDSETCHAR(fileno,"DELETEFLAG",TRUE);
+			WRTTRANS(fileno,0,NULL,prev);
+			last_npv=npv;
+		} else if(npv==FALSE)
+		{
+			prev=RDATDataNEW(fileno);
+			field=FLDNRD(fileno,chg_fe);
+			if(field!=NULL)
+			{
+				FINDFLDGETSTRING(dattrn,"PREVIOUS VALUE",&pv);
+				switch(field->type)
+				{
+					case SCROLLEDTEXT:
+					case VARIABLETEXT:
+					case DATES:
+					case TIMES:
+					case SOCSECNUM:
+					case PLAINTEXT:
+					case ZIPCODE:
+					case PHONE:
+					case EXPENDITURE:
+					case REVENUE:
+					case BALANCESHEET:
+					case BEGINNINGBALANCE:
+					case OPTIONALFIELDS:
+					case CUSTOMTYPE:
+						FINDFLDSETSTRING(fileno,chg_fe,pv);
+						break;
+					case CHARACTERS:
+						FINDFLDSETCHAR(fileno,chg_fe,pv[0]);
+						break;
+					case BOOLNS:
+						if(!RDAstrcmp(pv,"TRUE"))
+						{
+							FINDFLDSETCHAR(fileno,chg_fe,TRUE);
+						} else FINDFLDSETCHAR(fileno,chg_fe,FALSE);
+						break;
+					case DECIMALV:
+					case SDECIMALV:
+					case DOUBLEV:
+					case SDOUBLEV:
+					case DOLLARS_NOCENTS:
+						d=atof(pv);
+						FINDFLDSETDOUBLE(fileno,chg_fe,d);
+						break;
+					case DOLLARS:
+						d=atof(pv)*100;
+						FINDFLDSETDOUBLE(fileno,chg_fe,d);
+						break;
+					case SHORTV:
+					case SSHORTV:
+						s=atoi(pv);
+						FINDFLDSETSHORT(fileno,chg_fe,s);
+						break;
+					case SCROLLEDLIST:
+					case LONGV:
+					case SLONGV:
+						i=atoi(pv);
+						FINDFLDSETINT(fileno,chg_fe,i);
+						break;
+					default:
+						prterr("Error Key Field Type [%d] is invalid for Field [%s].",field->type,field->name);
+						break;
+				}
+			} else {
+				prterr("ERROR:  Changed Field [%s] not found in File [%s][%s].",(chg_fe!=NULL ? chg_fe:""),MODULENAME(fileno),FILENAME(fileno));
+			}
+		}
+	}
 	if(fileno!=(-1)) CLSNRD(fileno);
 	if(prev!=NULL) Rfree(prev);
 	if(pv!=NULL) Rfree(pv);

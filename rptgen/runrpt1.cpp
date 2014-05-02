@@ -253,7 +253,7 @@ void xexit_cleanly(RDArunrpt *runrpt,RDAreport *rpt,short exit_report,char *err_
 {
 	char *temp=NULL;
 	RDAvirtual *v;
-	int x=0;
+	int x=0,level=runrpt->level;
 
 #ifdef USE_RDA_DIAGNOSTICS
 	if(diagrptgen)
@@ -340,12 +340,6 @@ void xexit_cleanly(RDArunrpt *runrpt,RDAreport *rpt,short exit_report,char *err_
 			FreeRDArunrpt(runrpt);
 			runrpt=NULL;
 		}
-/* DCT: added this ShutdownSubsystems() on 4/1/2014 before finding the
-        audit trail, POAUDITENV was chained to didn't have the environment 
-	type virtual fields, so it couldn't remove the cookies.  This might
-	not be necessary.  Haven't yet found that it fails though....   
-*/
-		ShutdownSubsystems();
 	} else if(exit_report==1)
 	{
 		if(!runrpt->APPmainLoop) 

@@ -401,6 +401,7 @@ short xRunVMimeSendmail(MAIL_VARS *email,int line,char *file)
 	pid_t pid; 
 	int x=0;
 	int status=0;
+	char *temp=NULL;
 
 	pipe(fds); 
 	pid=fork(); 
@@ -501,7 +502,19 @@ short xRunVMimeSendmail(MAIL_VARS *email,int line,char *file)
 				RDA_UnSetEnv(stemp);
 			}
 		}
-		execl("/bin/sh","sh","-c","vmime-sendmail.lnx",NULL);
+
+		temp=getenv("WT_DOC_ROOT");
+		if(temp==NULL)
+		{
+			/* This requires vmime-sendmail to be in the PATH,
+			   Won't work for FastCGI  */
+			execl("/bin/sh","sh","-c","vmime-sendmail.lnx",NULL);
+		}else{
+			/* This prepends path and should work for FastCGI */
+			sprintf(stemp,"%s/vmime-sendmail.lnx",temp);
+			execl("/bin/sh","sh","-c",stemp,NULL);
+		}
+
 	}else if (pid == (pid_t) -1) {
 		/* parent fork failed */
 		close (fds[0]); 

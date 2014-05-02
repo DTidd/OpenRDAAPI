@@ -2553,8 +2553,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 	Wt::WCalendar *DE_Cal=NULL;
 	Wt::WAnimation aMaze;
 	Wt::WWebWidget *WWeb=NULL;
-	Wt::WCssDecorationStyle cDS;
-	Wt::WFont wF;
 	RDArmem *browse_list_desc=NULL;
 	Wt::WText *hold=NULL,*flatpB=NULL;
 	int h=0,w=0,longest=0;
@@ -3017,19 +3015,31 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				} else {
 					LE->setEchoMode(0);
 				}
+				memset(stemp,0,101);
+				c=NULL;
 				if(member->field_type==PHONE) 
 				{
-					member->definition=stralloc("NNN-NNN-NNNN");	
+					member->definition=stralloc("nnn-nnn-nnnn");	
 					member->validobject = new Wt::WRegExpValidator("[0-9]{3}-[0-9]{3}-[0-9]{4}");
+					sprintf(stemp,"999-999-9999");
+					c=new Wt::WString(stemp);
+					LE->setInputMask(*c);
 				} else if(member->field_type==SOCSECNUM)
 				{
-					member->definition=stralloc("NNN-NN-NNNN");	
+					member->definition=stralloc("nnn-nn-nnnn");	
 					member->validobject = new Wt::WRegExpValidator("[0-9]{3}-[0-9]{2}-[0-9]{4}");
+					sprintf(stemp,"999-99-9999");
+					c=new Wt::WString(stemp);
+					LE->setInputMask(*c);
 				} else if(member->field_type==ZIPCODE)
 				{
-					member->definition=stralloc("NNNNN-NNNN");	
+					member->definition=stralloc("nnnnn-nnnn");	
 					member->validobject = new Wt::WRegExpValidator("([0-9]{5})|([0-9]{5}-[0-9]{4})");
+					sprintf(stemp,"99999-9999");
+					c=new Wt::WString(stemp);
+					LE->setInputMask(*c);
 				}
+				if(c!=NULL) c->~WString();
 
 				if(member->validobject!=NULL) LE->setValidator(member->validobject);
 				if(!isEMPTY(member->value.string_value))
@@ -3062,8 +3072,10 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					}
 					ADVMEMBERSETEDITABLE(member,member->user_editable,TRUE);
 				}
+/*
 				LE->keyPressed().connect(std::bind([=] (const Wt::WKeyEvent& e) { formattedstring_callback(member,e); }, std::placeholders::_1));
 				LE->keyWentUp().connect(std::bind([=] (const Wt::WKeyEvent& e) { formattedstring_callbackKeyUp(member,e); }, std::placeholders::_1));
+*/
 				LE->enterPressed().connect(boost::bind(&activatefunction,member));
 				wFormW->blurred().connect(boost::bind(&losingfocusfunction,member));
 				wFormW->focussed().connect(boost::bind(&gainingfocusfunction,member));
@@ -3114,7 +3126,12 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					} else {
 						LE->setEchoMode(0);
 					}
-					member->definition=stralloc("NN/NN/NNNN");	
+					member->definition=stralloc("nn/nn/nnnn");	
+					memset(stemp,0,101);
+					sprintf(stemp,"99/99/9999");
+					c=new Wt::WString(stemp);
+					LE->setInputMask(*c);
+					c->~WString();
 					member->validobject = new Wt::WDateValidator("MM/dd/yyyy");
 /*
 					member->validobject = new Wt::WRegExpValidator("([0-9]{2}/[0-9]{2}/[0-9]{4})");
@@ -3150,8 +3167,10 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 						}
 						ADVMEMBERSETEDITABLE(member,member->user_editable,TRUE);
 					}
+/*
 					LE->keyPressed().connect(std::bind([=] (const Wt::WKeyEvent& e) { formattedstring_callback(member,e); }, std::placeholders::_1));
 					LE->keyWentUp().connect(std::bind([=] (const Wt::WKeyEvent& e) { formattedstring_callbackKeyUp(member,e); }, std::placeholders::_1));
+*/
 					LE->enterPressed().connect(boost::bind(&activatefunction,member));
 					wFormW->blurred().connect(boost::bind(&losingfocusfunction,member));
 					wFormW->focussed().connect(boost::bind(&gainingfocusfunction,member));
@@ -3257,7 +3276,12 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 						h=cols+2;
 					} else h=10;
 					LE->setTextSize(h);
-					member->definition=stralloc("NN:NN:NN");	
+					member->definition=stralloc("nn:nn:nn");	
+					memset(stemp,0,101);
+					sprintf(stemp,"00:00:00");
+					c=new WString(stemp);
+					LE->setInputMask(*c);
+					c->~WString();
 					member->validobject = new Wt::WRegExpValidator("[0-9]{2}:[0-9]{2}:[0-9]{2}");
 					if(member->validobject!=NULL) LE->setValidator(member->validobject);
 					
@@ -3301,8 +3325,10 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 						}
 						ADVMEMBERSETEDITABLE(member,member->user_editable,TRUE);
 					}
+/*
 					LE->keyPressed().connect(std::bind([=] (const Wt::WKeyEvent& e) { formattedstring_callback(member,e); }, std::placeholders::_1));
 					LE->keyWentUp().connect(std::bind([=] (const Wt::WKeyEvent& e) { formattedstring_callbackKeyUp(member,e); }, std::placeholders::_1));
+*/
 					LE->enterPressed().connect(boost::bind(&activatefunction,member));
 					wFormW->blurred().connect(boost::bind(&losingfocusfunction,member));
 					wFormW->focussed().connect(boost::bind(&gainingfocusfunction,member));
@@ -4227,12 +4253,15 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					} else if((!RDAstrcmp(member->rscrname,"HELP")) && !RDAstrstr(rsx->screen,"MENU") && ((FINDRSC(rsx,"MAIN MENU"))==(-1)))
 					{
 						if(PUSHBUTTON_STYLE<2) rtype=11;	
+					} else if(!RDAstrcmp(member->rscrname,"BROWSE"))
+					{
+						if(PUSHBUTTON_STYLE<2) rtype=67;
 					} else if(!RDAstrcmp(member->rscrname,"SELECT"))
 					{
 						if(RDAstrstr(rsx->screen," DEFINE LIST")) if(PUSHBUTTON_STYLE<2) rtype=15;
 						else if(RDAstrstr(rsx->screen," SEARCH BROWSE")) if(PUSHBUTTON_STYLE<2) rtype=12;
-						else if(RDAstrstr(rsx->screen," BROWSE")) if(PUSHBUTTON_STYLE<2) rtype=36;
 						else if(RDAstrstr(rsx->screen,"IMPORT/EXPORT RANGE SCREEN")) if(PUSHBUTTON_STYLE<2) rtype=25;
+						else rtype=68;
 					} else if(!RDAstrcmp(member->rscrname,"RUN REPORT"))
 					{
 						if(PUSHBUTTON_STYLE<2) rtype=25;
@@ -4335,7 +4364,7 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				if((rtype>=1 && rtype<=4))
 				{
 				}
-				if((rtype>=1 && rtype<=4) || (rtype>=6 && rtype<=66))
+				if((rtype>=1 && rtype<=4) || (rtype>=6 && rtype<=68))
 				{
 					if(!RDAstrcmp(member->label,"...") || !RDAstrcmp(member->label,"FY...") && isEMPTY(member->XHTML_Label))
 					{
@@ -4346,7 +4375,7 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					if(c!=NULL) c->~WString();
 				}
 				rname=NULL;
-				if((rtype>=1 && rtype<=4) || (rtype>=6 && rtype<=66))
+				if((rtype>=1 && rtype<=4) || (rtype>=6 && rtype<=68))
 				{
 					switch(rtype)
 					{
@@ -4394,8 +4423,14 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 							rname=stralloc("resources/OpenRDA/help.png");
 							break;
 						case 12: /* Search */
-							pB->addStyleClass("SearchButton");
-							rname=stralloc("resources/OpenRDA/search.png");
+							if(!RDAstrstr(rsx->screen,"SEARCH BROWSE")) 
+							{
+								pB->addStyleClass("SearchButton");
+								rname=stralloc("resources/OpenRDA/search.png");
+							} else {
+								pB->addStyleClass("SearchButton Color");
+								rname=stralloc("resources/OpenRDA/search_color.png");
+							}
 							break;
 						case 13: /* Edit */
 							pB->addStyleClass("Edit");
@@ -4406,8 +4441,14 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 							rname=stralloc("resources/OpenRDA/exit.png");
 							break;
 						case 15: /* definelist */
-							pB->addStyleClass("DefineList");
-							rname=stralloc("resources/OpenRDA/definelist.png");
+							if(!RDAstrstr(rsx->screen,"DEFINE LIST")) 
+							{
+								pB->addStyleClass("DefineList");
+								rname=stralloc("resources/OpenRDA/definelist.png");
+							} else {
+								pB->addStyleClass("DefineList Color");
+								rname=stralloc("resources/OpenRDA/definelist_color.png");
+							}
 							break;
 						case 16: /* add-create */
 							pB->addStyleClass("Add");
@@ -4612,6 +4653,14 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 						case 66: /* wiki */
 							pB->addStyleClass("Wiki");
 							rname=stralloc("resources/OpenRDA/wiki.png");
+							break;
+						case 67: /* browse */
+							pB->addStyleClass("Browse");
+							rname=stralloc("resources/OpenRDA/browse.png");
+							break;
+						case 68: /* select */
+							pB->addStyleClass("Select");
+							rname=stralloc("resources/OpenRDA/select.png");
 							break;
 					}
 					if(!isEMPTY(rname))
@@ -5171,7 +5220,7 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 		WW->setDisabled((member->sensitive ? FALSE:TRUE));
 		if(member->field_type==BUTTONS)
 		{
-			if(member->sensitive==FALSE && ((member->rtype>=1 && member->rtype<=4) || (member->rtype>=6 && member->rtype<=66)))
+			if(member->sensitive==FALSE && ((member->rtype>=1 && member->rtype<=4) || (member->rtype>=6 && member->rtype<=68)))
 			{
 				wFormW=(Wt::WFormWidget *)member->w;
 /* Remove Tool Tip? Maybe not needed with Wt */
@@ -5222,7 +5271,7 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					}
 					if(member->field_type==BUTTONS)
 					{
-						if(member->user_sensitive==FALSE && ((member->rtype>=1 && member->rtype<=4) || (member->rtype>=6 && member->rtype<=66)))
+						if(member->user_sensitive==FALSE && ((member->rtype>=1 && member->rtype<=4) || (member->rtype>=6 && member->rtype<=68)))
 						{
 							wFormW=(Wt::WFormWidget *)member->w;
 /* Remove Tool Tip? Maybe not needed with Wt */

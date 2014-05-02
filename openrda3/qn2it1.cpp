@@ -1017,7 +1017,6 @@ Wt::WPopupMenu *MySubMenu(Wt::WWidget *Parent_Widget,short ddl,int p,char *namex
 
 
 	pop=new Wt::WPopupMenu();
-	pop->setAutoHide(TRUE,200);
 	pop1=(Wt::WWidget *)Parent_Widget;
 	pop1->addMenu(namex,(Wt::WMenu *)pop);
 	ZERNRD(MENUITEM_FILENO);
@@ -1097,7 +1096,6 @@ Wt::WPopupMenu *ModuleDDL(short ddl)
 	short ef=0;
 
 	WHICH=new Wt::WPopupMenu();
-	WHICH->setAutoHide(TRUE,200);
 	ZERNRD(MENUITEM_FILENO);
 	FINDFLDSETSTRING(MENUITEM_FILENO,"MODULE NAME",CURRENT_MODULE);
 	FINDFLDSETSHORT(MENUITEM_FILENO,"DROP DOWN LIST",ddl);
@@ -1245,12 +1243,8 @@ void CreateDockRSRC(char *modname)
 	{
 		Query_P->setEnabled(FALSE);
 	} else {
+		QueryPop->addStyleClass("OpenRDA ResourceBar Query WPopupMenu");
 		Query_P->setMenu(QueryPop);
-#ifdef __Use_mouseWentOver__ 
-		Query_P->mouseWentOver().connect(std::bind([=] () {
-			Query_P->menu()->popup(QueryPop);
-		}));
-#endif /* __USE_mouseWentOver__ */
 		Query_P->setEnabled(TRUE);
 	}
 
@@ -1266,12 +1260,8 @@ void CreateDockRSRC(char *modname)
 	{
 		Reports_P->setEnabled(FALSE);
 	} else {
+		Reports->addStyleClass("OpenRDA ResourceBar Reports WPopupMenu");
 		Reports_P->setMenu(Reports);
-#ifdef __Use_mouseWentOver__ 
-		Reports_P->mouseWentOver().connect(std::bind([=] () {
-			Reports_P->menu()->popup(Reports);
-		}));
-#endif /* __USE_mouseWentOver__ */
 		Reports_P->setEnabled(TRUE);
 	}
 

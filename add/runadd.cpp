@@ -3150,6 +3150,7 @@ static void PerformWrites(RDArsrc *add_rsrc,PowerAdd *POWERADD)
 		}
 	}
 	DefaultAddEditWdgts(add_rsrc,POWERADD,4,POWERADDSubData,(void *)POWERADD);
+	SetAddEditWdgts(add_rsrc,POWERADD);
 }
 static void AfterWrites(RDArsrc *add_rsrc,PowerAdd *POWERADD,short update)
 {
