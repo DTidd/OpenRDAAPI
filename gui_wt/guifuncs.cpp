@@ -8257,7 +8257,6 @@ short xMEMBERSETEDITABLE(RDArmem *member,short editable,short which,int line,cha
 			wFormW->setReadOnly((editable ? FALSE:TRUE));
 		} else if(member->w!=NULL && member->popup_w==NULL && member->field_type==BOOLNS)
 		{
-			fprintf(RDA_STDERR,"member [%s] editable [%s] ",member->rscrname,(editable ? "True":"False"));TRACE;
 			CB=(Wt::WCheckBox *)member->w;
 			CB->setReadOnly((editable ? FALSE:TRUE));
 		} else if(member->w!=NULL && member->popup_w==NULL && member->field_type==BUTTONS)
@@ -8416,7 +8415,6 @@ short xMEMBERSETSENSITIVE(RDArmem *member,short sensitive,short which,int line,c
 		wFormW=(Wt::WFormWidget *)member->w;
 		if(member->w!=NULL && member->field_type!=BOOLNS)
 		{
-			fprintf(RDA_STDERR,"member [%s] sensitive [%s] ",member->rscrname,(sensitive ? "True":"False"));TRACE;
 			CB=(Wt::WCheckBox *)member->w;
 /*
 			CB->setReadOnly((sensitive ? FALSE:TRUE));
