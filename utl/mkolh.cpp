@@ -395,7 +395,7 @@ static void MAKE_OLHELP()
 		ADVaddwdgt(scrn,5,"","Resource List","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(scrn,7,"RESOURCE LIST","Resource List","","",25,0,0,"","","","");
+		ADVaddwdgt(scrn,7,"RESOURCE LIST","Resource List","","",20,0,0,"","","","");
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,3,"","","","",0,0,0,"","","","");

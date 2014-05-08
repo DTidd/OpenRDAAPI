@@ -1,5 +1,4 @@
 /* SECURITY's - Make (MTN USERS) Maintain Master */
-/* SPECIAL SCREENS FOR USING_QT */
 #include <cstdio>
 #include <mkmtn.hpp>
 #include <mkmsc.hpp>
@@ -69,7 +68,6 @@ static void MTN_MTN_USERS()
 			addSupportingRDAconfld(S,"DEPARTMENT","[USERS][DEPARTMENT]",FALSE);
 		}
 
-#ifdef USING_QT
 /* SECURITY MODSEC */
 
 		temp1=Rmalloc(3+1);
@@ -83,7 +81,6 @@ static void MTN_MTN_USERS()
 			addSupportingRDAconfld(S,"USER IDENTIFICATION","[USERS][USER IDENTIFICATION]",TRUE);
 			addSupportingRDAconfld(S,"MODULE NAME","[USERS][MODULE NAME]",FALSE);
 		}
-#endif /* USING_QT */
 /* UTILITIES MSG-GATEWAY */
 		if(XPERT_SETUP->software_type<2)
 		{
@@ -246,25 +243,6 @@ static void MTN_MTN_USERS()
 		}
 
 
-#ifndef WIN32
-/* EMAIL USER INFO emailuserinfo BUTTON */
-		temp1=Rmalloc(3+1);
-		sprintf(temp1,"%s",
-			"");
-		
-		args=APPlibNEW();
-		x=addMaintainMasterButton(MTNMSTR,"emailuserinfo","Email User Info","EMAIL USER INFO","SECURITY","USERS","USERS KEY",temp1,0,0,args,0,NULL);
-		if(temp1!=NULL) Rfree(temp1);
-		if(args!=NULL) freeapplib(args);
-		if(x!=(-1))
-		{
-			button=MTNMSTR->buttons+(x-1);
-			x=addMaintainMasterButtonField(button,"USER IDENTIFICATION","XPERT_USER");
-			x=addMaintainMasterButtonField(button,"EMAIL","VMIME_TO");
-			x=addMaintainMasterButtonField(button,"CURRENT USER NAME","VMIME_FROM_NAME");
-			x=addMaintainMasterButtonField(button,"CURRENT USER EMAIL","VMIME_FROM_ADDR");
-		}
-#endif
 
 		if(XPERT_SETUP->ARCHIVE)
 		{
@@ -588,25 +566,6 @@ static void MTN_MTN_USERS_SEARCH()
 			x=addMaintainMasterButtonField(button,"USER IDENTIFICATION","USER_IDENTIFICATION");
 		}
 
-#ifndef WIN32
-/* EMAIL USER INFO emailuserinfo BUTTON */
-		temp1=Rmalloc(3+1);
-		sprintf(temp1,"%s",
-			"");
-		
-		args=APPlibNEW();
-		x=addMaintainMasterButton(MTNMSTR,"emailuserinfo","Email User Info","EMAIL USER INFO","SECURITY","USERS","USERS KEY",temp1,0,0,args,0,NULL);
-		if(temp1!=NULL) Rfree(temp1);
-		if(args!=NULL) freeapplib(args);
-		if(x!=(-1))
-		{
-			button=MTNMSTR->buttons+(x-1);
-			x=addMaintainMasterButtonField(button,"USER IDENTIFICATION","XPERT_USER");
-			x=addMaintainMasterButtonField(button,"EMAIL","VMIME_TO");
-			x=addMaintainMasterButtonField(button,"CURRENT USER NAME","VMIME_FROM_NAME");
-			x=addMaintainMasterButtonField(button,"CURRENT USER EMAIL","VMIME_FROM_ADDR");
-		}
-#endif
 
 
 		if(XPERT_SETUP->ARCHIVE)
@@ -1165,269 +1124,6 @@ static void XPERT_USERS_MENU()
 		if(defdir!=NULL) Rfree(defdir);
 		if(menu!=NULL) free_menu(menu);
 	}
-}
-static void EmailUserInfoScript()
-{
-	FILE *fp=NULL;
-	char *name=NULL;
-	int error=0;
-
-#ifdef LINUX
-	name=stralloc("emailuserinfo.lnx");
-#endif
-#if defined(LINUX2_2) || defined(UBUNTU_OS)
-	name=stralloc("emailuserinfo.lnx");
-#endif
-
-	unlink(name);
-	fp=fopen(name,"w");
-
-
-	fprintf(fp,"#!/usr/bin/python\n");
-	fprintf(fp,"import commands\n");
-	fprintf(fp,"import os\n");
-	fprintf(fp,"\n");
-	fprintf(fp,"VNC=[ ]\n");
-	fprintf(fp,"E=[ ]\n");
-	fprintf(fp,"T=[ ]\n");
-	fprintf(fp,"G=\"\"\n");
-	fprintf(fp,"GEOMETRY=\"\"\n");
-	fprintf(fp,"\n");
-	fprintf(fp,"def get_ip_address(ifname):\n");
-	fprintf(fp,"	tlist = commands.getoutput(\"ifconfig \"+ifname).split(\"\\n\")\n");
-	fprintf(fp,"	if tlist[1].endswith('          inet addr:',0,20):\n");
-	fprintf(fp,"		return tlist[1].split()[1][5:]\n");
-	fprintf(fp,"	else:\n");
-	fprintf(fp,"		return ''\n");
-	fprintf(fp,"\n");
-	fprintf(fp,"F=open('/proc/net/dev','r')\n");
-	fprintf(fp,"for line in F:\n");
-	fprintf(fp,"	if \"eth\" in line:\n");
-	fprintf(fp,"		line=line.replace(' ','')\n");
-	fprintf(fp,"		if line.endswith(':',4,5):\n");
-	fprintf(fp,"			E.append(line[0:4])\n");
-	fprintf(fp,"		if line.endswith(':',5,6):\n");
-	fprintf(fp,"			E.append(line[0:5])\n");
-	fprintf(fp,"\n");
-	fprintf(fp,"F.close()\n");
-	fprintf(fp,"E.sort()\n");
-	fprintf(fp,"for i in E:\n");
-	fprintf(fp,"	ETHDEV=get_ip_address(i)\n");
-	fprintf(fp,"	if len(ETHDEV):\n");
-	fprintf(fp,"		break\n");
-	fprintf(fp,"\n");
-	fprintf(fp,"F=open('/etc/rdausers.conf','r')\n");
-	fprintf(fp,"for line in F:\n");
-	fprintf(fp,"	if \"VNCSERVER\" in line:\n");
-	fprintf(fp,"		line=line.replace('TIGERVNCSERVERS=','')\n");
-	fprintf(fp,"		line=line.replace('VNCSERVERS=','')\n");
-	fprintf(fp,"		line=line.replace('\"','')\n");
-	fprintf(fp,"		line=line.replace('\\n','')\n");
-	fprintf(fp,"		line=line.lstrip(' ')\n");
-	fprintf(fp,"		line=line.rstrip(' ')\n");
-	fprintf(fp,"		T=line.split(' ')\n");
-	fprintf(fp,"\n");
-	fprintf(fp,"	if \"GEOMETRY=\" in line:\n");
-	fprintf(fp,"		line2=line.replace('GEOMETRY=','')\n");
-	fprintf(fp,"		line2=line2.replace('\"','')\n");
-	fprintf(fp,"		line2=line2.replace('\\n','')\n");
-	fprintf(fp,"		GEOMETRY=line2\n");
-	fprintf(fp,"\n");
-	fprintf(fp,"F.close()\n");
-	fprintf(fp,"\n");
-	fprintf(fp,"keys = os.environ.keys()\n");
-	fprintf(fp,"XPERT_USER=''\n");
-	fprintf(fp,"for key in keys:\n");
-	fprintf(fp,"	if key.endswith('XPERT_USER',0,10):\n");
-	fprintf(fp,"		XPERT_USER=os.environ[key]\n");
-	fprintf(fp,"\n");
-	fprintf(fp,"for i in range(0,len(T)):\n");
-	fprintf(fp,"	T[i]=T[i].split(':')\n");
-	fprintf(fp,"	U=T[i][1]\n");
-	fprintf(fp,"	V=ETHDEV+':'+T[i][0]\n");
-	fprintf(fp,"	if len(T[i]) == 2:\n");
-	fprintf(fp,"		T[i].append(GEOMETRY)\n");
-	fprintf(fp,"\n");
-	fprintf(fp,"	T[i][0]=U.center(30)\n");
-	fprintf(fp,"	T[i][1]=V.center(30)\n");
-	fprintf(fp,"	T[i][2].center(15)\n");
-	fprintf(fp,"	\n");
-	fprintf(fp,"T.sort()\n");
-	fprintf(fp,"\n");
-	fprintf(fp,"VNC.append([ \"Username\".center(30), \"VNC Login Info\".center(30), \"VNC Resolution\".center(15) ])\n");
-	fprintf(fp,"for i in T:\n");
-	fprintf(fp,"	if len(XPERT_USER):\n");
-	fprintf(fp,"		if i[0] == XPERT_USER.center(30):\n");
-	fprintf(fp,"			if len(i) == 3:\n");
-	fprintf(fp,"				VNC.append([ i[0].center(30), i[1].center(30),i[2].center(15) ])\n");
-	fprintf(fp,"	else:\n");
-	fprintf(fp,"		VNC.append([ i[0].center(30), i[1].center(30),i[2].center(15) ])\n");
-	fprintf(fp,"			\n");
-	fprintf(fp,"VMIME_BODY = ''\n");
-	fprintf(fp,"for i in range(0,len(VNC)):\n");
-	fprintf(fp,"	VMIME_BODY=VMIME_BODY+VNC[i][0]+VNC[i][1]+VNC[i][2]+'\\n'\n");
-	fprintf(fp,"	\n");
-	fprintf(fp,"VMIME_BODY=VMIME_BODY+'\\n\\n\\nDownload the VNC Viewer from:  http://www.openrda.net/downloads\\n\\tUnder the section labeled Programs, click on the VNC link.  \\n\\tOn that page, click on the download button for \"TightVNC Viewer\"\\n\\tSave the viewer directly to your Desktop folder.\\n\\n\\nCoreFTP can be downloaded from: http://www.coreftp.com/download/coreftplite.exe\\n\\n'\n");
-	fprintf(fp,"	\n");
-	fprintf(fp,"os.environ['VMIME_SUBJECT'] = \"User Login Information.\"\n");
-	fprintf(fp,"os.environ['VMIME_BODY'] = VMIME_BODY\n");
-	fprintf(fp,"print VMIME_BODY\n");
-	fprintf(fp,"os.execlp('vmime-sendmail.lnx','')\n");
-
-
-
-	if(fp!=NULL)
-	{
-		fclose(fp);
-		RDAchmod(name,00770,&error);
-	}
-	if(name!=NULL) Rfree(name);
-}
-static void MakeUserDir()
-{
-	FILE *fp=NULL;
-	char *name=NULL;
-	int error=0;
-
-#ifdef UNIXWARE7
-	name=stralloc("mkUserDir.unw");
-#endif
-#ifdef SCOSYSV
-	name=stralloc("mkUserDir.sco");
-#endif
-#ifdef RS6000
-	name=stralloc("mkUserDir.rsc");
-#endif
-#ifdef LINUX
-	name=stralloc("mkUserDir.lnx");
-#endif
-#if defined(LINUX2_2) || defined(UBUNTU_OS)
-	name=stralloc("mkUserDir.lnx");
-#endif
-#ifdef SUNX86
-	name=stralloc("mkUserDir.sun");
-#endif
-#ifdef WIN32
-	name=stralloc("mkUserDir.bat");
-#endif
-	unlink(name);
-	fp=fopen(name,"w");
-	if(fp!=NULL)
-	{
-		fprintf(fp,"mkdir $USER_IDENTIFICATION\n");
-#ifndef WIN32
-		fprintf(fp,"chmod ugo+rwx $USER_IDENTIFICATION"); 	
-#endif
-		fclose(fp);
-		RDAchmod(name,00770,&error);
-	}
-	if(name!=NULL) Rfree(name);
-#ifdef UNIXWARE7
-	name=stralloc("CreateDir.unw");
-#endif
-#ifdef SCOSYSV
-	name=stralloc("CreateDir.sco");
-#endif
-#ifdef RS6000
-	name=stralloc("CreateDir.rsc");
-#endif
-#ifdef LINUX
-	name=stralloc("CreateDir.lnx");
-#endif
-#if defined(LINUX2_2) || defined(UBUNTU_OS)
-	name=stralloc("CreateDir.lnx");
-#endif
-#ifdef SUNX86
-	name=stralloc("CreateDir.sun");
-#endif
-#ifdef WIN32
-	name=stralloc("CreateDir.bat");
-#endif
-	unlink(name);
-	fp=fopen(name,"w");
-	if(fp!=NULL)
-	{
-		fprintf(fp,"mkdir $1\n");
-#ifndef WIN32
-		fprintf(fp,"chmod ugo+rwx \"$1\""); 	
-#endif
-		fclose(fp);
-		RDAchmod(name,00770,&error);
-	}
-	if(name!=NULL) Rfree(name);
-#ifdef UNIXWARE7
-	name=stralloc("MoveFile.unw");
-#endif
-#ifdef SCOSYSV
-	name=stralloc("MoveFile.sco");
-#endif
-#ifdef RS6000
-	name=stralloc("MoveFile.rsc");
-#endif
-#ifdef LINUX
-	name=stralloc("MoveFile.lnx");
-#endif
-#if defined(LINUX2_2) || defined(UBUNTU_OS)
-	name=stralloc("MoveFile.lnx");
-#endif
-#ifdef SUNX86
-	name=stralloc("MoveFile.sun");
-#endif
-#ifdef WIN32
-	name=stralloc("MoveFile.bat");
-#endif
-	unlink(name);
-	fp=fopen(name,"w");
-	if(fp!=NULL)
-	{
-#ifdef WIN32
-		fprintf(fp,"copy \"%s\" \"%s\"\n","%1","%2");
-		fprintf(fp,"del \"%s\"\n","%1");
-#endif
-#ifndef WIN32
-		fprintf(fp,"mv \"$1\" \"$2\"\n");
-		fprintf(fp,"chmod ug+rw \"$2\""); 	
-#endif
-		fclose(fp);
-		RDAchmod(name,00770,&error);
-	}
-	if(name!=NULL) Rfree(name);
-#ifdef UNIXWARE7
-	name=stralloc("CopyFile.unw");
-#endif
-#ifdef SCOSYSV
-	name=stralloc("CopyFile.sco");
-#endif
-#ifdef RS6000
-	name=stralloc("CopyFile.rsc");
-#endif
-#ifdef LINUX
-	name=stralloc("CopyFile.lnx");
-#endif
-#if defined(LINUX2_2) || defined(UBUNTU_OS)
-	name=stralloc("CopyFile.lnx");
-#endif
-#ifdef SUNX86
-	name=stralloc("CopyFile.sun");
-#endif
-#ifdef WIN32
-	name=stralloc("CopyFile.bat");
-#endif
-	unlink(name);
-	fp=fopen(name,"w");
-	if(fp!=NULL)
-	{
-#ifdef WIN32
-		fprintf(fp,"copy %s %s\n","%1","%2");
-#endif
-#ifndef WIN32
-		fprintf(fp,"cp \"$1\" \"$2\"\n");
-		fprintf(fp,"chmod ug+rw \"$2\""); 	
-#endif
-		fclose(fp);
-		RDAchmod(name,00770,&error);
-	}
-	if(name!=NULL) Rfree(name);
 }
 static void LST_USERS_DOMENU_STYLE()
 {
@@ -3196,7 +2892,7 @@ static void SCN_SELECT_DEFAULT_MODULE_DEFINE_LIST()
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,5,"","Enter a position and length for each of the following:","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
-		ADVaddwdgt(scrn,12,"","","","",300,200,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,12,"","","","",300,500,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,3,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
@@ -3662,14 +3358,12 @@ static void SCN_XPERT_USER_MAINTAIN_SCREEN()
 		ADVaddwdgt(scrn,5,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
-#ifdef USING_QT
 		ADVaddwdgt(scrn,5,""," Default Module:","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,6,"LOAD MODULE","Load","","",0,0,1,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,6,"PREVIOUS LOAD MODULE","Previous","","",0,0,2,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,0,"[USERS][MODULE NAME]","Default Module Name","","",0,15,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,6,"NEXT LOAD MODULE","Next","","",0,0,1,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,5,"","","","",0,0,0,NULL,NULL,NULL,NULL);
-#endif /* USING_QT */
 		ADVaddwdgt(scrn,5,"","Default File Output Device:","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,0,"[USERS][DEFAULT FILE OUTPUT DEVICE]","Default File Output Device","","",0,20,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
@@ -4004,9 +3698,6 @@ static void SCN_XPERT_USER_MAINTAIN_SCREEN()
 		if(temp2!=NULL) Rfree(temp2);
 		if(temp3!=NULL) Rfree(temp3);
 		if(temp4!=NULL) Rfree(temp4);
-#ifndef WIN32
-		ADVaddwdgt(scrn,6,"EMAIL USER INFO","Email User Info","","",0,0,0,temp1,temp2,temp3,temp4);
-#endif
 		if(XPERT_SETUP->ARCHIVE)
 		{
 		ADVaddwdgt(scrn,24,"","Assign Work Groups","","",0,0,0,NULL,NULL,NULL,NULL);
@@ -4652,13 +4343,7 @@ static void VIR_CURRENT_USER_EMAIL()
 }
 void USERS_MASTER()
 {
-	MakeUserDir();
-#ifdef LINUX
-	EmailUserInfoScript();
-#endif
-#if defined(LINUX2_2) || defined(UBUNTU_OS)
-	EmailUserInfoScript();
-#endif
+	/*MakeUserDir();*/
 	MTN_MTN_USERS();
 	SCN_SELECT_DEPARTMENT_BROWSE();
 	SCN_SELECT_DEPARTMENT_DEFINE_LIST();

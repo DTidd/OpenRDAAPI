@@ -41,4 +41,5 @@
 /*CPP_OPART prtfnc */
 /*CPP_OPART prtrng */
 /*CPP_OPART supreq */
+/*CPP_OPART sendmail */
 /*CPP_OPART mixsqlfuncs */

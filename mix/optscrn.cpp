@@ -75,6 +75,9 @@ void saveoptscrn(RDArsrc *r,RDArsrc *parent)
 				mem1->sensitive=mem->sensitive;
 				mem1->list=mem->list;
 				mem1->cols=mem->cols;
+				mem1->bootstrap=mem->bootstrap;
+				mem1->vertical=mem->vertical;
+				mem1->horizontal=mem->horizontal;
 				mem1->callbacktype=mem->callbacktype;
 				mem1->user_editable=mem->user_editable;
 				mem1->user_sensitive=mem->user_sensitive;
@@ -297,6 +300,9 @@ void OPTIONAL_SCREEN_FUNC(RDArsrc *parent,RDArmem *member)
 			mem1->validobject=NULL;
 			mem1->table_arglist=mem->table_arglist;
 			mem1->table_function_type=mem->table_function_type;
+			mem1->bootstrap=0;
+			mem1->vertical=0;
+			mem1->horizontal=0;
 			switch(mem->field_type)
 			{
 				case SCROLLEDLIST:
@@ -437,6 +443,10 @@ void addoswidgets(RDArsrc *r)
 		mem2->callbacktype=member->callbacktype;
 		mem2->editable_expression=stralloc(member->editable_expression);
 		mem2->sensitive_expression=stralloc(member->sensitive_expression);
+		mem2->required_expression=stralloc(member->required_expression);
+		mem2->bootstrap=member->bootstrap;
+		mem2->vertical=member->vertical;
+		mem2->horizontal=member->horizontal;
 		mem2->editable=member->editable;
 		mem2->sensitive=member->sensitive;
 		mem2->user_editable=member->user_editable;

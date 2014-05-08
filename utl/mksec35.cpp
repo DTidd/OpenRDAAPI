@@ -50,11 +50,7 @@ static void RPT_CREATEMSMTPRC()
 	engine=NRDLocalCtreeEngine;
 #endif
 #endif /* USE_MYISAM */
-#ifdef WIN32
-	tmp=RDAreportNEWADV3(rptname,t,desc,engine,"",FALSE,FALSE,FALSE,FALSE,FALSE,"","",TRUE,0,TRUE,"",FALSE,FALSE,FALSE,FALSE);
-#else
-	tmp=RDAreportNEWADV3(rptname,t,desc,engine,"",FALSE,FALSE,FALSE,FALSE,TRUE,"SECURITY","COPYMSMTPRC",FALSE,0,FALSE,"",FALSE,FALSE,FALSE,FALSE);
-#endif
+	tmp=RDAreportNEWADV3(rptname,t,desc,engine,"",FALSE,FALSE,FALSE,FALSE,FALSE,"","",FALSE,0,TRUE,"",FALSE,FALSE,FALSE,FALSE);
 	tmp->report_completion=0;
 	tmp->remove_file=0;
 	tmp->manual_form=0;
@@ -129,9 +125,9 @@ static void RPT_CREATEMSMTPRC()
 
 
 /* MSMTPRC VIRTUAL FIELD */
-	temp1=Rmalloc(163+1);
+	temp1=Rmalloc(189+1);
 	sprintf(temp1,"%s%s",
-		"IF ((STRING_LENGTH([APPDATA]))=0) THEN RETURN_VALUE=(\"./\"+[SECURITY][USERS][USER IDENTIFICATION]+",
+		"IF ((STRING_LENGTH([APPDATA]))=0) THEN RETURN_VALUE=([CURRENT DIRECTORY]+\"/\"+[SECURITY][USERS][USER IDENTIFICATION]+",
 		"\"/msmtprc\") ELSE RETURN_VALUE=([APPDATA]+\"\\msmtprc.txt\") FI");
 	addvirtuallineADV(tmp,"MSMTPRC",1,400,temp1,0,0);
 	if(temp1!=NULL) Rfree(temp1);
@@ -139,9 +135,9 @@ static void RPT_CREATEMSMTPRC()
 
 
 /* LOGFILE VIRTUAL FIELD */
-	temp1=Rmalloc(197+1);
+	temp1=Rmalloc(223+1);
 	sprintf(temp1,"%s%s",
-		"IF ((STRING_LENGTH([APPDATA]))=0) THEN RETURN_VALUE=(\"./\"+[SECURITY][USERS][USER IDENTIFICATION]+",
+		"IF ((STRING_LENGTH([APPDATA]))=0) THEN RETURN_VALUE=([CURRENT DIRECTORY]+\"/\"+[SECURITY][USERS][USER IDENTIFICATION]+",
 		"\"/msmtp.log\") ELSE RETURN_VALUE=(\"\"+[SECURITY][USERS][USER IDENTIFICATION]+\"\\msmtp.log\") FI");
 	addvirtuallineADV(tmp,"LOGFILE",1,400,temp1,0,0);
 	if(temp1!=NULL) Rfree(temp1);

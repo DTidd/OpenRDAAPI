@@ -320,7 +320,7 @@ void xmakebrowselist(MakeBrowseList *m,RDArsrc *tmprsrc)
 	if(test_exp1!=NULL) Rfree(test_exp1);
 	definelist=m->definelist;
 /* determining the maximum length of the viewable browse line */
-	for(x=1,length=0;x<(definelist->numrscs-6);x+=2)
+	for(x=1,length=0;x<(definelist->numrscs-7);x+=2)
 	{
 		pos_member=definelist->rscs+x;
 		len_member=definelist->rscs+(x+1);

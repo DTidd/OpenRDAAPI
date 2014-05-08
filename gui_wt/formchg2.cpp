@@ -3365,8 +3365,18 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					if(BEGINNING_BALANCE_ACCOUNT->num>member->items) holdacct=BEGINNING_BALANCE_ACCOUNT->codetype+member->items; 
 				}
 				if(holdacct!=NULL) member->definition=fullacctdef(holdacct);
+				LE=new Wt::WLineEdit((Wt::WWidget *)parent);
+				WW=(Wt::WWidget *)LE;
+				member->w=(Wt::WWidget *)LE;
 				if(!isEMPTY(member->definition))
 				{
+					for(temp1=member->definition;*temp1;++temp1) 
+					{
+						if(*temp1=='*') *temp1='x';
+						if(*temp1=='X') *temp1='x';
+						if(*temp1=='N') *temp1='n';
+						if(*temp1=='A') *temp1='a';
+					}
 					memset(MFstemp,0,101);
 					memset(MFstemp,'*',member->field_length);
 					MFstemp[member->field_length]=0;
@@ -3377,11 +3387,11 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 						{
 							prterr("DIAG Resource [%s] Type [%s] Regex Created: [%s]",member->rscrname, standardfieldtypes[member->field_type], (temp!=NULL ? temp:""));
 						}
+						c=new Wt::WString(member->definition);
+						LE->setInputMask(*c);
+						c->~WString();
 					} else temp=NULL;
 				}
-				LE=new Wt::WLineEdit((Wt::WWidget *)parent);
-				WW=(Wt::WWidget *)LE;
-				member->w=(Wt::WWidget *)LE;
 				mssc=ModuleScreenStyleClass(rsx);
 				fssc=InputFieldStyleClass(member);
 				memset(GUIstemp,0,1024);
@@ -3472,13 +3482,7 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					}
 					ADVMEMBERSETEDITABLE(member,member->user_editable,TRUE);
 				}
-				if(!isEMPTY(member->definition))
-				{	
-					LE->keyPressed().connect(std::bind([=] (const Wt::WKeyEvent& e) { formattedstring_callback(member,e); }, std::placeholders::_1));
-					LE->keyWentUp().connect(std::bind([=] (const Wt::WKeyEvent& e) { formattedstring_callbackKeyUp(member,e); }, std::placeholders::_1));
-				} else {
-					LE->keyWentUp().connect(boost::bind(&checktexteditable_autocomplete,member));
-				}
+				LE->keyWentUp().connect(boost::bind(&checktexteditable_autocomplete,member));
 				LE->enterPressed().connect(boost::bind(&activatefunction,member));
 				wFormW->blurred().connect(boost::bind(&losingfocusfunction,member));
 				wFormW->focussed().connect(boost::bind(&gainingfocusfunction,member));
@@ -4213,6 +4217,7 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 			if(!USER_INTERFACE)
 			{
 				if(PUSHBUTTON_STYLE==2 && rtype>6 && rtype!=20 && rtype!=21 && rtype!=41 && rtype!=42 && rtype!=62 && rtype!=63) rtype=0;
+
 				if(rtype==5)
 				{
 					if(isEMPTY(pixmap)) 
@@ -4258,10 +4263,10 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 						if(PUSHBUTTON_STYLE<2) rtype=67;
 					} else if(!RDAstrcmp(member->rscrname,"SELECT"))
 					{
-						if(RDAstrstr(rsx->screen," DEFINE LIST")) if(PUSHBUTTON_STYLE<2) rtype=15;
-						else if(RDAstrstr(rsx->screen," SEARCH BROWSE")) if(PUSHBUTTON_STYLE<2) rtype=12;
-						else if(RDAstrstr(rsx->screen,"IMPORT/EXPORT RANGE SCREEN")) if(PUSHBUTTON_STYLE<2) rtype=25;
-						else rtype=68;
+						if(RDAstrstr(rsx->screen," DEFINE LIST") && (PUSHBUTTON_STYLE<2)) rtype=15;
+						else if(RDAstrstr(rsx->screen," SEARCH BROWSE") && (PUSHBUTTON_STYLE<2)) rtype=12;
+						else if(RDAstrstr(rsx->screen,"IMPORT/EXPORT RANGE SCREEN") && (PUSHBUTTON_STYLE<2)) rtype=25;
+						else if(PUSHBUTTON_STYLE<2) rtype=68;
 					} else if(!RDAstrcmp(member->rscrname,"RUN REPORT"))
 					{
 						if(PUSHBUTTON_STYLE<2) rtype=25;
@@ -5229,6 +5234,7 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 	}
 	WW=(Wt::WWidget *)member->w;
 	WW->hiddenKeepsGeometry();
+	memberrequired(member);
 
 #ifdef USE_RDA_DIAGNOSTICS
 	if(diagcss)

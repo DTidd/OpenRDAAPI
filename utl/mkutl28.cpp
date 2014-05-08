@@ -6,14 +6,11 @@
 #include <mknrd.hpp>
 #include <mkmsc.hpp>
 
-#ifdef USING_QT
 extern char *module;
 extern APPlib *errorlist;
-#endif /* USING_QT */
 
 void DB_MENUITEM()
 {
-#ifdef USING_QT
 	DBsort *sort=NULL;
 	short x=(-1);
 	char same=FALSE;
@@ -47,6 +44,7 @@ void DB_MENUITEM()
 		addDBfield(sort,"STYLE",7,2);
 		addDBfield(sort,"Z ITEM NUMBER",8,8);
 		addDBfield(sort,"Z PARENT",8,8);
+		addDBfield(sort,"UIMETRIC COUNT",8,8);
 		addDBfield(sort,"ENVIRONMENT VALUE 1",14,2000);
 		addDBfield(sort,"ENVIRONMENT VALUE 2",14,2000);
 		addDBfield(sort,"ENVIRONMENT VALUE 3",14,2000);
@@ -87,10 +85,8 @@ void DB_MENUITEM()
 		}
 		if(sort!=NULL) ADVFreeDBsort(sort,FALSE);
 	}
-#endif /* USING_QT */
 }
 /* UTILITIES's - Make (MTN MENUITEM) Maintain Master */
-#ifdef USING_QT
 static void MNU_UTILITIES_MTN_MENUITEM()
 {
 	RDAmenu *menu=NULL;
@@ -368,7 +364,7 @@ static void SCN_MENUITEM_DEFINE_LIST()
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,5,"","Enter a position and length for each of the following:","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
-		ADVaddwdgt(scrn,12,"","","","",300,200,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,12,"","","","",300,500,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,3,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
@@ -460,6 +456,9 @@ static void SCN_MENUITEM_DEFINE_LIST()
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,5,"","Visible Expression:","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,5,"","UI Metric Count:","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,4,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,3,"","","","",0,0,0,NULL,NULL,NULL,NULL);
@@ -703,6 +702,14 @@ static void SCN_MENUITEM_DEFINE_LIST()
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,4,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,3,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,0,"UIMETRIC COUNT POSITION","UI Metric Count Position","","",0,3,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,0,"UIMETRIC COUNT LENGTH","UI Metric Count Length","","",0,3,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,4,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,4,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,5,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
@@ -886,6 +893,11 @@ static void SCN_MENUITEM_SEARCH_BROWSE()
 		ADVaddwdgt(scrn,9,"RANGE ON [MENUITEM][ENVIRONMENT NAME 5]","Range on Environment Name 5","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,0,"FROM [MENUITEM][ENVIRONMENT NAME 5]","From Environment Name 5","","",0,34,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,0,"TO [MENUITEM][ENVIRONMENT NAME 5]","To Environment Name 5","","",0,34,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,9,"RANGE ON [MENUITEM][UIMETRIC COUNT]","Range on UI Metric Count","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,0,"FROM [MENUITEM][UIMETRIC COUNT]","From UI Metric Count","","",0,8,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,0,"TO [MENUITEM][UIMETRIC COUNT]","To UI Metric Count","","",0,8,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,4,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
@@ -1143,6 +1155,10 @@ static void SCN_MENUITEM_MAINTAIN_SCREEN()
 		ADVaddwdgt(scrn,6,"MENUITEMS LOAD CONTROL","Load Control","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,4,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,5,"","UI Metric Count:","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,0,"[MENUITEM][UIMETRIC COUNT]","UI Metric Count:","","",0,8,0,NULL,"FALSE",NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,21,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,20,"","Variable #1","","",0,0,0,NULL,NULL,NULL,NULL);
@@ -1625,7 +1641,7 @@ static void SCN_SELECT_PARENT_DEFINE_LIST()
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,5,"","Enter a position and length for each of the following:","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
-		ADVaddwdgt(scrn,12,"","","","",300,200,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,12,"","","","",300,500,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,3,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
@@ -2681,10 +2697,8 @@ static void MTN_MTN_MENUITEM_SEARCH()
 		}
 	}
 }
-#endif /* USING_QT */
 void MTNMENUITEM()
 {
-#ifdef USING_QT
 	MTN_MTN_MENUITEM();
 	MNU_UTILITIES_MTN_MENUITEM();
 	LST_DROP_DOWN_LISTS();
@@ -2707,5 +2721,4 @@ void MTNMENUITEM()
 	DEF_MENUITEM_DEFINE_LIST();
 	MTN_MTN_MENUITEM_SEARCH();
 	RLV_MENUITEMS();
-#endif /* USING_QT */
 }

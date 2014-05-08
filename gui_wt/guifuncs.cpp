@@ -1322,6 +1322,7 @@ void xfree_scrn(RDAscrn *screen,int line,char *file)
 				if(wdgt->sensitive_expression!=NULL) Rfree(wdgt->sensitive_expression);
 				if(wdgt->editable_expression!=NULL) Rfree(wdgt->editable_expression);
 				if(wdgt->transversal_expression!=NULL) Rfree(wdgt->transversal_expression);
+				if(wdgt->required_expression!=NULL) Rfree(wdgt->required_expression);
 			}
 			Rfree(screen->wdgts); 
 		}
@@ -1421,6 +1422,7 @@ void xfree_rsrc(RDArsrc *rscrs,int line,char *file)
 				if(member->rscrname!=NULL) Rfree(member->rscrname);
 				if(member->editable_expression!=NULL) Rfree(member->editable_expression);
 				if(member->sensitive_expression!=NULL) Rfree(member->sensitive_expression);
+				if(member->required_expression!=NULL) Rfree(member->required_expression);
 				if(member->transversal_expression!=NULL) Rfree(member->transversal_expression);
 				if(member->label!=NULL) Rfree(member->label);
 				if(member->XHTML_Label!=NULL) Rfree(member->XHTML_Label);
@@ -1632,7 +1634,8 @@ void xfree_rsrc(RDArsrc *rscrs,int line,char *file)
 void xaddwdgt(RDAscrn *screen,short type,char *resource_name,char *label,
 	char *pixmap,char *XHTML_Label,short rows,short cols,int rtype,
 	char *expression,char *editable_expression,char *sensitive_expression,
-	char *transversal_expression,int line,char *file)
+	char *transversal_expression,char *required_expression,
+	short bootstrap,short vertical,short horizontal,int line,char *file)
 {
 	RDAwdgt *wdgt=NULL;
 
@@ -1711,6 +1714,15 @@ void xaddwdgt(RDAscrn *screen,short type,char *resource_name,char *label,
 	} else {
 		wdgt->transversal_expression=NULL;
 	}
+	wdgt->bootstrap=bootstrap;
+	wdgt->vertical=vertical;
+	wdgt->horizontal=horizontal;
+	if(!isEMPTY(required_expression))
+	{
+		wdgt->required_expression=stralloc(required_expression);
+	} else {
+		wdgt->required_expression=NULL;
+	}
 }
 /*---------------------------------------------------------------------------
 	This function adds resources to the structure specified as RDArsrc
@@ -1760,6 +1772,7 @@ void xaddrsrc(RDArsrc *resource,short type,char *rscr,short field_type,
 	member->helpfunction=helpfunction;
 	member->user_editable=editable;
 	member->editable_expression=NULL;
+	member->required_expression=NULL;
 	member->user_sensitive=TRUE;
 	member->sensitive_expression=NULL;
 	member->transversal_expression=NULL;
@@ -1770,6 +1783,9 @@ void xaddrsrc(RDArsrc *resource,short type,char *rscr,short field_type,
 	member->toolbar_w=NULL;
 	member->popup_w=NULL;
 	member->popup_id=(-1);
+	member->bootstrap=0;
+	member->vertical=0;
+	member->horizontal=0;
 
 	member->Table=NULL;
 	member->table_row=0;
@@ -1924,6 +1940,31 @@ void xaddrsrc(RDArsrc *resource,short type,char *rscr,short field_type,
 			break;
 	}
 }
+/* memberrequired() */
+void xmemberrequired(RDArmem *member,int line,char *file)
+{
+	Wt::WWidget *WW=NULL;
+	char b=FALSE;
+	RDArsrc *rs=(RDArsrc *)member->parent;
+	Wt::WValidator *V=(Wt::WValidator *)member->validobject;
+
+	if(diaggui)
+	{
+		prterr("DIAG memberrequired for [%s] at line [%d] program [%s].",member->rscrname,line,file);
+	}
+	if(!isEMPTY(member->required_expression))
+	{
+		b=rs->EvalFunc(member->required_expression,rs,rs->EvalFuncArgs);
+		WW=(Wt::WWidget *)member->w;
+		if(b==TRUE)
+		{
+			V->setMandatory(TRUE);
+		} else {
+			V->setMandatory(FALSE);
+		}
+	}
+}
+/* updatemember */
 short xupdatemember(RDArmem *member,int line,char *file)
 {
 	char *value=NULL,*temp1=NULL,*temp2=NULL;
@@ -2515,6 +2556,7 @@ short xupdatemember(RDArmem *member,int line,char *file)
 		}
 		if(value!=NULL) Rfree(value);
 	}
+	memberrequired(member);
 	member->app_update=FALSE;
 	return(TRUE);
 }
@@ -2883,7 +2925,7 @@ short xwritescrnbin(char *libname,RDAscrn *screen,int line,char *file)
 	}
 #endif /* USE_RDA_DIAGNOSTICS */
 	bin=BINnew();
-	BINaddshort(bin,-1688);	
+	BINaddshort(bin,-1687);	
 	BINaddstring(bin,screen->name);
 	BINaddint(bin,screen->numwdgts);
 	for(x=0,wdgt=screen->wdgts+x;x<screen->numwdgts;++x,++wdgt)
@@ -2908,6 +2950,9 @@ short xwritescrnbin(char *libname,RDAscrn *screen,int line,char *file)
 				} else BINaddshort(bin,FALSE);
 				BINaddshort(bin,wdgt->cols);
 				BINaddint(bin,wdgt->rtype);
+				BINaddshort(bin,wdgt->bootstrap);
+				BINaddshort(bin,wdgt->vertical);
+				BINaddshort(bin,wdgt->horizontal);
 				if(!isEMPTY(wdgt->editable_expression))
 				{
 					BINaddshort(bin,TRUE);
@@ -2922,6 +2967,11 @@ short xwritescrnbin(char *libname,RDAscrn *screen,int line,char *file)
 				{
 					BINaddshort(bin,TRUE);
 					BINaddstring(bin,wdgt->transversal_expression);
+				} else BINaddshort(bin,FALSE);
+				if(!isEMPTY(wdgt->required_expression))
+				{
+					BINaddshort(bin,TRUE);
+					BINaddstring(bin,wdgt->required_expression);
 				} else BINaddshort(bin,FALSE);
 				break;
 			case 0:	/* Standard Resource type */
@@ -2938,6 +2988,9 @@ short xwritescrnbin(char *libname,RDAscrn *screen,int line,char *file)
 				} else BINaddshort(bin,FALSE);
 				BINaddshort(bin,wdgt->cols);
 				BINaddint(bin,wdgt->rtype);
+				BINaddshort(bin,wdgt->bootstrap);
+				BINaddshort(bin,wdgt->vertical);
+				BINaddshort(bin,wdgt->horizontal);
 				if(!isEMPTY(wdgt->editable_expression))
 				{
 					BINaddshort(bin,TRUE);
@@ -2953,14 +3006,23 @@ short xwritescrnbin(char *libname,RDAscrn *screen,int line,char *file)
 					BINaddshort(bin,TRUE);
 					BINaddstring(bin,wdgt->transversal_expression);
 				} else BINaddshort(bin,FALSE);
+				if(!isEMPTY(wdgt->required_expression))
+				{
+					BINaddshort(bin,TRUE);
+					BINaddstring(bin,wdgt->required_expression);
+				} else BINaddshort(bin,FALSE);
 				break;
 			case 12: /* New Scrolled Window */
 				BINaddshort(bin,wdgt->rows);
 				BINaddshort(bin,wdgt->cols);
+				BINaddshort(bin,wdgt->vertical);
+				BINaddshort(bin,wdgt->horizontal);
 				break;
 			case 1: /* start row */
-			case 2: /* end row */
 			case 3: /* start box */
+				BINaddshort(bin,wdgt->bootstrap);
+				break;
+			case 2: /* end row */
 			case 4: /* end box */
 			case 13: /* End Scrolled Window */
 			case 21: /* End Tabbed Container */
@@ -2976,10 +3038,34 @@ short xwritescrnbin(char *libname,RDAscrn *screen,int line,char *file)
 			case 23: /* New Tab Bar */
 				BINaddint(bin,wdgt->rtype);
 				break;
+			case 28: /* New Table      */
+				if(!isEMPTY(wdgt->label))
+				{
+					BINaddshort(bin,TRUE);
+					BINaddstring(bin,wdgt->label);
+				} else BINaddshort(bin,FALSE);
+				BINaddshort(bin,wdgt->cols);
+				BINaddint(bin,wdgt->rtype);
+				BINaddshort(bin,wdgt->bootstrap);
+				BINaddshort(bin,wdgt->vertical);
+				BINaddshort(bin,wdgt->horizontal);
+				if(wdgt->rtype==1)
+				{
+					if(!isEMPTY(wdgt->pixmap))
+					{
+						BINaddshort(bin,TRUE);
+						BINaddstring(bin,wdgt->pixmap);
+					} else BINaddshort(bin,FALSE);
+				}
+				if(!isEMPTY(wdgt->XHTML_Label))
+				{
+					BINaddshort(bin,TRUE);
+					BINaddstring(bin,wdgt->XHTML_Label);
+				} else BINaddshort(bin,FALSE);
+				break;
 			case 20: /* New Tabbed Container */
 			case 24: /* New Popup Menu */
 			case 26: /* New ToolBar    */
-			case 28: /* New Table      */
 			case 32: /* Start Panel */
 			case 5: /* labels */
 				if(!isEMPTY(wdgt->label))
@@ -2988,6 +3074,9 @@ short xwritescrnbin(char *libname,RDAscrn *screen,int line,char *file)
 					BINaddstring(bin,wdgt->label);
 				} else BINaddshort(bin,FALSE);
 				BINaddint(bin,wdgt->rtype);
+				BINaddshort(bin,wdgt->bootstrap);
+				BINaddshort(bin,wdgt->vertical);
+				BINaddshort(bin,wdgt->horizontal);
 				if(wdgt->rtype==1)
 				{
 					if(!isEMPTY(wdgt->pixmap))
@@ -3015,6 +3104,9 @@ short xwritescrnbin(char *libname,RDAscrn *screen,int line,char *file)
 					BINaddstring(bin,wdgt->label);
 				} else BINaddshort(bin,FALSE);
 				BINaddint(bin,wdgt->rtype);
+				BINaddshort(bin,wdgt->bootstrap);
+				BINaddshort(bin,wdgt->vertical);
+				BINaddshort(bin,wdgt->horizontal);
 				if(wdgt->rtype==5)
 				{
 					if(!isEMPTY(wdgt->pixmap))
@@ -3056,6 +3148,9 @@ short xwritescrnbin(char *libname,RDAscrn *screen,int line,char *file)
 					BINaddstring(bin,wdgt->label);
 				} else BINaddshort(bin,FALSE);
 				BINaddint(bin,wdgt->rtype);
+				BINaddshort(bin,wdgt->bootstrap);
+				BINaddshort(bin,wdgt->vertical);
+				BINaddshort(bin,wdgt->horizontal);
 				if(wdgt->rtype==1)
 				{
 					if(!isEMPTY(wdgt->pixmap))
@@ -3084,6 +3179,11 @@ short xwritescrnbin(char *libname,RDAscrn *screen,int line,char *file)
 					BINaddshort(bin,TRUE);
 					BINaddstring(bin,wdgt->transversal_expression);
 				} else BINaddshort(bin,FALSE);
+				if(!isEMPTY(wdgt->required_expression))
+				{
+					BINaddshort(bin,TRUE);
+					BINaddstring(bin,wdgt->required_expression);
+				} else BINaddshort(bin,FALSE);
 				break;
 			case 7: /* scrolled list */
 				if(!isEMPTY(wdgt->resource_name))
@@ -3097,6 +3197,9 @@ short xwritescrnbin(char *libname,RDAscrn *screen,int line,char *file)
 					BINaddstring(bin,wdgt->label);
 				} else BINaddshort(bin,FALSE);
 				BINaddshort(bin,wdgt->rows);
+				BINaddshort(bin,wdgt->bootstrap);
+				BINaddshort(bin,wdgt->vertical);
+				BINaddshort(bin,wdgt->horizontal);
 				if(!isEMPTY(wdgt->editable_expression))
 				{
 					BINaddshort(bin,TRUE);
@@ -3111,6 +3214,11 @@ short xwritescrnbin(char *libname,RDAscrn *screen,int line,char *file)
 				{
 					BINaddshort(bin,TRUE);
 					BINaddstring(bin,wdgt->transversal_expression);
+				} else BINaddshort(bin,FALSE);
+				if(!isEMPTY(wdgt->required_expression))
+				{
+					BINaddshort(bin,TRUE);
+					BINaddstring(bin,wdgt->required_expression);
 				} else BINaddshort(bin,FALSE);
 				break;
 			case 8:	/* scrolled text */
@@ -3127,6 +3235,9 @@ short xwritescrnbin(char *libname,RDAscrn *screen,int line,char *file)
 				BINaddshort(bin,wdgt->rows);
 				BINaddshort(bin,wdgt->cols);
 				BINaddint(bin,wdgt->rtype);
+				BINaddshort(bin,wdgt->bootstrap);
+				BINaddshort(bin,wdgt->vertical);
+				BINaddshort(bin,wdgt->horizontal);
 				if(!isEMPTY(wdgt->editable_expression))
 				{
 					BINaddshort(bin,TRUE);
@@ -3141,6 +3252,11 @@ short xwritescrnbin(char *libname,RDAscrn *screen,int line,char *file)
 				{
 					BINaddshort(bin,TRUE);
 					BINaddstring(bin,wdgt->transversal_expression);
+				} else BINaddshort(bin,FALSE);
+				if(!isEMPTY(wdgt->required_expression))
+				{
+					BINaddshort(bin,TRUE);
+					BINaddstring(bin,wdgt->required_expression);
 				} else BINaddshort(bin,FALSE);
 				break;
 			default:
@@ -3281,13 +3397,14 @@ short xgetscrnbin(char *libname,RDAscrn *screen,short showerror,int line,char *f
 		return(-1);
 	}
 	x=BINgetshort(bin);
-	if(x!=(-1688) && x!=(-1689) && x!=(-1690) && x!=(-1691) && x!=(-1692) && x!=(-1693) && x!=(-1694) && x!=(-1695) && x!=(-1696) && x!=(-1697) && x!=(-1698) && x!=(-1701) && x!=(-1702) && x!=(-1703) && x!=(-1700) && x!=(-1699))
+	if(x!=(-1687) && x!=(-1688) && x!=(-1689) && x!=(-1690) && x!=(-1691) && x!=(-1692) && x!=(-1693) && x!=(-1694) && x!=(-1695) && x!=(-1696) && x!=(-1697) && x!=(-1698) && x!=(-1701) && x!=(-1702) && x!=(-1703) && x!=(-1700) && x!=(-1699))
 	{
 		prterr("Error Invalid version or bad binary for Screen [%s] [%s] in Library [%s] at line [%d] program [%s].",screen->module,screen->name,libname,line,file);
 		BINfree(bin);
 		return(-1);
 	}
-	if(x==(-1688)) donewscreen=15;
+	if(x==(-1687)) donewscreen=16;
+	else if(x==(-1688)) donewscreen=15;
 	else if(x==(-1689)) donewscreen=14;
 	else if(x==(-1690)) donewscreen=13;
 	else if(x==(-1691)) donewscreen=12;
@@ -3303,31 +3420,35 @@ short xgetscrnbin(char *libname,RDAscrn *screen,short showerror,int line,char *f
 	else if(x==(-1703)) donewscreen=2;
 	else if(x==(-1700)) donewscreen=3;
 	else donewscreen=FALSE;
-	testx=BINgetstring(bin);
-	if(testx!=NULL) Rfree(testx);
-	screen->numwdgts=BINgetint(bin);
-	screen->wdgts=Rmalloc(screen->numwdgts*sizeof(struct RDAwdgts));
-	for(x=0,wdgt=screen->wdgts;x<screen->numwdgts;++x,++wdgt)
+	if(donewscreen>15)
 	{
-		wdgt->type=BINgetshort(bin);
-		wdgt->resource_num=0;
-		wdgt->transversal_expression=NULL;
-		wdgt->sensitive_expression=NULL;
-		wdgt->editable_expression=NULL;
-		wdgt->expression=NULL;
-		wdgt->resource_name=NULL;
-		wdgt->label=NULL;
-		wdgt->XHTML_Label=NULL;
-		wdgt->pixmap=NULL;
-		switch(wdgt->type)
+		testx=BINgetstring(bin);
+		if(testx!=NULL) Rfree(testx);
+		screen->numwdgts=BINgetint(bin);
+		screen->wdgts=Rmalloc(screen->numwdgts*sizeof(struct RDAwdgts));
+		for(x=0,wdgt=screen->wdgts;x<screen->numwdgts;++x,++wdgt)
 		{
-			case 15: /* Custom Input Fields */
-			case 16: /* Expenditure Fields */
-			case 17: /* Revenue Fields */
-			case 18: /* Balance Sheet Fields */
-			case 19: /* Beginning Balance Fields */
-				if(donewscreen>6)
-				{
+			wdgt->type=BINgetshort(bin);
+			wdgt->resource_num=0;
+			wdgt->transversal_expression=NULL;
+			wdgt->sensitive_expression=NULL;
+			wdgt->editable_expression=NULL;
+			wdgt->required_expression=NULL;
+			wdgt->bootstrap=0;
+			wdgt->vertical=0;
+			wdgt->horizontal=0;
+			wdgt->expression=NULL;
+			wdgt->resource_name=NULL;
+			wdgt->label=NULL;
+			wdgt->XHTML_Label=NULL;
+			wdgt->pixmap=NULL;
+			switch(wdgt->type)
+			{
+				case 15: /* Custom Input Fields */
+				case 16: /* Expenditure Fields */
+				case 17: /* Revenue Fields */
+				case 18: /* Balance Sheet Fields */
+				case 19: /* Beginning Balance Fields */
 					test=BINgetshort(bin);
 					if(test) wdgt->resource_name=BINgetstring(bin);
 						else wdgt->resource_name=NULL;
@@ -3337,6 +3458,371 @@ short xgetscrnbin(char *libname,RDAscrn *screen,short showerror,int line,char *f
 					wdgt->rows=0;
 					wdgt->cols=BINgetshort(bin);
 					wdgt->rtype=BINgetint(bin);
+					wdgt->bootstrap=BINgetshort(bin);
+					wdgt->vertical=BINgetshort(bin);
+					wdgt->horizontal=BINgetshort(bin);
+					wdgt->pixmap=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->editable_expression=BINgetstring(bin);
+						else wdgt->editable_expression=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->sensitive_expression=BINgetstring(bin);
+						else wdgt->sensitive_expression=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->transversal_expression=BINgetstring(bin);
+						else wdgt->transversal_expression=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->required_expression=BINgetstring(bin);
+						else wdgt->required_expression=NULL;
+					break;
+				case 22: /* Progress Bar */
+				case 0:	/* for fields */
+					test=BINgetshort(bin);
+					if(test) wdgt->resource_name=BINgetstring(bin);
+						else wdgt->resource_name=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->label=BINgetstring(bin);
+						else wdgt->label=NULL;
+					wdgt->rows=0;
+					wdgt->cols=BINgetshort(bin);
+					wdgt->rtype=BINgetint(bin);
+					wdgt->bootstrap=BINgetshort(bin);
+					wdgt->vertical=BINgetshort(bin);
+					wdgt->horizontal=BINgetshort(bin);
+					wdgt->pixmap=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->editable_expression=BINgetstring(bin);
+						else wdgt->editable_expression=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->sensitive_expression=BINgetstring(bin);
+						else wdgt->sensitive_expression=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->transversal_expression=BINgetstring(bin);
+						else wdgt->transversal_expression=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->required_expression=BINgetstring(bin);
+						else wdgt->required_expression=NULL;
+					break;
+				case 1: /* new line */
+				case 3: /* new box */
+					wdgt->bootstrap=BINgetshort(bin);
+					break;
+				case 2: /* end line */
+				case 4: /* end box */
+				case 21: /* End Tabbed Container */
+				case 25: /* End Popup Menu */
+				case 27: /* End Toolbar */
+				case 29: /* End Table */
+				case 30: /* Start Header */
+				case 31: /* End Header */
+				case 33: /* End Panel */
+					wdgt->resource_name=NULL;
+					wdgt->label=NULL;
+					wdgt->pixmap=NULL;
+					wdgt->rows=0;
+					wdgt->cols=0;
+					wdgt->rtype=0;
+					break;
+				case 28: /* New Table */
+					wdgt->resource_name=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->label=BINgetstring(bin);
+						else wdgt->label=NULL;
+					wdgt->cols=BINgetshort(bin);
+					wdgt->rtype=BINgetint(bin);
+					wdgt->bootstrap=BINgetshort(bin);
+					wdgt->vertical=BINgetshort(bin);
+					wdgt->horizontal=BINgetshort(bin);
+					if(wdgt->rtype==1)
+					{
+						test=BINgetshort(bin);
+						if(test) wdgt->pixmap=BINgetstring(bin);
+							else wdgt->pixmap=NULL;
+					} else {
+						wdgt->pixmap=NULL;
+					}
+					test=BINgetshort(bin);
+					if(test) wdgt->XHTML_Label=BINgetstring(bin);
+						else wdgt->XHTML_Label=NULL;
+					wdgt->rows=0;
+					wdgt->cols=0;
+					break;
+				case 20: /* New Tabbed Container */
+				case 24: /* New Popup Menu */
+				case 26: /* New Toolbar */
+				case 32: /* Start Panel */
+				case 5: /* labels */
+					wdgt->resource_name=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->label=BINgetstring(bin);
+						else wdgt->label=NULL;
+					wdgt->rtype=BINgetint(bin);
+					wdgt->bootstrap=BINgetshort(bin);
+					wdgt->vertical=BINgetshort(bin);
+					wdgt->horizontal=BINgetshort(bin);
+					if(wdgt->rtype==1)
+					{
+						test=BINgetshort(bin);
+						if(test) wdgt->pixmap=BINgetstring(bin);
+							else wdgt->pixmap=NULL;
+					} else {
+						wdgt->pixmap=NULL;
+					}
+					test=BINgetshort(bin);
+					if(test) wdgt->XHTML_Label=BINgetstring(bin);
+						else wdgt->XHTML_Label=NULL;
+					wdgt->rows=0;
+					wdgt->cols=0;
+					break;
+				case 6: /* buttons */
+				case 14:/* optional screens */
+					test=BINgetshort(bin);
+					if(test) wdgt->resource_name=BINgetstring(bin);
+						else wdgt->resource_name=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->label=BINgetstring(bin);
+						else wdgt->label=NULL;
+					wdgt->rtype=BINgetint(bin);
+					wdgt->bootstrap=BINgetshort(bin);
+					wdgt->vertical=BINgetshort(bin);
+					wdgt->horizontal=BINgetshort(bin);
+					if(wdgt->rtype==5)
+					{
+						test=BINgetshort(bin);
+						if(test) wdgt->pixmap=BINgetstring(bin);
+							else wdgt->pixmap=NULL;
+					} else {
+						wdgt->pixmap=NULL;
+					}
+					test=BINgetshort(bin);
+					if(test) wdgt->XHTML_Label=BINgetstring(bin);
+						else wdgt->XHTML_Label=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->editable_expression=BINgetstring(bin);
+						else wdgt->editable_expression=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->sensitive_expression=BINgetstring(bin);
+						else wdgt->sensitive_expression=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->transversal_expression=BINgetstring(bin);
+						else wdgt->transversal_expression=NULL;
+					wdgt->rows=0;
+					wdgt->cols=0;
+					break;
+				case 9: /* toggle buttons */
+					test=BINgetshort(bin);
+					if(test) wdgt->resource_name=BINgetstring(bin);
+						else wdgt->resource_name=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->label=BINgetstring(bin);
+						else wdgt->label=NULL;
+					wdgt->rtype=BINgetint(bin);
+					wdgt->bootstrap=BINgetshort(bin);
+					wdgt->vertical=BINgetshort(bin);
+					wdgt->horizontal=BINgetshort(bin);
+					if(wdgt->rtype==1)
+					{
+						test=BINgetshort(bin);
+						if(test) wdgt->pixmap=BINgetstring(bin);
+							else wdgt->pixmap=NULL;
+					} else {
+						wdgt->pixmap=NULL;
+					}
+					test=BINgetshort(bin);
+					if(test) wdgt->XHTML_Label=BINgetstring(bin);
+						else wdgt->XHTML_Label=NULL;
+					wdgt->rows=0;
+					wdgt->cols=0;
+					test=BINgetshort(bin);
+					if(test) wdgt->editable_expression=BINgetstring(bin);
+						else wdgt->editable_expression=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->sensitive_expression=BINgetstring(bin);
+						else wdgt->sensitive_expression=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->transversal_expression=BINgetstring(bin);
+						else wdgt->transversal_expression=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->required_expression=BINgetstring(bin);
+						else wdgt->required_expression=NULL;
+					break;
+				case 7: /* scrolled list */
+					test=BINgetshort(bin);
+					if(test) wdgt->resource_name=BINgetstring(bin);
+						else wdgt->resource_name=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->label=BINgetstring(bin);
+						else wdgt->label=NULL;
+					wdgt->rows=BINgetshort(bin);
+					wdgt->bootstrap=BINgetshort(bin);
+					wdgt->vertical=BINgetshort(bin);
+					wdgt->horizontal=BINgetshort(bin);
+					wdgt->cols=0;
+					wdgt->rtype=0;
+					wdgt->pixmap=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->editable_expression=BINgetstring(bin);
+						else wdgt->editable_expression=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->sensitive_expression=BINgetstring(bin);
+						else wdgt->sensitive_expression=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->transversal_expression=BINgetstring(bin);
+						else wdgt->transversal_expression=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->required_expression=BINgetstring(bin);
+						else wdgt->required_expression=NULL;
+					break;
+				case 8: /* scrolled text */
+					test=BINgetshort(bin);
+					if(test) wdgt->resource_name=BINgetstring(bin);
+						else wdgt->resource_name=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->label=BINgetstring(bin);
+						else wdgt->label=NULL;
+					wdgt->rows=BINgetshort(bin);
+					wdgt->cols=BINgetshort(bin);
+					wdgt->rtype=BINgetint(bin);
+					wdgt->bootstrap=BINgetshort(bin);
+					wdgt->vertical=BINgetshort(bin);
+					wdgt->horizontal=BINgetshort(bin);
+					wdgt->pixmap=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->editable_expression=BINgetstring(bin);
+						else wdgt->editable_expression=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->sensitive_expression=BINgetstring(bin);
+						else wdgt->sensitive_expression=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->transversal_expression=BINgetstring(bin);
+						else wdgt->transversal_expression=NULL;
+					test=BINgetshort(bin);
+					if(test) wdgt->required_expression=BINgetstring(bin);
+						else wdgt->required_expression=NULL;
+					break;
+				case 10: /* frame */
+				case 11: /* seperator */
+				case 23: /* New Tab Bar */
+					wdgt->rtype=BINgetint(bin);
+					wdgt->resource_name=NULL;
+					wdgt->label=NULL;
+					wdgt->pixmap=NULL;
+					wdgt->rows=0;
+					wdgt->cols=0;
+					break;
+				case 12: /* New Scrolled Window */
+				case 13: /* End Scrolled Window */
+					wdgt->resource_name=NULL;
+					wdgt->label=NULL;
+					wdgt->pixmap=NULL;
+					if(wdgt->type==12)
+					{
+						wdgt->rows=BINgetshort(bin);
+						wdgt->cols=BINgetshort(bin);
+						wdgt->vertical=BINgetshort(bin);
+						wdgt->horizontal=BINgetshort(bin);
+					} else {
+						wdgt->rows=0;
+						wdgt->cols=0;
+					}
+					wdgt->rtype=0;
+					break;
+				default:
+					prterr("Error Widget type [%d] invalid for Screen Widget [%d] on Screen [%s] [%s] at line [%d] program [%s].",wdgt->type,x,screen->module,screen->name,line,file);
+					wdgt->resource_name=NULL;
+					wdgt->label=NULL;
+					wdgt->pixmap=NULL;
+					wdgt->rows=0;
+					wdgt->cols=0;
+					wdgt->rtype=0;
+					break;
+			}
+			test=BINgetshort(bin);
+			if(test) wdgt->expression=BINgetstring(bin);
+				else wdgt->expression=NULL;
+		}
+	} else {
+		testx=BINgetstring(bin);
+		if(testx!=NULL) Rfree(testx);
+		screen->numwdgts=BINgetint(bin);
+		screen->wdgts=Rmalloc(screen->numwdgts*sizeof(struct RDAwdgts));
+		for(x=0,wdgt=screen->wdgts;x<screen->numwdgts;++x,++wdgt)
+		{
+			wdgt->type=BINgetshort(bin);
+			wdgt->resource_num=0;
+			wdgt->transversal_expression=NULL;
+			wdgt->sensitive_expression=NULL;
+			wdgt->editable_expression=NULL;
+			wdgt->expression=NULL;
+			wdgt->resource_name=NULL;
+			wdgt->label=NULL;
+			wdgt->XHTML_Label=NULL;
+			wdgt->pixmap=NULL;
+			switch(wdgt->type)
+			{
+				case 15: /* Custom Input Fields */
+				case 16: /* Expenditure Fields */
+				case 17: /* Revenue Fields */
+				case 18: /* Balance Sheet Fields */
+				case 19: /* Beginning Balance Fields */
+					if(donewscreen>6)
+					{
+						test=BINgetshort(bin);
+						if(test) wdgt->resource_name=BINgetstring(bin);
+							else wdgt->resource_name=NULL;
+						test=BINgetshort(bin);
+						if(test) wdgt->label=BINgetstring(bin);
+							else wdgt->label=NULL;
+						wdgt->rows=0;
+						wdgt->cols=BINgetshort(bin);
+						wdgt->rtype=BINgetint(bin);
+						wdgt->pixmap=NULL;
+						if(donewscreen>11)
+						{
+							test=BINgetshort(bin);
+							if(test) wdgt->editable_expression=BINgetstring(bin);
+								else wdgt->editable_expression=NULL;
+							test=BINgetshort(bin);
+							if(test) wdgt->sensitive_expression=BINgetstring(bin);
+								else wdgt->sensitive_expression=NULL;
+						}
+						if(donewscreen>12)
+						{
+							test=BINgetshort(bin);
+							if(test) wdgt->transversal_expression=BINgetstring(bin);
+								else wdgt->transversal_expression=NULL;
+						} else wdgt->transversal_expression=NULL;
+					} else {
+						prterr("Error Widget type [%d] invalid for Screen Widget [%d] on Screen [%s] [%s] at line [%d] program [%s].",wdgt->type,x,screen->module,screen->name,line,file);
+						wdgt->resource_name=NULL;
+						wdgt->label=NULL;
+						wdgt->pixmap=NULL;
+						wdgt->rows=0;
+						wdgt->cols=0;
+						wdgt->rtype=0;
+					}
+					break;
+				case 22: /* Progress Bar */
+				case 0:	/* for fields */
+					if(donewscreen>2)
+					{
+						test=BINgetshort(bin);
+						if(test) wdgt->resource_name=BINgetstring(bin);
+							else wdgt->resource_name=NULL;
+					} else wdgt->resource_name=BINgetstring(bin);;
+					if(donewscreen>4)
+					{
+						test=BINgetshort(bin);
+						if(test) wdgt->label=BINgetstring(bin);
+							else wdgt->label=NULL;
+					} else wdgt->label=NULL;
+					wdgt->rows=0;
+					if(donewscreen) wdgt->cols=BINgetshort(bin);
+						else wdgt->cols=0;
+					if(donewscreen>13)
+					{
+						wdgt->rtype=BINgetint(bin);
+					} else wdgt->rtype=0;
 					wdgt->pixmap=NULL;
 					if(donewscreen>11)
 					{
@@ -3353,204 +3839,98 @@ short xgetscrnbin(char *libname,RDAscrn *screen,short showerror,int line,char *f
 						if(test) wdgt->transversal_expression=BINgetstring(bin);
 							else wdgt->transversal_expression=NULL;
 					} else wdgt->transversal_expression=NULL;
-				} else {
-					prterr("Error Widget type [%d] invalid for Screen Widget [%d] on Screen [%s] [%s] at line [%d] program [%s].",wdgt->type,x,screen->module,screen->name,line,file);
+					break;
+				case 1: /* new line */
+				case 2: /* end line */
+				case 3: /* new box */
+				case 4: /* end box */
+				case 21: /* End Tabbed Container */
+				case 25: /* End Popup Menu */
+				case 27: /* End Toolbar */
+				case 29: /* End Table */
+				case 30: /* Start Header */
+				case 31: /* End Header */
+				case 33: /* End Panel */
 					wdgt->resource_name=NULL;
 					wdgt->label=NULL;
 					wdgt->pixmap=NULL;
 					wdgt->rows=0;
 					wdgt->cols=0;
 					wdgt->rtype=0;
-				}
-				break;
-			case 22: /* Progress Bar */
-			case 0:	/* for fields */
-				if(donewscreen>2)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->resource_name=BINgetstring(bin);
-						else wdgt->resource_name=NULL;
-				} else wdgt->resource_name=BINgetstring(bin);;
-				if(donewscreen>4)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->label=BINgetstring(bin);
-						else wdgt->label=NULL;
-				} else wdgt->label=NULL;
-				wdgt->rows=0;
-				if(donewscreen) wdgt->cols=BINgetshort(bin);
-					else wdgt->cols=0;
-				if(donewscreen>13)
-				{
-					wdgt->rtype=BINgetint(bin);
-				} else wdgt->rtype=0;
-				wdgt->pixmap=NULL;
-				if(donewscreen>11)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->editable_expression=BINgetstring(bin);
-						else wdgt->editable_expression=NULL;
-					test=BINgetshort(bin);
-					if(test) wdgt->sensitive_expression=BINgetstring(bin);
-						else wdgt->sensitive_expression=NULL;
-				}
-				if(donewscreen>12)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->transversal_expression=BINgetstring(bin);
-						else wdgt->transversal_expression=NULL;
-				} else wdgt->transversal_expression=NULL;
-				break;
-			case 1: /* new line */
-			case 2: /* end line */
-			case 3: /* new box */
-			case 4: /* end box */
-			case 21: /* End Tabbed Container */
-			case 25: /* End Popup Menu */
-			case 27: /* End Toolbar */
-			case 29: /* End Table */
-			case 30: /* Start Header */
-			case 31: /* End Header */
-			case 33: /* End Panel */
-				wdgt->resource_name=NULL;
-				wdgt->label=NULL;
-				wdgt->pixmap=NULL;
-				wdgt->rows=0;
-				wdgt->cols=0;
-				wdgt->rtype=0;
-				break;
-			case 20: /* New Tabbed Container */
-			case 24: /* New Popup Menu */
-			case 26: /* New Toolbar */
-			case 28: /* New Table */
-			case 32: /* Start Panel */
-			case 5: /* labels */
-				wdgt->resource_name=NULL;
-				if(donewscreen>2)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->label=BINgetstring(bin);
-						else wdgt->label=NULL;
-				} else wdgt->label=BINgetstring(bin);
-				if(donewscreen>8)
-				{
-					if(donewscreen>10)
+					break;
+				case 20: /* New Tabbed Container */
+				case 24: /* New Popup Menu */
+				case 26: /* New Toolbar */
+				case 28: /* New Table */
+				case 32: /* Start Panel */
+				case 5: /* labels */
+					wdgt->resource_name=NULL;
+					if(donewscreen>2)
 					{
-						wdgt->rtype=BINgetint(bin);
-						if(wdgt->rtype==1)
-						{
-							test=BINgetshort(bin);
-							if(test) wdgt->pixmap=BINgetstring(bin);
-								else wdgt->pixmap=NULL;
-						} else {
-							wdgt->pixmap=NULL;
-						}
-					} else {
 						test=BINgetshort(bin);
-						if(test) wdgt->pixmap=BINgetstring(bin);
-							else wdgt->pixmap=NULL;
-						wdgt->rtype=BINgetint(bin);
-					}
-				} else {
-					wdgt->pixmap=NULL;
-					wdgt->rtype=0;
-				}
-				if(donewscreen>14)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->XHTML_Label=BINgetstring(bin);
-						else wdgt->XHTML_Label=NULL;
-				} else if(donewscreen>9)
-				{
-					test=BINgetshort(bin);
-					if(test) temp=BINgetstring(bin);
-					if(temp!=NULL) Rfree(temp);
-				}
-				wdgt->rows=0;
-				wdgt->cols=0;
-				break;
-			case 6: /* buttons */
-				if(donewscreen>2)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->resource_name=BINgetstring(bin);
-						else wdgt->resource_name=NULL;
-				} else wdgt->resource_name=BINgetstring(bin);
-				if(donewscreen>2)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->label=BINgetstring(bin);
-						else wdgt->label=NULL;
-				} else wdgt->label=BINgetstring(bin);
-				if(donewscreen>4)
-				{
-					wdgt->rtype=BINgetint(bin);
-				} else {
-					wdgt->rtype=0;
-				}
-				if(donewscreen>8)
-				{
-					if(donewscreen>10)
-					{
-						if(wdgt->rtype==5)
-						{
-							test=BINgetshort(bin);
-							if(test) wdgt->pixmap=BINgetstring(bin);
-								else wdgt->pixmap=NULL;
-						} else {
-							wdgt->pixmap=NULL;
-						}
-					} else {
-						test=BINgetshort(bin);
-						if(test) wdgt->pixmap=BINgetstring(bin);
-							else wdgt->pixmap=NULL;
-					}
-				} else {
-					wdgt->pixmap=NULL;
-				}
-				if(donewscreen>14)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->XHTML_Label=BINgetstring(bin);
-						else wdgt->XHTML_Label=NULL;
-				} else if(donewscreen>9)
-				{
-					test=BINgetshort(bin);
-					if(test) temp=BINgetstring(bin);
-					if(temp!=NULL) Rfree(temp);
-				}
-				if(donewscreen>11)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->editable_expression=BINgetstring(bin);
-						else wdgt->editable_expression=NULL;
-					test=BINgetshort(bin);
-					if(test) wdgt->sensitive_expression=BINgetstring(bin);
-						else wdgt->sensitive_expression=NULL;
-				}
-				if(donewscreen>12)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->transversal_expression=BINgetstring(bin);
-						else wdgt->transversal_expression=NULL;
-				} else wdgt->transversal_expression=NULL;
-				wdgt->rows=0;
-				wdgt->cols=0;
-				break;
-			case 14:/* optional screens */
-				if(donewscreen>5)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->resource_name=BINgetstring(bin);
-						else wdgt->resource_name=NULL;
-					test=BINgetshort(bin);
-					if(test) wdgt->label=BINgetstring(bin);
-						else wdgt->label=NULL;
+						if(test) wdgt->label=BINgetstring(bin);
+							else wdgt->label=NULL;
+					} else wdgt->label=BINgetstring(bin);
 					if(donewscreen>8)
 					{
 						if(donewscreen>10)
 						{
 							wdgt->rtype=BINgetint(bin);
+							if(wdgt->rtype==1)
+							{
+								test=BINgetshort(bin);
+								if(test) wdgt->pixmap=BINgetstring(bin);
+									else wdgt->pixmap=NULL;
+							} else {
+								wdgt->pixmap=NULL;
+							}
+						} else {
+							test=BINgetshort(bin);
+							if(test) wdgt->pixmap=BINgetstring(bin);
+								else wdgt->pixmap=NULL;
+							wdgt->rtype=BINgetint(bin);
+						}
+					} else {
+						wdgt->pixmap=NULL;
+						wdgt->rtype=0;
+					}
+					if(donewscreen>14)
+					{
+						test=BINgetshort(bin);
+						if(test) wdgt->XHTML_Label=BINgetstring(bin);
+							else wdgt->XHTML_Label=NULL;
+					} else if(donewscreen>9)
+					{
+						test=BINgetshort(bin);
+						if(test) temp=BINgetstring(bin);
+						if(temp!=NULL) Rfree(temp);
+					}
+					wdgt->rows=0;
+					wdgt->cols=0;
+					break;
+				case 6: /* buttons */
+					if(donewscreen>2)
+					{
+						test=BINgetshort(bin);
+						if(test) wdgt->resource_name=BINgetstring(bin);
+							else wdgt->resource_name=NULL;
+					} else wdgt->resource_name=BINgetstring(bin);
+					if(donewscreen>2)
+					{
+						test=BINgetshort(bin);
+						if(test) wdgt->label=BINgetstring(bin);
+							else wdgt->label=NULL;
+					} else wdgt->label=BINgetstring(bin);
+					if(donewscreen>4)
+					{
+						wdgt->rtype=BINgetint(bin);
+					} else {
+						wdgt->rtype=0;
+					}
+					if(donewscreen>8)
+					{
+						if(donewscreen>10)
+						{
 							if(wdgt->rtype==5)
 							{
 								test=BINgetshort(bin);
@@ -3578,9 +3958,146 @@ short xgetscrnbin(char *libname,RDAscrn *screen,short showerror,int line,char *f
 						if(test) temp=BINgetstring(bin);
 						if(temp!=NULL) Rfree(temp);
 					}
-					if(donewscreen<11)
+					if(donewscreen>11)
 					{
-						wdgt->rtype=BINgetint(bin);
+						test=BINgetshort(bin);
+						if(test) wdgt->editable_expression=BINgetstring(bin);
+							else wdgt->editable_expression=NULL;
+						test=BINgetshort(bin);
+						if(test) wdgt->sensitive_expression=BINgetstring(bin);
+							else wdgt->sensitive_expression=NULL;
+					}
+					if(donewscreen>12)
+					{
+						test=BINgetshort(bin);
+						if(test) wdgt->transversal_expression=BINgetstring(bin);
+							else wdgt->transversal_expression=NULL;
+					} else wdgt->transversal_expression=NULL;
+					wdgt->rows=0;
+					wdgt->cols=0;
+					break;
+				case 14:/* optional screens */
+					if(donewscreen>5)
+					{
+						test=BINgetshort(bin);
+						if(test) wdgt->resource_name=BINgetstring(bin);
+							else wdgt->resource_name=NULL;
+						test=BINgetshort(bin);
+						if(test) wdgt->label=BINgetstring(bin);
+							else wdgt->label=NULL;
+						if(donewscreen>8)
+						{
+							if(donewscreen>10)
+							{
+								wdgt->rtype=BINgetint(bin);
+								if(wdgt->rtype==5)
+								{
+									test=BINgetshort(bin);
+									if(test) wdgt->pixmap=BINgetstring(bin);
+										else wdgt->pixmap=NULL;
+								} else {
+									wdgt->pixmap=NULL;
+								}
+							} else {
+								test=BINgetshort(bin);
+								if(test) wdgt->pixmap=BINgetstring(bin);
+									else wdgt->pixmap=NULL;
+							}
+						} else {
+							wdgt->pixmap=NULL;
+						}
+						if(donewscreen>14)
+						{
+							test=BINgetshort(bin);
+							if(test) wdgt->XHTML_Label=BINgetstring(bin);
+								else wdgt->XHTML_Label=NULL;
+						} else if(donewscreen>9)
+						{
+							test=BINgetshort(bin);
+							if(test) temp=BINgetstring(bin);
+							if(temp!=NULL) Rfree(temp);
+						}
+						if(donewscreen<11)
+						{
+							wdgt->rtype=BINgetint(bin);
+						}
+						wdgt->rows=0;
+						wdgt->cols=0;
+						if(donewscreen>11)
+						{
+							test=BINgetshort(bin);
+							if(test) wdgt->editable_expression=BINgetstring(bin);
+								else wdgt->editable_expression=NULL;
+							test=BINgetshort(bin);
+							if(test) wdgt->sensitive_expression=BINgetstring(bin);
+								else wdgt->sensitive_expression=NULL;
+						}
+						if(donewscreen>12)
+						{
+							test=BINgetshort(bin);
+							if(test) wdgt->transversal_expression=BINgetstring(bin);
+								else wdgt->transversal_expression=NULL;
+						} else wdgt->transversal_expression=NULL;
+					} else {
+						if(donewscreen>2)
+						{
+							test=BINgetshort(bin);
+							if(test) wdgt->resource_name=BINgetstring(bin);
+								else wdgt->resource_name=NULL;
+						} else wdgt->resource_name=BINgetstring(bin);
+						if(donewscreen>2)
+						{
+							test=BINgetshort(bin);
+							if(test) wdgt->label=BINgetstring(bin);
+								else wdgt->label=NULL;
+						} else wdgt->label=BINgetstring(bin);
+						wdgt->rows=0;
+						wdgt->cols=0;
+						wdgt->rtype=0;
+						wdgt->pixmap=NULL;
+					}
+					break;
+				case 9: /* toggle buttons */
+					if(donewscreen>2)
+					{
+						test=BINgetshort(bin);
+						if(test) wdgt->resource_name=BINgetstring(bin);
+							else wdgt->resource_name=NULL;
+					} else wdgt->resource_name=BINgetstring(bin);
+					if(donewscreen>2)
+					{
+						test=BINgetshort(bin);
+						if(test) wdgt->label=BINgetstring(bin);
+							else wdgt->label=NULL;
+					} else wdgt->label=BINgetstring(bin);
+					if(donewscreen>8)
+					{
+						if(donewscreen>10)
+						{
+							wdgt->rtype=BINgetint(bin);
+							if(wdgt->rtype==1)
+							{
+								test=BINgetshort(bin);
+								if(test) wdgt->pixmap=BINgetstring(bin);
+									else wdgt->pixmap=NULL;
+							} else {
+								wdgt->pixmap=NULL;
+							}
+						} else {
+							test=BINgetshort(bin);
+							if(test) wdgt->pixmap=BINgetstring(bin);
+								else wdgt->pixmap=NULL;
+							wdgt->rtype=BINgetint(bin);
+						}
+					} else {
+						wdgt->pixmap=NULL;
+						wdgt->rtype=0;
+					}
+					if(donewscreen>9)
+					{
+						test=BINgetshort(bin);
+						if(test) temp=BINgetstring(bin);
+						if(temp!=NULL) Rfree(temp);
 					}
 					wdgt->rows=0;
 					wdgt->cols=0;
@@ -3599,204 +4116,127 @@ short xgetscrnbin(char *libname,RDAscrn *screen,short showerror,int line,char *f
 						if(test) wdgt->transversal_expression=BINgetstring(bin);
 							else wdgt->transversal_expression=NULL;
 					} else wdgt->transversal_expression=NULL;
-				} else {
+					break;
+				case 7: /* scrolled list */
 					if(donewscreen>2)
 					{
 						test=BINgetshort(bin);
 						if(test) wdgt->resource_name=BINgetstring(bin);
 							else wdgt->resource_name=NULL;
 					} else wdgt->resource_name=BINgetstring(bin);
-					if(donewscreen>2)
+					if(donewscreen>4)
 					{
 						test=BINgetshort(bin);
 						if(test) wdgt->label=BINgetstring(bin);
 							else wdgt->label=NULL;
-					} else wdgt->label=BINgetstring(bin);
-					wdgt->rows=0;
+					} else wdgt->label=NULL;
+					wdgt->rows=BINgetshort(bin);
 					wdgt->cols=0;
 					wdgt->rtype=0;
 					wdgt->pixmap=NULL;
-				}
-				break;
-			case 9: /* toggle buttons */
-				if(donewscreen>2)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->resource_name=BINgetstring(bin);
-						else wdgt->resource_name=NULL;
-				} else wdgt->resource_name=BINgetstring(bin);
-				if(donewscreen>2)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->label=BINgetstring(bin);
-						else wdgt->label=NULL;
-				} else wdgt->label=BINgetstring(bin);
-				if(donewscreen>8)
-				{
-					if(donewscreen>10)
+					if(donewscreen>11)
 					{
-						wdgt->rtype=BINgetint(bin);
-						if(wdgt->rtype==1)
-						{
-							test=BINgetshort(bin);
-							if(test) wdgt->pixmap=BINgetstring(bin);
-								else wdgt->pixmap=NULL;
-						} else {
-							wdgt->pixmap=NULL;
-						}
-					} else {
 						test=BINgetshort(bin);
-						if(test) wdgt->pixmap=BINgetstring(bin);
-							else wdgt->pixmap=NULL;
-						wdgt->rtype=BINgetint(bin);
+						if(test) wdgt->editable_expression=BINgetstring(bin);
+							else wdgt->editable_expression=NULL;
+						test=BINgetshort(bin);
+						if(test) wdgt->sensitive_expression=BINgetstring(bin);
+							else wdgt->sensitive_expression=NULL;
 					}
-				} else {
-					wdgt->pixmap=NULL;
-					wdgt->rtype=0;
-				}
-				if(donewscreen>9)
-				{
-					test=BINgetshort(bin);
-					if(test) temp=BINgetstring(bin);
-					if(temp!=NULL) Rfree(temp);
-				}
-				wdgt->rows=0;
-				wdgt->cols=0;
-				if(donewscreen>11)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->editable_expression=BINgetstring(bin);
-						else wdgt->editable_expression=NULL;
-					test=BINgetshort(bin);
-					if(test) wdgt->sensitive_expression=BINgetstring(bin);
-						else wdgt->sensitive_expression=NULL;
-				}
-				if(donewscreen>12)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->transversal_expression=BINgetstring(bin);
-						else wdgt->transversal_expression=NULL;
-				} else wdgt->transversal_expression=NULL;
-				break;
-			case 7: /* scrolled list */
-				if(donewscreen>2)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->resource_name=BINgetstring(bin);
-						else wdgt->resource_name=NULL;
-				} else wdgt->resource_name=BINgetstring(bin);
-				if(donewscreen>4)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->label=BINgetstring(bin);
-						else wdgt->label=NULL;
-				} else wdgt->label=NULL;
-				wdgt->rows=BINgetshort(bin);
-				wdgt->cols=0;
-				wdgt->rtype=0;
-				wdgt->pixmap=NULL;
-				if(donewscreen>11)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->editable_expression=BINgetstring(bin);
-						else wdgt->editable_expression=NULL;
-					test=BINgetshort(bin);
-					if(test) wdgt->sensitive_expression=BINgetstring(bin);
-						else wdgt->sensitive_expression=NULL;
-				}
-				if(donewscreen>12)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->transversal_expression=BINgetstring(bin);
-						else wdgt->transversal_expression=NULL;
-				} else wdgt->transversal_expression=NULL;
-				break;
-			case 8: /* scrolled text */
-				if(donewscreen>2)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->resource_name=BINgetstring(bin);
-						else wdgt->resource_name=NULL;
-				} else wdgt->resource_name=BINgetstring(bin);
-				if(donewscreen>4)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->label=BINgetstring(bin);
-						else wdgt->label=NULL;
-				} else wdgt->label=NULL;
-				wdgt->rows=BINgetshort(bin);
-				wdgt->cols=BINgetshort(bin);
-				if(donewscreen>1)
-				{
-					wdgt->rtype=BINgetint(bin);
-				} else wdgt->rtype=0;
-				wdgt->pixmap=NULL;
-				if(donewscreen>11)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->editable_expression=BINgetstring(bin);
-						else wdgt->editable_expression=NULL;
-					test=BINgetshort(bin);
-					if(test) wdgt->sensitive_expression=BINgetstring(bin);
-						else wdgt->sensitive_expression=NULL;
-				}
-				if(donewscreen>12)
-				{
-					test=BINgetshort(bin);
-					if(test) wdgt->transversal_expression=BINgetstring(bin);
-						else wdgt->transversal_expression=NULL;
-				} else wdgt->transversal_expression=NULL;
-				break;
-			case 10: /* frame */
-			case 11: /* seperator */
-			case 23: /* New Tab Bar */
-				if(donewscreen>1)
-				{
-					wdgt->rtype=BINgetint(bin);
-				} else {
-					prterr("Error Widget type [%d] invalid for Screen Widget [%d] on Screen [%s] [%s] at line [%d] program [%s].",wdgt->type,x,screen->module,screen->name,line,file);
-					wdgt->rtype=0;
-				}
-				wdgt->resource_name=NULL;
-				wdgt->label=NULL;
-				wdgt->pixmap=NULL;
-				wdgt->rows=0;
-				wdgt->cols=0;
-				break;
-			case 12: /* New Scrolled Window */
-			case 13: /* End Scrolled Window */
-				if(donewscreen<2)
-				{
-					prterr("Error Widget type [%d] invalid for Screen Widget [%d] on Screen [%s] [%s] at line [%d] program [%s].",wdgt->type,x,screen->module,screen->name,line,file);
-				}
-				wdgt->resource_name=NULL;
-				wdgt->label=NULL;
-				wdgt->pixmap=NULL;
-				if(donewscreen>7 && wdgt->type==12)
-				{
+					if(donewscreen>12)
+					{
+						test=BINgetshort(bin);
+						if(test) wdgt->transversal_expression=BINgetstring(bin);
+							else wdgt->transversal_expression=NULL;
+					} else wdgt->transversal_expression=NULL;
+					break;
+				case 8: /* scrolled text */
+					if(donewscreen>2)
+					{
+						test=BINgetshort(bin);
+						if(test) wdgt->resource_name=BINgetstring(bin);
+							else wdgt->resource_name=NULL;
+					} else wdgt->resource_name=BINgetstring(bin);
+					if(donewscreen>4)
+					{
+						test=BINgetshort(bin);
+						if(test) wdgt->label=BINgetstring(bin);
+							else wdgt->label=NULL;
+					} else wdgt->label=NULL;
 					wdgt->rows=BINgetshort(bin);
 					wdgt->cols=BINgetshort(bin);
-				} else {
+					if(donewscreen>1)
+					{
+						wdgt->rtype=BINgetint(bin);
+					} else wdgt->rtype=0;
+					wdgt->pixmap=NULL;
+					if(donewscreen>11)
+					{
+						test=BINgetshort(bin);
+						if(test) wdgt->editable_expression=BINgetstring(bin);
+							else wdgt->editable_expression=NULL;
+						test=BINgetshort(bin);
+						if(test) wdgt->sensitive_expression=BINgetstring(bin);
+							else wdgt->sensitive_expression=NULL;
+					}
+					if(donewscreen>12)
+					{
+						test=BINgetshort(bin);
+						if(test) wdgt->transversal_expression=BINgetstring(bin);
+							else wdgt->transversal_expression=NULL;
+					} else wdgt->transversal_expression=NULL;
+					break;
+				case 10: /* frame */
+				case 11: /* seperator */
+				case 23: /* New Tab Bar */
+					if(donewscreen>1)
+					{
+						wdgt->rtype=BINgetint(bin);
+					} else {
+						prterr("Error Widget type [%d] invalid for Screen Widget [%d] on Screen [%s] [%s] at line [%d] program [%s].",wdgt->type,x,screen->module,screen->name,line,file);
+						wdgt->rtype=0;
+					}
+					wdgt->resource_name=NULL;
+					wdgt->label=NULL;
+					wdgt->pixmap=NULL;
 					wdgt->rows=0;
 					wdgt->cols=0;
-				}
-				wdgt->rtype=0;
-				break;
-			default:
-				prterr("Error Widget type [%d] invalid for Screen Widget [%d] on Screen [%s] [%s] at line [%d] program [%s].",wdgt->type,x,screen->module,screen->name,line,file);
-				wdgt->resource_name=NULL;
-				wdgt->label=NULL;
-				wdgt->pixmap=NULL;
-				wdgt->rows=0;
-				wdgt->cols=0;
-				wdgt->rtype=0;
-				break;
-		}
-		if(donewscreen>3)
-		{
-			test=BINgetshort(bin);
-			if(test) wdgt->expression=BINgetstring(bin);
-				else wdgt->expression=NULL;
+					break;
+				case 12: /* New Scrolled Window */
+				case 13: /* End Scrolled Window */
+					if(donewscreen<2)
+					{
+						prterr("Error Widget type [%d] invalid for Screen Widget [%d] on Screen [%s] [%s] at line [%d] program [%s].",wdgt->type,x,screen->module,screen->name,line,file);
+					}
+					wdgt->resource_name=NULL;
+					wdgt->label=NULL;
+					wdgt->pixmap=NULL;
+					if(donewscreen>7 && wdgt->type==12)
+					{
+						wdgt->rows=BINgetshort(bin);
+						wdgt->cols=BINgetshort(bin);
+					} else {
+						wdgt->rows=0;
+						wdgt->cols=0;
+					}
+					wdgt->rtype=0;
+					break;
+				default:
+					prterr("Error Widget type [%d] invalid for Screen Widget [%d] on Screen [%s] [%s] at line [%d] program [%s].",wdgt->type,x,screen->module,screen->name,line,file);
+					wdgt->resource_name=NULL;
+					wdgt->label=NULL;
+					wdgt->pixmap=NULL;
+					wdgt->rows=0;
+					wdgt->cols=0;
+					wdgt->rtype=0;
+					break;
+			}
+			if(donewscreen>3)
+			{
+				test=BINgetshort(bin);
+				if(test) wdgt->expression=BINgetstring(bin);
+					else wdgt->expression=NULL;
+			}
 		}
 	}
 	BINfree(bin);
@@ -7790,6 +8230,7 @@ short xMEMBERSETEDITABLE(RDArmem *member,short editable,short which,int line,cha
 	Wt::WString *c=NULL;
 	Wt::WFormWidget *wFormW=NULL;
 	Wt::WWidget *WW=NULL;
+	Wt::WCheckBox *CB=NULL;
 #ifdef __USE_ANIMATIONS__
 	Wt::WAnimation fadeout(Wt::WAnimation::Fade,Wt::WAnimation::Linear,250);
 	Wt::WAnimation fadein(Wt::WAnimation::Pop,Wt::WAnimation::Linear,250);
@@ -7811,9 +8252,14 @@ short xMEMBERSETEDITABLE(RDArmem *member,short editable,short which,int line,cha
 	{
 		WW=(Wt::WWidget *)member->w;
 		wFormW=(Wt::WFormWidget *)member->w;
-		if(member->w!=NULL && member->field_type!=BUTTONS)
+		if(member->w!=NULL && member->field_type!=BUTTONS && member->field_type!=BOOLNS)
 		{ 
 			wFormW->setReadOnly((editable ? FALSE:TRUE));
+		} else if(member->w!=NULL && member->popup_w==NULL && member->field_type==BOOLNS)
+		{
+			fprintf(RDA_STDERR,"member [%s] editable [%s] ",member->rscrname,(editable ? "True":"False"));TRACE;
+			CB=(Wt::WCheckBox *)member->w;
+			CB->setReadOnly((editable ? FALSE:TRUE));
 		} else if(member->w!=NULL && member->popup_w==NULL && member->field_type==BUTTONS)
 		{
 			wFormW->setEnabled((editable ? TRUE:FALSE));
@@ -7954,6 +8400,7 @@ short xMEMBERSETSENSITIVE(RDArmem *member,short sensitive,short which,int line,c
 	Wt::WString *c=NULL;
 	Wt::WWidget *WW=NULL;
 	Wt::WFormWidget *wFormW=NULL;
+	Wt::WCheckBox *CB=NULL;
 #ifdef __USE_ANIMATIONS__
 	Wt::WAnimation fadeout(Wt::WAnimation::Fade,Wt::WAnimation::Linear,250);
 	Wt::WAnimation fadein(Wt::WAnimation::Pop,Wt::WAnimation::Linear,250);
@@ -7967,7 +8414,15 @@ short xMEMBERSETSENSITIVE(RDArmem *member,short sensitive,short which,int line,c
 	{
 		WW=(Wt::WWidget *)member->w;
 		wFormW=(Wt::WFormWidget *)member->w;
-		if(member->w!=NULL && member->field_type!=BUTTONS)
+		if(member->w!=NULL && member->field_type!=BOOLNS)
+		{
+			fprintf(RDA_STDERR,"member [%s] sensitive [%s] ",member->rscrname,(sensitive ? "True":"False"));TRACE;
+			CB=(Wt::WCheckBox *)member->w;
+/*
+			CB->setReadOnly((sensitive ? FALSE:TRUE));
+*/
+			CB->setEnabled((sensitive ? TRUE:FALSE));
+		} else if(member->w!=NULL && member->field_type!=BUTTONS)
 		{ 
 			wFormW->setReadOnly((sensitive ? FALSE:TRUE));
 			wFormW->setEnabled((sensitive ? TRUE:FALSE));
@@ -8395,7 +8850,8 @@ void xFreeRDALoadValue(RDALoadValue *RLV,int line,char *file)
 short xMEMBERSETDEFTYPE(RDArmem *member,short acctype,int line,char *file)
 {
 	RDAacct *holdacct=NULL;
-	char *temp2=NULL,MFstemp[101];
+	char *temp1=NULL,*temp2=NULL,MFstemp[101];
+	Wt::WString *c=NULL;
 	Wt::WLineEdit *LE=NULL;
 	Wt::WRegExpValidator *REv=NULL;
 
@@ -8475,6 +8931,16 @@ short xMEMBERSETDEFTYPE(RDArmem *member,short acctype,int line,char *file)
 		default:
 			return(-1);
 	}
+	if(!isEMPTY(member->definition))
+	{
+		for(temp1=member->definition;*temp1;++temp1) 
+		{
+			if(*temp1=='*') *temp1='x';
+			if(*temp1=='X') *temp1='x';
+			if(*temp1=='N') *temp1='n';
+			if(*temp1=='A') *temp1='a';
+		}
+	}
 	if(member->w!=NULL)
 	{
 		memset(MFstemp,0,101);
@@ -8493,6 +8959,10 @@ short xMEMBERSETDEFTYPE(RDArmem *member,short acctype,int line,char *file)
 			member->validobject = new Wt::WRegExpValidator(temp2);
 			if(member->validobject!=NULL) LE->setValidator(member->validobject);
 		} else temp2=NULL;
+		LE=(Wt::WLineEdit *)member->w;
+		c=new Wt::WString(member->definition);
+		LE->setInputMask(*c);
+		c->~WString();
 		if(temp2!=NULL) Rfree(temp2);
 	}
 	updatemember(member);

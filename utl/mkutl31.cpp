@@ -9,7 +9,6 @@
 extern char *module;
 extern APPlib *errorlist;
 
-#ifdef USING_QT
 static void RPT_PURGE_MENUITEM()
 {
 	int x=0;
@@ -1737,10 +1736,8 @@ static void SCN_ZEROZPARENTITEM_RANGE_SCREEN()
 	if(temp3!=NULL) Rfree(temp3);
 	if(temp4!=NULL) Rfree(temp4);
 }
-#endif /* USING_QT */
 void MENUITEMRPTS()
 {
-#ifdef USING_QT
 	RPT_PURGE_MENUITEM();
 	SCN_PURGE_MENUITEM_RANGE_SCREEN();
 	RPT_PURGE_MODULE();
@@ -1751,5 +1748,4 @@ void MENUITEMRPTS()
 	SCN_SHOWZPARENTITEM_RANGE_SCREEN();
 	RPT_ZEROZPARENTITEM();
 	SCN_ZEROZPARENTITEM_RANGE_SCREEN();
-#endif /* USING_QT */
 }

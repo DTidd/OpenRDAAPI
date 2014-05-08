@@ -2,8 +2,6 @@
 #include<powadd.hpp>
 
 #define MAXIMUM_SCREEN_LINES	15
-#ifdef USING_QT
-#endif
 
 static char *ReturnScreenName(char *filename,NRDfield *f)
 {

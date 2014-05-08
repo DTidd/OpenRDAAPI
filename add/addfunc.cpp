@@ -2867,6 +2867,9 @@ void xMakePowerAddButtons(RDArsrc *mainrsrc,PowerAdd *POWERADD,
 				} else if(!RDAstrcmp(button->progname,"PUTENV") || !RDAstrcmp(button->progname,"putenv"))
 				{
 					button->func=quitfunc;
+				} else if(!RDAstrcmp(button->progname,"DOHTTP") || !RDAstrcmp(button->progname,"dohttp"))
+				{
+					button->func=quitfunc;
 				}
 				addbtnrsrc(mainrsrc,button->buttonname,TRUE,
 					PowerAddButtonFunction,button);
@@ -3367,19 +3370,38 @@ void PowerAddButtonFunction(RDArsrc *mainrsrc,MaintainButton *button)
 		} else if(!RDAstrcmp(button->progname,"COPYFILE") || !RDAstrcmp(button->progname,"copyfile"))
 		{
 			blank_envpx1=TRUE;
-			RDACopyFile(newargs->libs[0],newargs->libs[1]);
+			if(newargs->numlibs>1)
+			{
+				RDACopyFile(newargs->libs[0],newargs->libs[1]);
+			}
 		} else if(!RDAstrcmp(button->progname,"MOVEFILE") || !RDAstrcmp(button->progname,"movefile"))
 		{
 			blank_envpx1=TRUE;
-			RDAMoveFile(newargs->libs[0],newargs->libs[1]);
+			if(newargs->numlibs>1)
+			{
+				RDAMoveFile(newargs->libs[0],newargs->libs[1]);
+			}
 		} else if(!RDAstrcmp(button->progname,"DISPLAYRELATIVEFILE") || !RDAstrcmp(button->progname,"displayrelativefile"))
 		{
 			blank_envpx1=TRUE;
-			DisplayRelativeFile(newargs->libs[0]);
+			if(newargs->numlibs>0)
+			{
+				DisplayRelativeFile(newargs->libs[0]);
+			}
 		} else if(!RDAstrcmp(button->progname,"DISPLAYFILE") || !RDAstrcmp(button->progname,"displayfile") || !RDAstrcmp(button->progname,"doarchive"))
 		{
 			blank_envpx1=TRUE;
-			DisplayFile(newargs->libs[0]);
+			if(newargs->numlibs>0)
+			{
+				DisplayFile(newargs->libs[0]);
+			}
+		} else if(!RDAstrcmp(button->progname,"DOHTTP") || !RDAstrcmp(button->progname,"dohttp")) 
+		{
+			blank_envpx1=TRUE;
+			if(newargs->numlibs>0)
+			{
+				GUI_OpenURL(newargs->libs[0]);
+			}
 		} else {
 			if(envpx!=NULL)
 			{

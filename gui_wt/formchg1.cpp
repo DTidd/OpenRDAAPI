@@ -1428,7 +1428,10 @@ short xmakescrn(RDArsrc  *scrnrscr,short modalx,short (*EvalFunc)(...),void *Eva
 			scrnrscr->primary->setTitleBarEnabled(TRUE);
 			scrnrscr->primary->setInline(FALSE);
 #ifdef __NEED_WDIALOG_LAYOUT__
+/*
 			scrnrscr->primary->setResizable(FALSE);
+*/
+			scrnrscr->primary->setResizable(TRUE);
 			scrnrscr->primary->setMaximumSize(Wt::WLength::Auto,Wt::WLength(98,Wt::WLength::Percentage));
 			scrnrscr->swidget=scrnrscr->primary->contents();
 			scrnrscr->swidget->setOverflow(WContainerWidget::OverflowVisible,Vertical);	

@@ -623,6 +623,13 @@ void xPowerExecuteListFunc(RDArsrc *mainrsrc,int listnum,void *targetkey,
 									}
 								}
 								RUNMAINTAINADV(newargs->libs[0],newargs->libs[1],(MTNMASTER->level+1),button->func,mainrsrc,(void *)PSTRUCT,TRUE);
+							} else if(!RDAstrcmp(button->progname,"DOHTTP") || !RDAstrcmp(button->progname,"dohttp"))
+							{
+								blank_envpx1=TRUE;
+								if(newargs->numlibs>0)
+								{
+									GUI_OpenURL(newargs->libs[0]);
+								}
 							}
 							if(envpx1!=NULL)
 							{
@@ -812,6 +819,10 @@ void PowerExecuteBrowseButtonFunc(RDArsrc *brsrc,MaintainButton *button,void *ta
 									}
 								}
 								RUNMAINTAINADV(newargs->libs[0],newargs->libs[1],(MTNMASTER->level+1),button->func,brsrc,(void *)PSTRUCT,TRUE);
+							} else if(!RDAstrcmp(button->progname,"DOHTTP") || !RDAstrcmp(button->progname,"dohttp"))
+							{
+								blank_envpx1=TRUE;
+								if(newargs->numlibs>0) GUI_OpenURL(newargs->libs[0]);	
 							} else {
 								if(button->type==0)
 								{
@@ -929,6 +940,10 @@ void PostSaveButtonFunction(RDArsrc *mainrsrc,MaintainButton *button)
 							}
 						}
 						RUNMAINTAINADV(newargs->libs[0],newargs->libs[1],(MTNMASTER->level+1),button->func,mainrsrc,(void *)PSTRUCT,TRUE);
+					} else if(!RDAstrcmp(button->progname,"DOHTTP") || !RDAstrcmp(button->progname,"dohttp"))
+					{
+						blank_envpx1=TRUE;
+						if(newargs->numlibs>0) GUI_OpenURL(newargs->libs[0]);	
 					} else if(!RDAstrcmp(button->progname,"MKDIR") || !RDAstrcmp(button->progname,"mkdir"))
 					{
 						blank_envpx1=TRUE;
@@ -1178,6 +1193,10 @@ short PowerMasterButtonFunction(RDArsrc *mainrsrc,MaintainButton *button,short q
 					} else if(!RDAstrcmp(button->progname,"DISPLAYFILE") || !RDAstrcmp(button->progname,"displayfile") || !RDAstrcmp(button->progname,"doarchive"))
 					{
 						DisplayFile(newargs->libs[0]);
+					} else if(!RDAstrcmp(button->progname,"DOHTTP") || !RDAstrcmp(button->progname,"dohttp"))
+					{
+						blank_envpx1=TRUE;
+						if(newargs->numlibs>0) GUI_OpenURL(newargs->libs[0]);	
 					} else { 
 						if(button->type==0)
 						{

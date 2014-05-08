@@ -77,6 +77,8 @@ int main(int argc,char **argv)
 	}
 	FINDFLDSETSTRING(fileno,"USER IDENTIFICATION",USERLOGIN);
 	EQLNRD(fileno,1);
+
+/*
 #ifdef WIN32
 	home=RDA_GetEnv("APPDATA");
 #else
@@ -88,6 +90,8 @@ int main(int argc,char **argv)
 		prterr("Error:  Unable to find home directory.");
 		return(-1);
 	}
+*/
+
 	email=Users_Email();
 	if(isEMPTY(email))
 	{
@@ -96,13 +100,15 @@ int main(int argc,char **argv)
 		if(email!=NULL) Rfree(email);
 		return(-1);
 	}
+
+/*
 	temp=Rmalloc(RDAstrlen(USERLOGIN)+RDAstrlen(home)+20);
 #ifdef WIN32
 	sprintf(temp,"%s\\msmtprc.txt",home);
 #else
 	sprintf(temp,"%s/.msmtprc",home);
 
-	/* This needs fixed for Windows */
+	// This needs fixed for Windows 
 	if(access(temp,00)!=0)
 	{
 		ERRORDIALOG("MISSING MSMTPRC","User is missing msmtprc file from home directory.",NULL,TRUE);
@@ -119,8 +125,12 @@ int main(int argc,char **argv)
 		return(-1);
 	}
 #endif
+
 	if(temp!=NULL) Rfree(temp);
 	FINDFLDGETSTRING(fileno,"USER NAME",&temp);
+*/
+
+
 /*
 	args=APPlibNEW();
 	addAPPlib(args,temp);

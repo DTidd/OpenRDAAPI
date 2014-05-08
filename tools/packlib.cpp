@@ -476,7 +476,7 @@ void makescrncode(RDAscrn *scrn,FILE *fp,char *dirname,char *libname,char *scrnn
 		fprintf(fp,"\tchar *defdir=NULL;\n");
 #ifndef OLDWAY
 		fprintf(fp,"\tchar *temp1=NULL,*temp2=NULL;\n");
-		fprintf(fp,"\tchar *temp3=NULL,*temp4=NULL,*tempx=NULL;\n");
+		fprintf(fp,"\tchar *temp3=NULL,*temp4=NULL,*temp5=NULL,*tempx=NULL;\n");
 #endif /* OLDWAY */
 #ifdef OLDWAY
 		fprintf(fp,"\tchar *temp1=NULL;\n");
@@ -491,9 +491,10 @@ void makescrncode(RDAscrn *scrn,FILE *fp,char *dirname,char *libname,char *scrnn
 		fprintf(fp,"void xaddwdgt(RDAscrn *screen,short type,char *resource_name,char *label,\n");
 		fprintf(fp,"\tchar *pixmap,char *XHTML_Label,short rows,short cols,int rtype,\n");
 		fprintf(fp,"\tchar *expression,char *editable_expression,char *sensitive_expression,\n");
-		fprintf(fp,"\tchar *transversal_expression,int line,char *file)\n");
+		fprintf(fp,"\tchar *transversal_expression,char *required_expression,short bootstrap,short vertical,short horizonal,int line,char *file)\n");
 		fprintf(fp,"\n");
-		fprintf(fp,"#define ADVaddwdgt(a,b,c,d,p,w,e,f,g,h,i,j,l)   xaddwdgt(a,b,c,d,p,w,e,f,g,h,i,j,l,__LINE__,__FILE__)\n");
+		fprintf(fp,"#define ADVaddwdgt(a,b,c,d,p,w,e,f,g,h,i,j,l)   xaddwdgt(a,b,c,d,p,w,e,f,g,h,i,j,l,NULL,0,0,0,__LINE__,__FILE__)\n");
+		fprintf(fp,"#define ADV2addwdgt(a,b,c,d,p,w,e,f,g,h,i,j,l,m,n,o,r)   xaddwdgt(a,b,c,d,p,w,e,f,g,h,i,j,l,m,n,o,r,__LINE__,__FILE__)\n");
 		fprintf(fp,"\n");
 		fprintf(fp,"RDAwdgts types\n");
 		fprintf(fp,"{\n");
@@ -579,6 +580,7 @@ void makescrncode(RDAscrn *scrn,FILE *fp,char *dirname,char *libname,char *scrnn
 				!isEMPTY(wdgt->editable_expression) 
 				|| !isEMPTY(wdgt->sensitive_expression) 
 				|| !isEMPTY(wdgt->transversal_expression)
+				|| !isEMPTY(wdgt->required_expression)
 				|| !isEMPTY(wdgt->XHTML_Label))
 			{
 				overall_length=0;
@@ -670,6 +672,28 @@ void makescrncode(RDAscrn *scrn,FILE *fp,char *dirname,char *libname,char *scrnn
 					freeapplib(tempapplib);
 				}
 				overall_length=0;
+				tempapplib=break_expression2(wdgt->required_expression,&overall_length);
+				if(tempapplib!=NULL)
+				{
+					fprintf(fp,"\t\ttemp5=Rmalloc(%d+1);\n",overall_length);
+					fprintf(fp,"\t\tsprintf(temp5,\"");
+					for(q=0;q<tempapplib->numlibs;++q)
+					{
+						fprintf(fp,"%%s");
+					}
+					fprintf(fp,"\",\n");
+					for(q=0;q<tempapplib->numlibs;++q)
+					{
+						if(q!=(tempapplib->numlibs-1))
+						{
+							fprintf(fp,"\t\t\t%s,\n",tempapplib->libs[q]);
+						} else {
+							fprintf(fp,"\t\t\t%s);\n",tempapplib->libs[q]);
+						}
+					}
+					freeapplib(tempapplib);
+				}
+				overall_length=0;
 				temp2=stralloc(wdgt->XHTML_Label);
 				sub_quotes(&temp2);
 				tempapplib=break_expression2(temp2,&overall_length);
@@ -694,28 +718,31 @@ void makescrncode(RDAscrn *scrn,FILE *fp,char *dirname,char *libname,char *scrnn
 					freeapplib(tempapplib);
 				}
 				if(temp2!=NULL) Rfree(temp2);
-				fprintf(fp,"\t\tADVaddwdgt(scrn,%d,\"%s\",\"%s\",\"%s\",tempx,%d,%d,%d,temp1,temp2,temp3,temp4);\n",
+				fprintf(fp,"\t\tADV2addwdgt(scrn,%d,\"%s\",\"%s\",\"%s\",tempx,%d,%d,%d,temp1,temp2,temp3,temp4,temp5,%d,%d,%d);\n",
 					wdgt->type,
 					(wdgt->resource_name!=NULL ? wdgt->resource_name:""),
 					(wdgt->label!=NULL ? wdgt->label:""),
 					(wdgt->pixmap!=NULL ? wdgt->pixmap:""),
 					wdgt->rows,
 					wdgt->cols,
-					wdgt->rtype);
+					wdgt->rtype,wdgt->bootstrap,
+					wdgt->vertical,wdgt->horizontal);
 				fprintf(fp,"\t\tif(temp1!=NULL) Rfree(temp1);\n");
 				fprintf(fp,"\t\tif(temp2!=NULL) Rfree(temp2);\n");
 				fprintf(fp,"\t\tif(temp3!=NULL) Rfree(temp3);\n");
 				fprintf(fp,"\t\tif(temp4!=NULL) Rfree(temp4);\n");
+				fprintf(fp,"\t\tif(temp5!=NULL) Rfree(temp5);\n");
 				fprintf(fp,"\t\tif(tempx!=NULL) Rfree(tempx);\n");
 			} else {
-				fprintf(fp,"\t\tADVaddwdgt(scrn,%d,\"%s\",\"%s\",\"%s\",NULL,%d,%d,%d,NULL,NULL,NULL,NULL);\n",
+				fprintf(fp,"\t\tADV2addwdgt(scrn,%d,\"%s\",\"%s\",\"%s\",NULL,%d,%d,%d,NULL,NULL,NULL,NULL,NULL,%d,%d,%d);\n",
 					wdgt->type,
 					(wdgt->resource_name!=NULL ? wdgt->resource_name:""),
 					(wdgt->label!=NULL ? wdgt->label:""),
 					(wdgt->pixmap!=NULL ? wdgt->pixmap:""),
 					wdgt->rows,
 					wdgt->cols,
-					wdgt->rtype);
+					wdgt->rtype,wdgt->bootstrap,
+					wdgt->vertical,wdgt->horizontal);
 			}
 		}
 		fprintf(fp,"\n");
@@ -747,6 +774,8 @@ void makescrncode(RDAscrn *scrn,FILE *fp,char *dirname,char *libname,char *scrnn
 		fprintf(fp,"\tif(temp2!=NULL) Rfree(temp2);\n");
 		fprintf(fp,"\tif(temp3!=NULL) Rfree(temp3);\n");
 		fprintf(fp,"\tif(temp4!=NULL) Rfree(temp4);\n");
+		fprintf(fp,"\tif(temp5!=NULL) Rfree(temp5);\n");
+		fprintf(fp,"\tif(tempx!=NULL) Rfree(tempx);\n");
 		fprintf(fp,"}\n");
 
 		if(libx!=NULL) Rfree(libx);

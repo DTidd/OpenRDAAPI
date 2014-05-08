@@ -233,9 +233,6 @@ static void getprinters(RDArsrc *mainrsrc)
 #endif
 #ifdef LINUX
 	addAPPlibNoDuplicates(printers,"rdaout.lnx");
-	addAPPlibNoDuplicates(printers,"rdareportcd.lnx");
-	addAPPlibNoDuplicates(printers,"sendattach-2.lnx");
-	addAPPlibNoDuplicates(printers,"outputemail.lnx");
 	sprintf(stemp,"lpstat -v | cut -f3 -d' '");
 	p=popen(stemp,"r");
 	if(p!=NULL)
@@ -270,8 +267,6 @@ static void getprinters(RDArsrc *mainrsrc)
 #endif
 #if defined(LINUX2_2) || defined(UBUNTU_OS)
 	addAPPlibNoDuplicates(printers,"rdaout.lnx");
-	addAPPlibNoDuplicates(printers,"rdareportcd.lnx");
-	addAPPlibNoDuplicates(printers,"outputemail.lnx");
 	sprintf(stemp,"lpstat -v | cut -f3 -d' '");
 	p=popen(stemp,"r");
 	if(p!=NULL)

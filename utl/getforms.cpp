@@ -6,7 +6,6 @@
 #define __NAM__ "getforms.exe"
 #endif
 #include <app.hpp>
-#include <mix.hpp>
 #include <mkmsc.hpp>
 #include <curl/curl.h>
 #include <curl/easy.h>
@@ -40,7 +39,7 @@ char use_proxy=FALSE,*http_proxy=NULL;
 int http_proxy_port=1080;
 #endif /* USE PROXY */
 
-int getprogram(void *buffer,size_t size,size_t nmemb,void *stream)
+size_t getprogram(void *buffer,size_t size,size_t nmemb,void *stream)
 {
 	struct FtpFile *out=(struct FtpFile *)stream;
 
@@ -73,10 +72,10 @@ static void getForm(short which)
 			temp=stralloc("dirdepforma.7z");
 			break;
 		case 3:
-			temp=stralloc("pay.hppeckmicr.7z");
+			temp=stralloc("paycheckmicr.7z");
 			break;
 		case 4:
-			temp=stralloc("pay.hppeckmicra.7z");
+			temp=stralloc("paycheckmicra.7z");
 			break;
 		case 5:
 			temp=stralloc("vencheckmicr.7z");
@@ -98,6 +97,9 @@ static void getForm(short which)
 			break;
 		case 11:
 			temp=stralloc("payvwcheckmicra.7z");
+			break;
+		case 12:
+			temp=stralloc("vendecotrans.7z");
 			break;
 	}
 	nam=Rmalloc(RDAstrlen(ftpsvr)+RDAstrlen(temp)+512);
@@ -147,6 +149,7 @@ static void getForm(short which)
 		addAPPlib(args,"-aoa");
 		memset(stemp1,0,512);
 		sprintf(stemp1,"-o%s/",CURRENTDIRECTORY);
+		prterr("stemp1 [%s] ",stemp1);TRACE;
 		addAPPlib(args,stemp1);
 		addAPPlib(args,plst.filename);
 		ADVExecute2Program("7za",args,NULL);
@@ -192,7 +195,22 @@ static void SCN_LASER_FORM_TEST()
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,3,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
-		ADVaddwdgt(scrn,5,"","Use this tool to download decorative forms and setup a laser Printer to use them.","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,5,"","This process facilitates downloading certain laser forms into the ","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,5,"","/rda/xpert/forms directory.  A Development License (access code for the day)","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,5,"","is required. Because use of these forms requires the codes to be","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,5,"","in printer definitions, this download program also allows an existing","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,5,"","printer definition to be selected and then updated based on the","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,5,"","standard HP Laser 4000n printer definition codes.","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,4,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
@@ -234,7 +252,7 @@ static void SCN_LASER_FORM_TEST()
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,11,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
-		ADVaddwdgt(scrn,1,"","","","",0,0,0,"FALSE","","","");
+		ADVaddwdgt(scrn,1,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,5,"","Setup Output Device:","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,6,"LOAD DEVICE NAME","Load Device Name:","","",0,0,2,"","","","");
 		ADVaddwdgt(scrn,3,"","","","",0,0,0,"","","","");
@@ -374,6 +392,7 @@ static void selectx(RDArsrc *r)
 	{
 		getForm(5);
 		getForm(6);
+		getForm(12);
 	}
 	if(download_941) 
 	{
@@ -405,7 +424,10 @@ static void setdevlicense(RDArsrc *r)
 	}
 	FINDRSCSETEDITABLE(r,"SELECT",(dev_license==TRUE ? TRUE:FALSE));
 	FINDRSCSETSENSITIVE(r,"SELECT",(dev_license==TRUE ? TRUE:FALSE));
+/*
 	updateallrsrc(r);
+*/
+	updatersrc(r,"SELECT");
 }
 #ifdef CPPMAIN
 int c_main(int argc,char **argv)
@@ -415,55 +437,68 @@ int main(int argc,char **argv)
 {
 	RDArsrc *mainrsrc=NULL;
 	char *temp1=NULL,*tmp=NULL,*defaultprinter=NULL;
+	int x=0;
 
 	if(InitializeSubsystems(argc,argv,"UTILITIES","GET LASER FORMS")) 
 	{
+		RDAAPPMAINLOOP();
 		return(1);
 	}
-	tmp=RDA_GetEnv("DEV_LICENSE");
-	if(tmp!=NULL)
-	{
-		temp1=strtok(tmp," ");
-		devlicense=stralloc(temp1);
-		if(CheckDevLicense(devlicense))
-		{
-			dev_license=TRUE;
-		} else {
-			dev_license=FALSE;
-		}
-	}
-	SCN_LASER_FORM_TEST();
-	mainrsrc=RDArsrcNEW("UTILITIES","GET LASER FORMS");
-	addstdrsrc(mainrsrc,"DEV_LICENSE",VARIABLETEXT,0,devlicense,TRUE);
-	FINDRSCSETFUNC(mainrsrc,"DEV_LICENSE",setdevlicense,NULL);
-	addstdrsrc(mainrsrc,"OVERRIDE PASSWORD",PLAINTEXT,60,NULL,TRUE);
-	addstdrsrc(mainrsrc,"DOWNLOAD DIRDEP",BOOLNS,1,&download_dirdep,TRUE);
-	addstdrsrc(mainrsrc,"DOWNLOAD PAYMICR",BOOLNS,1,&download_paymicr,TRUE);
-	addstdrsrc(mainrsrc,"DOWNLOAD PAYVWMICR",BOOLNS,1,&download_payvwmicr,TRUE);
-	addstdrsrc(mainrsrc,"DOWNLOAD PAYVMICR",BOOLNS,1,&download_payvwmicr,TRUE);
-	addstdrsrc(mainrsrc,"DOWNLOAD VENMICR",BOOLNS,1,&download_venmicr,TRUE);
-	addstdrsrc(mainrsrc,"DOWNLOAD PRTAPO",BOOLNS,1,&download_prtapo,TRUE);
-	addstdrsrc(mainrsrc,"DOWNLOAD 941",BOOLNS,1,&download_941,TRUE);
-	addstdrsrc(mainrsrc,"DOWNLOAD BENEFIT RECAP",BOOLNS,1,&download_bftrecap,TRUE);
-	addstdrsrc(mainrsrc,"DEVICE",VARIABLETEXT,0,defaultprinter,TRUE);
-	addbtnrsrc(mainrsrc,"LOAD DEVICE NAME",TRUE,LoadDeviceWindow,SelectFuncDevice);
 	ftpsvr=stralloc("66.135.38.166");
-	addstdrsrc(mainrsrc,"FTP SERVER",VARIABLETEXT,0,ftpsvr,TRUE);
+	if(argc>1)
+	{
+		x=Ratoi(argv[1]);
+		if(x>0)
+		{
+			getForm((short) x);
+			quitx(NULL);
+		}
+	} else {
+		tmp=RDA_GetEnv("DEV_LICENSE");
+		if(tmp!=NULL)
+		{
+			temp1=strtok(tmp," ");
+			devlicense=stralloc(temp1);
+			if(CheckDevLicense(devlicense))
+			{
+				dev_license=TRUE;
+			} else {
+				dev_license=FALSE;
+			}
+		}
+		SCN_LASER_FORM_TEST();
+		mainrsrc=RDArsrcNEW("UTILITIES","GET LASER FORMS");
+		addstdrsrc(mainrsrc,"DEV_LICENSE",VARIABLETEXT,0,devlicense,TRUE);
+		FINDRSCSETFUNC(mainrsrc,"DEV_LICENSE",setdevlicense,NULL);
+		addstdrsrc(mainrsrc,"OVERRIDE PASSWORD",PLAINTEXT,60,NULL,TRUE);
+		addstdrsrc(mainrsrc,"DOWNLOAD DIRDEP",BOOLNS,1,&download_dirdep,TRUE);
+		addstdrsrc(mainrsrc,"DOWNLOAD PAYMICR",BOOLNS,1,&download_paymicr,TRUE);
+		addstdrsrc(mainrsrc,"DOWNLOAD PAYVWMICR",BOOLNS,1,&download_payvwmicr,TRUE);
+		addstdrsrc(mainrsrc,"DOWNLOAD PAYVMICR",BOOLNS,1,&download_payvwmicr,TRUE);
+		addstdrsrc(mainrsrc,"DOWNLOAD VENMICR",BOOLNS,1,&download_venmicr,TRUE);
+		addstdrsrc(mainrsrc,"DOWNLOAD PRTAPO",BOOLNS,1,&download_prtapo,TRUE);
+		addstdrsrc(mainrsrc,"DOWNLOAD 941",BOOLNS,1,&download_941,TRUE);
+		addstdrsrc(mainrsrc,"DOWNLOAD BENEFIT RECAP",BOOLNS,1,&download_bftrecap,TRUE);
+		addstdrsrc(mainrsrc,"DEVICE",VARIABLETEXT,0,defaultprinter,TRUE);
+		addbtnrsrc(mainrsrc,"LOAD DEVICE NAME",TRUE,LoadDeviceWindow,SelectFuncDevice);
+		addstdrsrc(mainrsrc,"FTP SERVER",VARIABLETEXT,0,ftpsvr,TRUE);
 #ifdef USE_PROXY
-	addstdrsrc(mainrsrc,"FTP USE PROXY",BOOLNS,1,&use_proxy,TRUE);
-	addstdrsrc(mainrsrc,"FTP PROXY",VARIABLETEXT,0,http_proxy,TRUE);
-	addstdrsrc(mainrsrc,"FTP PROXY PORT",LONGV,4,&http_proxy_port,TRUE);
+		addstdrsrc(mainrsrc,"FTP USE PROXY",BOOLNS,1,&use_proxy,TRUE);
+		addstdrsrc(mainrsrc,"FTP PROXY",VARIABLETEXT,0,http_proxy,TRUE);
+		addstdrsrc(mainrsrc,"FTP PROXY PORT",LONGV,4,&http_proxy_port,TRUE);
 #endif /* USE PROXY */
 #ifndef WIN32
-	devicex=stralloc("viewpdf.lnx");
+		devicex=stralloc("viewpdf.lnx");
 #else
-	devicex=stralloc("viewpdf.exe");
+		devicex=stralloc("viewpdf.exe");
 #endif
-	addbtnrsrc(mainrsrc,"SELECT",TRUE,selectx,NULL);
-	addrfexrsrc(mainrsrc,"QUIT",TRUE,quitx,NULL);
-	addbtnrsrc(mainrsrc,"HELP",TRUE,screenhelp,NULL);
-	addbtnrsrc(mainrsrc,"PRINT RESOURCES",TRUE,printrsrcs,NULL);
-	APPmakescrn(mainrsrc,TRUE,quitx,NULL,TRUE);
-	setdevlicense(mainrsrc);
+		addbtnrsrc(mainrsrc,"SELECT",TRUE,selectx,NULL);
+		addrfexrsrc(mainrsrc,"QUIT",TRUE,quitx,NULL);
+		addbtnrsrc(mainrsrc,"HELP",TRUE,screenhelp,NULL);
+		addbtnrsrc(mainrsrc,"PRINT RESOURCES",TRUE,printrsrcs,NULL);
+		APPmakescrn(mainrsrc,TRUE,quitx,NULL,TRUE);
+		setdevlicense(mainrsrc);
+		RDAAPPMAINLOOP();
+	}
 	return(0);
 }

@@ -9,7 +9,6 @@ extern char *module;
 extern APPlib *errorlist;
 char SWB_BP04_PAYROLL=FALSE;
 
-#ifdef USING_QT
 void AddModuleRecord(short fileno,short Group,short Rank,char *m,char *desc)
 {
 	ZERNRD(fileno);
@@ -19,10 +18,8 @@ void AddModuleRecord(short fileno,short Group,short Rank,char *m,char *desc)
 	FINDFLDSETSTRING(fileno,"DESCRIPTION",desc);
 	WRTNRD(fileno,0,NULL);
 }
-#endif /* USING_QT */
 void DB_MODULE()
 {
-#ifdef USING_QT
 	DBsort *sort=NULL;
 	short x=(-1),ef=0,g=0;
 	char same=FALSE;
@@ -172,9 +169,7 @@ void DB_MODULE()
 		AddModuleRecord(x,5,70,"VERSION","Version Control");
 		CLSNRD(x);
 	}
-#endif /* USING_QT */
 }
-#ifdef USING_QT
 static void MTN_MTN_MODULE()
 {
 	char *defdir=NULL;
@@ -838,10 +833,8 @@ static void LST_MODULE_GROUPS()
 		if(list!=NULL) FreeRDAScrolledList(list);
 	}
 }
-#endif /* USING_QT */
 void MTNMODULE()
 {
-#ifdef USING_QT
 	MTN_MTN_MODULE();
 	MNU_UTILITIES_MTN_MODULE();
 	LST_MODULE_GROUPS();
@@ -851,5 +844,4 @@ void MTNMODULE()
 	SCN_MODULE_MAINTAIN_SCREEN();
 	SCN_MODULE_SEARCH_BROWSE();
 	SCN_MODULE_SEARCH_BROWSE_EXPRESSION();
-#endif /* USING_QT */
 }

@@ -51,9 +51,7 @@
 /*CPP_OPART mksec31 */
 /*CPP_OPART mksec32 */
 /*CPP_OPART mksec33 */
-/*CPP_OPART mksec34 */
 /*CPP_OPART mksec35 */
-/*CPP_OPART mksec36 */
 /*CPP_OPART mksec37 */
 /*CPP_OPART mksec38 */
 /*CPP_OPART mksec39 */
@@ -99,7 +97,7 @@ extern void USERS_IMPORT(void),MODSEC_IMPORT(void),FILESEC_IMPORT(void);
 extern void CHGRECORDSEC(void);
 extern void PROCSEC_IMPORT(void),FLDSEC_IMPORT(void);
 extern void RPTPURGEFILESEC(void),RPTPURGEPROCSEC(void),RPTPURGEFLDSEC(void),RPTPURGEMODSEC(void),SCNSECURITY_PURGE(void);
-extern void MakeStdUsers(void),MAKE_RPT_COPYMSMTPRC(),MAKE_RPT_CREATEMSMTPRC(),MAKE_SCRIPTMoveMSMTPRC();
+extern void MakeStdUsers(void),MAKE_RPT_CREATEMSMTPRC();
 extern void MAKE_RPT_SETPOSTACTIVITY(void),EMAILUSERSINFO(void);
 extern void MakeRDACronUser(void);
 
@@ -138,9 +136,7 @@ struct RPTSTRUCTs RptAvl[]=
 	{"COPYPOSLMST            ","Copy Position Locations to Departments",COPYPOSLMST},
 	{"COPYPAYLOC             ","Copy Pay Locations to Departments",COPYPAYLOC},
 	{"ADDMODSEC              ","Copy Add Secuirty By Module",RPTADDMODSEC},
-	{"COPYMSMTPRC            ","Copy the msmtprc file to home directories",MAKE_RPT_COPYMSMTPRC},
 	{"CREATEMSMTPRC          ","Create the msmtprc files",MAKE_RPT_CREATEMSMTPRC},
-	{"MoveMSMTPRC            ","Copy script for msmtprc files",MAKE_SCRIPTMoveMSMTPRC},
 	{"USERS_IMPORT           ","Import/Export Users",USERS_IMPORT},
 	{"MODSEC_IMPORT          ","Import/Export Module Security",MODSEC_IMPORT},
 	{"PROCSEC_IMPORT         ","Import/Export Process Security",PROCSEC_IMPORT},
@@ -487,7 +483,7 @@ static void MAKE_SECURITY()
 		ADVaddwdgt(scrn,5,"","Resource List","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(scrn,7,"RESOURCE LIST","Resource List","","",25,0,0,"","","","");
+		ADVaddwdgt(scrn,7,"RESOURCE LIST","Resource List","","",20,0,0,"","","","");
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,3,"","","","",0,0,0,"","","","");
@@ -537,7 +533,6 @@ static void mk_diagscrn()
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,4,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,"","","","");
-#ifdef USING_QT
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,3,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
@@ -545,7 +540,6 @@ static void mk_diagscrn()
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,4,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
-#endif /* USING_QT */
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,3,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,"","","","");

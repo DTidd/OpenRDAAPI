@@ -582,6 +582,11 @@ int xcrttablecontainer(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widge
 						if(!isEMPTY(wdgt->sensitive_expression)) member->sensitive_expression=stralloc(wdgt->sensitive_expression);
 						if(member->transversal_expression!=NULL) Rfree(member->transversal_expression);
 						if(!isEMPTY(wdgt->transversal_expression)) member->transversal_expression=stralloc(wdgt->transversal_expression);
+						if(member->required_expression!=NULL) Rfree(member->required_expression);
+						if(!isEMPTY(wdgt->required_expression)) member->required_expression=stralloc(wdgt->required_expression);
+						member->bootstrap=wdgt->bootstrap;
+						member->vertical=wdgt->vertical;
+						member->horizontal=wdgt->horizontal;
 						makefield((Wt::WWidget *)TE,member,wdgt->label,wdgt->XHTML_Label,wdgt->pixmap,wdgt->rows,wdgt->cols,wdgt->rtype,myTable,row,col,row_span,col_span);
 						if(!RDAstrcmp(member->rscrname,"BROWSE LIST")) hold=(Wt::WWidget *)member->w->parent();
 							else hold=member->w;
@@ -630,6 +635,11 @@ int xcrttablecontainer(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widge
 						if(!isEMPTY(wdgt->sensitive_expression)) member->sensitive_expression=stralloc(wdgt->sensitive_expression);
 						if(member->transversal_expression!=NULL) Rfree(member->transversal_expression);
 						if(!isEMPTY(wdgt->transversal_expression)) member->transversal_expression=stralloc(wdgt->transversal_expression);
+						if(member->required_expression!=NULL) Rfree(member->required_expression);
+						if(!isEMPTY(wdgt->required_expression)) member->required_expression=stralloc(wdgt->required_expression);
+						member->bootstrap=wdgt->bootstrap;
+						member->vertical=wdgt->vertical;
+						member->horizontal=wdgt->horizontal;
 						makefield((Wt::WWidget *)TE,member,wdgt->label,wdgt->XHTML_Label,wdgt->pixmap,wdgt->rows,wdgt->cols,wdgt->rtype,myTable,row,col,row_span,col_span);
 						if(!RDAstrcmp(member->rscrname,"BROWSE LIST")) hold=(Wt::WWidget *)member->w->parent();
 							else if((member->field_type==0 || member->field_type==1) && member->rtype>4) hold=(Wt::WWidget *)member->w->parent();
@@ -1198,6 +1208,11 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 							if(!isEMPTY(wdgt->sensitive_expression)) member->sensitive_expression=stralloc(wdgt->sensitive_expression);
 							if(member->transversal_expression!=NULL) Rfree(member->transversal_expression);
 							if(!isEMPTY(wdgt->transversal_expression)) member->transversal_expression=stralloc(wdgt->transversal_expression);
+							if(member->required_expression!=NULL) Rfree(member->required_expression);
+							if(!isEMPTY(wdgt->required_expression)) member->required_expression=stralloc(wdgt->required_expression);
+							member->bootstrap=wdgt->bootstrap;
+							member->vertical=wdgt->vertical;
+							member->horizontal=wdgt->horizontal;
 							makefield((Wt::WWidget *)*line,member,wdgt->label,wdgt->XHTML_Label,wdgt->pixmap,wdgt->rows,wdgt->cols,wdgt->rtype,NULL,0,0,0,0);
 							if(!RDAstrcmp(member->rscrname,"BROWSE LIST")) hold=(Wt::WWidget *)member->w->parent();
 								else hold=member->w;
@@ -1249,6 +1264,11 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 							if(!isEMPTY(wdgt->sensitive_expression)) member->sensitive_expression=stralloc(wdgt->sensitive_expression);
 							if(member->transversal_expression!=NULL) Rfree(member->transversal_expression);
 							if(!isEMPTY(wdgt->transversal_expression)) member->transversal_expression=stralloc(wdgt->transversal_expression);
+							if(member->required_expression!=NULL) Rfree(member->required_expression);
+							if(!isEMPTY(wdgt->required_expression)) member->required_expression=stralloc(wdgt->required_expression);
+							member->bootstrap=wdgt->bootstrap;
+							member->vertical=wdgt->vertical;
+							member->horizontal=wdgt->horizontal;
 							makefield((Wt::WWidget *)*line,member,wdgt->label,wdgt->XHTML_Label,wdgt->pixmap,wdgt->rows,wdgt->cols,wdgt->rtype,NULL,0,0,0,0);
 							if(!RDAstrcmp(member->rscrname,"BROWSE LIST")) hold=(Wt::WWidget *)member->w->parent();
 								else if((member->field_type==0 || member->field_type==1) && member->rtype>4) hold=(Wt::WWidget *)member->w->parent();
@@ -1750,6 +1770,11 @@ int xcrttoolbarcontainer(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *wid
 				if(!isEMPTY(wdgt->sensitive_expression)) member->sensitive_expression=stralloc(wdgt->sensitive_expression);
 				if(member->transversal_expression!=NULL) Rfree(member->transversal_expression);
 				if(!isEMPTY(wdgt->transversal_expression)) member->transversal_expression=stralloc(wdgt->transversal_expression);
+				if(member->required_expression!=NULL) Rfree(member->required_expression);
+				if(!isEMPTY(wdgt->required_expression)) member->required_expression=stralloc(wdgt->required_expression);
+				member->bootstrap=wdgt->bootstrap;
+				member->vertical=wdgt->vertical;
+				member->horizontal=wdgt->horizontal;
 				dashes=adddashes(wdgt->label);
 				if(member->label==NULL && !isEMPTY(wdgt->label)) member->label=stralloc(wdgt->label);
 				else if(member->label==NULL) member->label=stralloc(member->rscrname);
@@ -1780,12 +1805,13 @@ int xcrttoolbarcontainer(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *wid
 int xcrtpopup(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt::WWidget **pop,short parent_type,int rtype,int line,char *file)
 {
 	Wt::WPopupMenu *pB=NULL,*ppB=NULL;
-	Wt::WPushButton *B=NULL;
+	Wt::WPushButton *B=NULL,*PB=NULL,*PB1=NULL;
 	Wt::WSplitButton *SB=NULL;
 	Wt::WToolBar *tBar=NULL;
 	Wt::WWidget *hold=NULL;
 	Wt::WString *c=NULL;
 	Wt::WMenuItem *Item=NULL,*MenuI=NULL;
+	Wt::WLink *WK=NULL;
 	RDAwdgt *wdgt=NULL;
 	RDArmem *member=NULL;
 	char *dashes=NULL,first_button=TRUE;
@@ -1852,6 +1878,11 @@ int xcrtpopup(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt
 			B->setDefault(FALSE);
 		} else {
 			SB->dropDownButton()->setMenu(pB);
+			WK = new WLink("resources/OpenRDA/down.png");
+			SB->dropDownButton()->setIcon(*WK);
+			PB1=SB->actionButton();
+			PB=SB->dropDownButton();
+			PB->doJavaScript(PB->jsRef() + ".style.height=" + PB1->jsRef() + ".offsetHeight + 'px';");
 		}
 #ifdef FLAT_DOCK_BUTTON
 		if(rtype==0)
@@ -1926,6 +1957,11 @@ int xcrtpopup(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt
 				if(!isEMPTY(wdgt->sensitive_expression)) member->sensitive_expression=stralloc(wdgt->sensitive_expression);
 				if(member->transversal_expression!=NULL) Rfree(member->transversal_expression);
 				if(!isEMPTY(wdgt->transversal_expression)) member->transversal_expression=stralloc(wdgt->transversal_expression);
+				if(member->required_expression!=NULL) Rfree(member->required_expression);
+				if(!isEMPTY(wdgt->required_expression)) member->required_expression=stralloc(wdgt->required_expression);
+				member->bootstrap=wdgt->bootstrap;
+				member->vertical=wdgt->vertical;
+				member->horizontal=wdgt->horizontal;
 				if(member->label==NULL && !isEMPTY(wdgt->label)) member->label=stralloc(wdgt->label);
 				else if(member->label==NULL) member->label=stralloc(member->rscrname);
 				pB->addItem(member->label)->triggered().connect(boost::bind(&xExecuteRDArmemFunction,member,__LINE__,__FILE__));
@@ -2058,6 +2094,11 @@ int xcrtbox(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt::
 							if(!isEMPTY(wdgt->sensitive_expression)) member->sensitive_expression=stralloc(wdgt->sensitive_expression);
 							if(member->transversal_expression!=NULL) Rfree(member->transversal_expression);
 							if(!isEMPTY(wdgt->transversal_expression)) member->transversal_expression=stralloc(wdgt->transversal_expression);
+							if(member->required_expression!=NULL) Rfree(member->required_expression);
+							if(!isEMPTY(wdgt->required_expression)) member->required_expression=stralloc(wdgt->required_expression);
+							member->bootstrap=wdgt->bootstrap;
+							member->vertical=wdgt->vertical;
+							member->horizontal=wdgt->horizontal;
 							makefield((Wt::WWidget *)hBox,member,wdgt->label,wdgt->XHTML_Label,wdgt->pixmap,wdgt->rows,wdgt->cols,wdgt->rtype,NULL,0,0,0,0);
 							if(!RDAstrcmp(member->rscrname,"BROWSE LIST")) hold=(Wt::WWidget *)member->w->parent();
 								else hold=member->w;
@@ -2092,6 +2133,11 @@ int xcrtbox(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt::
 							if(!isEMPTY(wdgt->sensitive_expression)) member->sensitive_expression=stralloc(wdgt->sensitive_expression);
 							if(member->transversal_expression!=NULL) Rfree(member->transversal_expression);
 							if(!isEMPTY(wdgt->transversal_expression)) member->transversal_expression=stralloc(wdgt->transversal_expression);
+							if(member->required_expression!=NULL) Rfree(member->required_expression);
+							if(!isEMPTY(wdgt->required_expression)) member->required_expression=stralloc(wdgt->required_expression);
+							member->bootstrap=wdgt->bootstrap;
+							member->vertical=wdgt->vertical;
+							member->horizontal=wdgt->horizontal;
 							makefield((Wt::WWidget *)hBox,member,wdgt->label,wdgt->XHTML_Label,wdgt->pixmap,wdgt->rows,wdgt->cols,wdgt->rtype,NULL,0,0,0,0);
 							if(!RDAstrcmp(member->rscrname,"BROWSE LIST")) hold=(Wt::WWidget *)member->w->parent();
 								else if((member->field_type==0 || member->field_type==1) && member->rtype>4) hold=(Wt::WWidget *)member->w->parent();
@@ -2122,6 +2168,11 @@ int xcrtbox(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt::
 							if(!isEMPTY(wdgt->sensitive_expression)) member->sensitive_expression=stralloc(wdgt->sensitive_expression);
 							if(member->transversal_expression!=NULL) Rfree(member->transversal_expression);
 							if(!isEMPTY(wdgt->transversal_expression)) member->transversal_expression=stralloc(wdgt->transversal_expression);
+							if(member->required_expression!=NULL) Rfree(member->required_expression);
+							if(!isEMPTY(wdgt->required_expression)) member->required_expression=stralloc(wdgt->required_expression);
+							member->bootstrap=wdgt->bootstrap;
+							member->vertical=wdgt->vertical;
+							member->horizontal=wdgt->horizontal;
 							makefield((Wt::WWidget *)hBox,member,wdgt->label,wdgt->XHTML_Label,wdgt->pixmap,wdgt->rows,wdgt->cols,wdgt->rtype,NULL,0,0,0,0);
 							if(!RDAstrcmp(member->rscrname,"BROWSE LIST")) hold=(Wt::WWidget *)member->w->parent();
 								else hold=member->w;
@@ -2260,7 +2311,8 @@ int xcrtbox(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt::
 					}
 					break;
 				case 4: /* end box */
-					return(rows*boxmaxr);
+					if(rows==0) rows=1;
+					return(rows);
 				case 5: /* LABELS */
 					if(!USER_INTERFACE)
 					{
@@ -3999,7 +4051,11 @@ void crtwdgts(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsc,char *label)
 				{
 					CW->addWidget(line_widget);
 				} else {
+/*
 					vb->addWidget((Wt::WWidget *)line_widget,(rowz>0 ? rowz-1:0),Wt::AlignLeft | Wt::AlignJustify);
+*/
+					fprintf(RDA_STDERR,"crttab rowz [%d] ",rowz);TRACE;
+					vb->addWidget((Wt::WWidget *)line_widget,rowz,Wt::AlignLeft | Wt::AlignJustify);
 				}
 #else 
 				CW->addWidget(line_widget);

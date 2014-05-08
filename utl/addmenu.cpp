@@ -233,7 +233,7 @@ static void close_preview_screen(RDArmem *member,RDArsrc *mainrsrc)
 					addendline(scn);
 					added_it=TRUE;
 				}
-				xaddwdgt(scn,wdgt->type,wdgt->resource_name,wdgt->label,wdgt->pixmap,wdgt->XHTML_Label,wdgt->rows,wdgt->cols,wdgt->rtype,wdgt->expression,wdgt->editable_expression,wdgt->sensitive_expression,wdgt->transversal_expression,__LINE__,__FILE__);
+				xaddwdgt(scn,wdgt->type,wdgt->resource_name,wdgt->label,wdgt->pixmap,wdgt->XHTML_Label,wdgt->rows,wdgt->cols,wdgt->rtype,wdgt->expression,wdgt->editable_expression,wdgt->sensitive_expression,wdgt->transversal_expression,NULL,0,0,0,__LINE__,__FILE__);
 				if(added_it==FALSE)
 				{
 					if(!RDAstrcmp(wdgt->resource_name,member->rscrname))
@@ -274,7 +274,7 @@ static void close_preview_screen(RDArmem *member,RDArsrc *mainrsrc)
 				addendline(scn);
 				for(x=0,wdgt=screen->wdgts;x<screen->numwdgts;++x,++wdgt)
 				{
-					xaddwdgt(scn,wdgt->type,wdgt->resource_name,wdgt->label,wdgt->pixmap,wdgt->XHTML_Label,wdgt->rows,wdgt->cols,wdgt->rtype,wdgt->expression,wdgt->editable_expression,wdgt->sensitive_expression,wdgt->transversal_expression,__LINE__,__FILE__);
+					xaddwdgt(scn,wdgt->type,wdgt->resource_name,wdgt->label,wdgt->pixmap,wdgt->XHTML_Label,wdgt->rows,wdgt->cols,wdgt->rtype,wdgt->expression,wdgt->editable_expression,wdgt->sensitive_expression,wdgt->transversal_expression,NULL,0,0,0,__LINE__,__FILE__);
 				}
 
 			} else {
@@ -290,7 +290,7 @@ static void close_preview_screen(RDArmem *member,RDArsrc *mainrsrc)
 						addendbox(scn);
 						addendline(scn);
 					}
-					xaddwdgt(scn,wdgt->type,wdgt->resource_name,wdgt->label,wdgt->pixmap,wdgt->XHTML_Label,wdgt->rows,wdgt->cols,wdgt->rtype,wdgt->expression,wdgt->editable_expression,wdgt->sensitive_expression,wdgt->transversal_expression,__LINE__,__FILE__);
+					xaddwdgt(scn,wdgt->type,wdgt->resource_name,wdgt->label,wdgt->pixmap,wdgt->XHTML_Label,wdgt->rows,wdgt->cols,wdgt->rtype,wdgt->expression,wdgt->editable_expression,wdgt->sensitive_expression,wdgt->transversal_expression,NULL,0,0,0,__LINE__,__FILE__);
 				}
 			}
 			break;
@@ -301,13 +301,13 @@ static void close_preview_screen(RDArmem *member,RDArsrc *mainrsrc)
 				{
 					addbutton(scn,MenuItem,MenuLabel,"","");
 				}
-				xaddwdgt(scn,wdgt->type,wdgt->resource_name,wdgt->label,wdgt->pixmap,wdgt->XHTML_Label,wdgt->rows,wdgt->cols,wdgt->rtype,wdgt->expression,wdgt->editable_expression,wdgt->sensitive_expression,wdgt->transversal_expression,__LINE__,__FILE__);
+				xaddwdgt(scn,wdgt->type,wdgt->resource_name,wdgt->label,wdgt->pixmap,wdgt->XHTML_Label,wdgt->rows,wdgt->cols,wdgt->rtype,wdgt->expression,wdgt->editable_expression,wdgt->sensitive_expression,wdgt->transversal_expression,NULL,0,0,0,__LINE__,__FILE__);
 			}
 			break;
 		case 3: /* Right */
 			for(x=0,wdgt=screen->wdgts;x<screen->numwdgts;++x,++wdgt)
 			{
-				xaddwdgt(scn,wdgt->type,wdgt->resource_name,wdgt->label,wdgt->pixmap,wdgt->XHTML_Label,wdgt->rows,wdgt->cols,wdgt->rtype,wdgt->expression,wdgt->editable_expression,wdgt->sensitive_expression,wdgt->transversal_expression,__LINE__,__FILE__);
+				xaddwdgt(scn,wdgt->type,wdgt->resource_name,wdgt->label,wdgt->pixmap,wdgt->XHTML_Label,wdgt->rows,wdgt->cols,wdgt->rtype,wdgt->expression,wdgt->editable_expression,wdgt->sensitive_expression,wdgt->transversal_expression,NULL,0,0,0,__LINE__,__FILE__);
 				if(!RDAstrcmp(wdgt->resource_name,member->rscrname))
 				{
 					addbutton(scn,MenuItem,MenuLabel,"","");

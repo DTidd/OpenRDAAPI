@@ -1916,6 +1916,7 @@ void process_dataline(RDArunrpt *rrpt,RDAreport *rpt,RDAimage *image,
 	email_vars->tolist=NULL;
 	email_vars->cclist=NULL;
 	email_vars->bcclist=NULL;
+	email_vars->srcdomain=NULL;
 	email_vars->ignerr=0;
 	for(x=0;x<10;x++)
 	{
@@ -2518,6 +2519,12 @@ void process_dataline(RDArunrpt *rrpt,RDAreport *rpt,RDAimage *image,
 				!isEMPTY(email_vars->subject) &&!isEMPTY(email_vars->body) && 
 				!isEMPTY(email_vars->tolist) && !isEMPTY(email_vars->fname[0]) && !isEMPTY(email_vars->dname[0]))
 			{
+				if(email_vars->srcdomain==NULL)
+				{
+					temp=GetWebIDGSV();
+					sprintf(stemp,"%s.openrda.net",temp);
+					email_vars->srcdomain=stralloc(stemp);
+				}
 				RunVMimeSendmail(email_vars);
 			} else {
 				prterr("Error: sendattach-1 Requires 1st 6 parameters established.");
@@ -2529,6 +2536,7 @@ void process_dataline(RDArunrpt *rrpt,RDAreport *rpt,RDAimage *image,
 				prterr("\t\t       FILENAME TO BE ATTACHED [%s] ",(email_vars->fname[0]!=NULL ? email_vars->fname[0]:""));
 				prterr("\t\t EMAIL ATTACHMENT TO BE NAMED: [%s] ",(email_vars->dname[0]!=NULL ? email_vars->dname[0]:""));
 			}
+			if(temp!=NULL) Rfree(temp);
 			if(email_vars!=NULL) Rfree(email_vars);
 		}
 	} else if(!strncmp(&image->line[0],"EMAILUSERINFO",13) || 
@@ -2687,10 +2695,17 @@ void process_dataline(RDArunrpt *rrpt,RDAreport *rpt,RDAimage *image,
 			if(!isEMPTY(email_vars->from_name) && !isEMPTY(email_vars->from_addr) && !isEMPTY(email_vars->subject) &&
 				!isEMPTY(email_vars->body) && !isEMPTY(email_vars->tolist))
 			{
+				if(email_vars->srcdomain==NULL)
+				{
+					temp=GetWebIDGSV();
+					sprintf(stemp,"%s.openrda.net",temp);
+					email_vars->srcdomain=stralloc(stemp);
+				}
 				RunVMimeSendmail(email_vars);
 			} else {
 				prterr("Error: SENDMAIL Requires all 5 parameters established.");
 			}
+			if(temp!=NULL) Rfree(temp);
 			if(email_vars!=NULL) Rfree(email_vars);
 		}
 	} else if(!strncmp(&image->line[0],"SEND EMAIL",10) || 
@@ -3012,10 +3027,17 @@ void process_dataline(RDArunrpt *rrpt,RDAreport *rpt,RDAimage *image,
 			if(!isEMPTY(email_vars->from_name) && !isEMPTY(email_vars->from_addr) && !isEMPTY(email_vars->subject) &&
 				!isEMPTY(email_vars->body) && ((!isEMPTY(email_vars->tolist)) || (!isEMPTY(email_vars->cclist)) || (!isEMPTY(email_vars->bcclist))))
 			{
+				if(email_vars->srcdomain==NULL)
+				{
+					temp=GetWebIDGSV();
+					sprintf(stemp,"%s.openrda.net",temp);
+					email_vars->srcdomain=stralloc(stemp);
+				}
 				RunVMimeSendmail(email_vars);
 			} else {
 				prterr("Error: SEND EMAIL Requires From User Info, Valid Recipients, a Subject and a Body to be set at a minimum.");
 			}
+			if(temp!=NULL) Rfree(temp);
 			if(email_vars!=NULL) Rfree(email_vars);
 		}
 // This is the end of email functions

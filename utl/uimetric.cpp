@@ -684,7 +684,8 @@ int main(int argc,char **argv)
 #endif
 {
 	short ef=FALSE,drop=0;
-	int len=0,option=0,l=0;
+	int len=0,option=0,l=0,xx=0;
+	RDATData *prev=NULL;
 	char *user=NULL,*filename=NULL,delflag=FALSE,buffer[512];
 	char *temp=NULL,*temp1=NULL,module[16],*uname=NULL;
 	FILE *fp=NULL;
@@ -720,6 +721,18 @@ int main(int argc,char **argv)
 	{
 		prterr("Error:  Cannot open UTILITIES -> MENUITEM.");
 		exit(1);
+	}
+	if(sum_all_users==TRUE)
+	{
+		ef=FRSNRD(MENUITEM_FILENO,1);
+		while(!ef)
+		{
+			prev=RDATDataNEW(MENUITEM_FILENO);
+			FINDFLDSETINT(MENUITEM_FILENO,"UIMETRIC COUNT",xx);
+			WRTTRANS(MENUITEM_FILENO,0,NULL,prev);
+			if(prev!=NULL) FreeRDATData(prev);
+			ef=NXTNRD(MENUITEM_FILENO,1);
+		}
 	}
 	myMetric=NULL;
 	numMetric=0;
@@ -836,6 +849,12 @@ int main(int argc,char **argv)
 									if(uname!=NULL) Rfree(uname);
 								} else {
 									addUIMetric("ALL","SUMMARY OF ALL USERS",module,drop,option,temp);
+									prev=RDATDataNEW(MENUITEM_FILENO);
+									FINDFLDGETINT(MENUITEM_FILENO,"UIMETRIC COUNT",&xx);
+									++xx;
+									FINDFLDSETINT(MENUITEM_FILENO,"UIMETRIC COUNT",xx);
+									WRTTRANS(MENUITEM_FILENO,0,NULL,prev);
+									if(prev!=NULL) FreeRDATData(prev);
 								}
 								if(temp!=NULL) Rfree(temp);
 							}

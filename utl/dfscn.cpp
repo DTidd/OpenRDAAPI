@@ -73,6 +73,10 @@ struct dfwdgts
 	char *editable_expression;
 	char *sensitive_expression;
 	char *transversal_expression;
+	char *required_expression;
+	short bootstrap;
+	short vertical;
+	short horizontal;
 };
 typedef struct dfwdgts dfwdgt;
 struct dfscrns
@@ -83,7 +87,7 @@ struct dfscrns
 typedef struct dfscrns dfscn;
 
 static dfscn *dfscreen;
-static APPlib *scr_libs,*rsrclist=NULL;
+static APPlib *scr_libs,*rsrclist=NULL,*BootStrap=NULL,*VerAlign=NULL,*HorAlign=NULL;
 static APPlib *scr_defs;
 static APPlib *dir_libs;
 static char **wlist,**wdgtlist;
@@ -164,9 +168,7 @@ void xFreeHoldRDArsrc(HoldRDArsrc *h,int line,char *file)
 						if(m->value.short_value!=NULL)
 							Rfree(m->value.short_value);
 						break;
-#ifdef USING_QT
 					case PROGRESS_BAR:
-#endif
 					case SCROLLEDLIST:
 					case LONGV:
 					case SLONGV:
@@ -201,8 +203,6 @@ HoldRDArsrc *ReadRsrcList(char *module,char *name)
 	if(fname1!=NULL) Rfree(fname1);
 	if(access(fname,04))
 	{
-		/* JAB:  Disabling this error because it isn't necessary and is annoying, I think. */
-		/*prterr("Error in permissions, user cannot read the resource binary library [%s].",fname);*/
 		if(fname!=NULL) Rfree(fname);
 		return(NULL);
 	}
@@ -297,9 +297,7 @@ HoldRDArsrc *ReadRsrcList(char *module,char *name)
 					} 
 				}
 				break;
-#ifdef USING_QT
 			case PROGRESS_BAR:
-#endif
 			case LONGV:
 			case SLONGV:
 				mem->value.integer_value=Rmalloc(sizeof(int));
@@ -411,28 +409,33 @@ void printscrndef(RDA_PFILE *fp,RDAscrn *s,int *lines,int *pages)
 				case 17: /* Revenue field*/
 				case 18: /* Balance Sheet field*/
 				case 19: /* Beginning Balance field*/
-					RDA_fprintf(fp,"[%5d] [%s] Name: [%s] Label: [%s] Cols: [%d]\r\n",
+					RDA_fprintf(fp,"[%5d] [%s] Name: [%s] Label: [%s] Cols: [%d] Bootstrap: [%d] Ver: [%d] Hor: [%d]\r\n",
 						(x+1),wdgttypes[w->type],
 						(w->resource_name!=NULL?w->resource_name:""),
 						(w->label!=NULL?w->label:""),
-						w->cols);
+						w->cols,w->bootstrap,w->vertical,w->horizontal);
 					++*lines;
 					checkheader(fp,lines,pages,s->module);
 					break;
 				case 22: /* progress bar */
 				case 0: /* standard resource */
-					RDA_fprintf(fp,"[%5d] [%s] Name: [%s] Label: [%s] Cols: [%d]\r\n",
+					RDA_fprintf(fp,"[%5d] [%s] Name: [%s] Label: [%s] Cols: [%d] Bootstrap: [%d] Ver: [%d] Hor: [%d]\r\n",
 						(x+1),
 						wdgttypes[w->type],
 						(w->resource_name!=NULL?w->resource_name:""),
 						(w->label!=NULL?w->label:""),
-						w->cols);
+						w->cols,w->bootstrap,w->vertical,w->horizontal);
 					++*lines;
 					checkheader(fp,lines,pages,s->module);
 					break;
 				case 1: /* new line */
-				case 2: /* end line */
 				case 3: /* new box */
+					RDA_fprintf(fp,"[%5d] [%s] Bootstrap: [%d]\r\n",
+						(x+1),wdgttypes[w->type],w->bootstrap);
+					++*lines;
+					checkheader(fp,lines,pages,s->module);
+					break;
+				case 2: /* end line */
 				case 4: /* end box */
 				case 10: /* frame */
 				case 11: /* seperator */
@@ -466,28 +469,31 @@ void printscrndef(RDA_PFILE *fp,RDAscrn *s,int *lines,int *pages)
 				case 14: /* Optional Screen */
 				case 6: /* button */
 				case 9: /* toggle button */
-					RDA_fprintf(fp,"[%5d] [%s] Name: [%s] Label: [%s] Pixmap: [%s] XHTML label: [%s]\r\n",
+					RDA_fprintf(fp,"[%5d] [%s] Name: [%s] Label: [%s] Pixmap: [%s] XHTML label: [%s] Bootstrap: [%d] Ver: [%d] Hor: [%d]\r\n",
 						(x+1),wdgttypes[w->type],
 						(w->resource_name!=NULL?w->resource_name:""),
 						(w->label!=NULL?w->label:""),
 						(w->pixmap!=NULL?w->pixmap:""),
-						(w->XHTML_Label!=NULL?w->XHTML_Label:""));
+						(w->XHTML_Label!=NULL?w->XHTML_Label:""),
+						w->bootstrap,w->vertical,w->horizontal);
 					++*lines;
 					checkheader(fp,lines,pages,s->module);
 					break;
 				case 7: /* scrolled list */
-					RDA_fprintf(fp,"[%5d] [%s] Name: [%s] Label: [%s] Rows: [%d]\r\n",
+					RDA_fprintf(fp,"[%5d] [%s] Name: [%s] Label: [%s] Rows: [%d] Bootstrap: [%d] Ver: [%d] Hor: [%d]\r\n",
 						(x+1),wdgttypes[w->type],
 						(w->resource_name!=NULL?w->resource_name:""),
-						(w->label!=NULL ? w->label:""),w->rows);
+						(w->label!=NULL ? w->label:""),w->rows,
+						w->bootstrap,w->vertical,w->horizontal);
 					++*lines;
 					checkheader(fp,lines,pages,s->module);
 					break;
 				case 8: /* scrolled text */
-					RDA_fprintf(fp,"[%5d] [%s] Name: [%s] Label: [%s] Rows: [%d] Cols: [%d]\r\n",
+					RDA_fprintf(fp,"[%5d] [%s] Name: [%s] Label: [%s] Rows: [%d] Cols: [%d] Bootstrap: [%d] Ver: [%d] Hor: [%d]\r\n",
 						(x+1),wdgttypes[w->type],
 						(w->resource_name!=NULL?w->resource_name:""),
-						(w->label!=NULL ? w->label:""),w->rows,w->cols);
+						(w->label!=NULL ? w->label:""),w->rows,w->cols,
+						w->bootstrap,w->vertical,w->horizontal);
 					++*lines;
 					checkheader(fp,lines,pages,s->module);
 					break;
@@ -497,12 +503,21 @@ void printscrndef(RDA_PFILE *fp,RDAscrn *s,int *lines,int *pages)
 			}
 			if(!isEMPTY(w->expression) ||
 				!isEMPTY(w->editable_expression)|| 
+				!isEMPTY(w->required_expression)|| 
 				!isEMPTY(w->sensitive_expression) ||
-				!isEMPTY(w->transversal_expression)) 
+				!isEMPTY(w->transversal_expression) || 
+				!isEMPTY(w->XHTML_Label)) 
 			{
 				RDA_fprintf(fp,"        Expressions: \r\n");
 				++*lines;
 				checkheader(fp,lines,pages,s->module);
+				if(!isEMPTY(w->XHTML_Label))
+				{
+					RDA_fprintf(fp,"       XHTML Label: [%s]\r\n",
+						w->XHTML_Label);
+					++*lines;
+					checkheader(fp,lines,pages,s->module);
+				}
 				if(!isEMPTY(w->expression))
 				{
 					RDA_fprintf(fp,"          Visible : [%s]\r\n",
@@ -528,6 +543,13 @@ void printscrndef(RDA_PFILE *fp,RDAscrn *s,int *lines,int *pages)
 				{
 					RDA_fprintf(fp,"          Transversal: [%s]\r\n",
 						w->transversal_expression);
+					++*lines;
+					checkheader(fp,lines,pages,s->module);
+				}
+				if(!isEMPTY(w->required_expression))
+				{
+					RDA_fprintf(fp,"          Required: [%s]\r\n",
+						w->required_expression);
 					++*lines;
 					checkheader(fp,lines,pages,s->module);
 				}
@@ -716,6 +738,7 @@ static void FREEdfscn(dfscn *tmp)
 				if(wdgt->editable_expression!=NULL) Rfree(wdgt->editable_expression);
 				if(wdgt->sensitive_expression!=NULL) Rfree(wdgt->sensitive_expression);
 				if(wdgt->transversal_expression!=NULL) Rfree(wdgt->transversal_expression);
+				if(wdgt->required_expression!=NULL) Rfree(wdgt->required_expression);
 			}
 			Rfree(tmp->wdgts);
 		}
@@ -777,13 +800,16 @@ static void changenamelist(RDArsrc *edit_rsrc)
 }
 static void changewidgetlist(RDArsrc *edit_rsrc)
 {
-	int selected=0,selectedr=0,x;
+	int selected=0,selectedr=0,x,bs=0;
 	HoldRDArmem *mem;
 	RDAacct *acc=NULL;
 
 	if(FINDRSCGETINT(edit_rsrc,"WIDGET TYPES",&selected)) return;
 	if(FINDRSCGETINT(edit_rsrc,"RESOURCE TYPES",&selectedr)) return;
+	FINDRSCGETINT(edit_rsrc,"BOOTSTRAP",&bs);
 	if(RSRClist!=NULL) freeapplib(RSRClist);
+	if(BootStrap!=NULL) freeapplib(BootStrap);
+	BootStrap=APPlibNEW();
 	RSRClist=APPlibNEW();
 	FINDRSCSETSENSITIVE(edit_rsrc,"DFLIST",FALSE);
 	FINDRSCSETSENSITIVE(edit_rsrc,"DFMENU",FALSE);
@@ -791,10 +817,42 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 	FINDRSCSETSENSITIVE(edit_rsrc,"DFVIR",FALSE);
 	switch(selected)
 	{
+		case 1: /* New Line */
+		case 3: /* New Box */
+			addAPPlib(BootStrap,"Default");
+			addAPPlib(BootStrap,"h1");
+			addAPPlib(BootStrap,"h2");
+			addAPPlib(BootStrap,"h3");
+			addAPPlib(BootStrap,"h4");
+			addAPPlib(BootStrap,"h5");
+			addAPPlib(BootStrap,"h6");
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
+			break;
+		case 2: /* End Line */
+		case 4: /* End Box */
+			addAPPlib(BootStrap,"Default");
+			addAPPlib(BootStrap,"h1");
+			addAPPlib(BootStrap,"h2");
+			addAPPlib(BootStrap,"h3");
+			addAPPlib(BootStrap,"h4");
+			addAPPlib(BootStrap,"h5");
+			addAPPlib(BootStrap,"h6");
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",FALSE);
+			break;
 		default:
+			addAPPlib(BootStrap,"Default");
+			addAPPlib(BootStrap,"Large");
+			addAPPlib(BootStrap,"Small");
+			addAPPlib(BootStrap,"Extra Small");
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
 			break;
 		case 7:
 			FINDRSCSETSENSITIVE(edit_rsrc,"DFLIST",TRUE);
+			addAPPlib(BootStrap,"Default");
+			addAPPlib(BootStrap,"Large");
+			addAPPlib(BootStrap,"Small");
+			addAPPlib(BootStrap,"Extra Small");
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
 			break;
 		case 6:
 		case 14:
@@ -805,9 +863,19 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			} else {
 				FINDRSCSETSENSITIVE(edit_rsrc,"DFLOAD",TRUE);
 			}
+			addAPPlib(BootStrap,"Default");
+			addAPPlib(BootStrap,"Large");
+			addAPPlib(BootStrap,"Small");
+			addAPPlib(BootStrap,"Extra Small");
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
 			break;
 		case 0:
 			FINDRSCSETSENSITIVE(edit_rsrc,"DFVIR",TRUE);
+			addAPPlib(BootStrap,"Default");
+			addAPPlib(BootStrap,"Large");
+			addAPPlib(BootStrap,"Small");
+			addAPPlib(BootStrap,"Extra Small");
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
 			break;
 	}	
 	if(HoldRsrc!=NULL)
@@ -888,6 +956,10 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"TRANSVERSAL EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"REQUIRED EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"VERTICAL",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"HORIZONTAL",TRUE);
 			break;
 		case 16: /* Expenditure fields */
 			if(EXPENDITURE_ACCOUNT!=NULL)
@@ -918,6 +990,10 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"TRANSVERSAL EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"REQUIRED EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"VERTICAL",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"HORIZONTAL",TRUE);
 			break;
 		case 17: /* Revenue fields */
 			if(REVENUE_ACCOUNT!=NULL)
@@ -948,6 +1024,10 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"TRANSVERSAL EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"REQUIRED EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"VERTICAL",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"HORIZONTAL",TRUE);
 			break;
 		case 18: /* Balance Sheet fields */
 			if(BALANCE_SHEET_ACCOUNT!=NULL)
@@ -978,6 +1058,10 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"TRANSVERSAL EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"REQUIRED EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"VERTICAL",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"HORIZONTAL",TRUE);
 			break;
 		case 19: /* Beginning Balance fields */
 			if(BEGINNING_BALANCE_ACCOUNT!=NULL)
@@ -1008,6 +1092,10 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"TRANSVERSAL EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"REQUIRED EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"VERTICAL",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"HORIZONTAL",TRUE);
 			break;
 		case 0: /* standard resource */
 			addAPPlib(rsrclist,"None");
@@ -1028,6 +1116,10 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"RESOURCE TYPES",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"REQUIRED EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"VERTICAL",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"HORIZONTAL",TRUE);
 			break;
 		case 12: /* start scrolled window */
 			addAPPlib(rsrclist,"Not Applicable");
@@ -1042,6 +1134,10 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",FALSE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",FALSE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"TRANSVERSAL EXPRESSION",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"REQUIRED EXPRESSION",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"VERTICAL",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"HORIZONTAL",TRUE);
 			break;
 		case 28: /* Start Table */
 			addAPPlib(rsrclist,"Number Rows in Header (Auto Stretch)");
@@ -1060,11 +1156,15 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET PIXMAP",FALSE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"XHTML LABEL",FALSE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"NUMBER ROWS",FALSE);
-			FINDRSCSETSENSITIVE(edit_rsrc,"NUMBER COLUMNS",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"NUMBER COLUMNS",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"RESOURCE TYPES",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"TRANSVERSAL EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"REQUIRED EXPRESSION",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"VERTICAL",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"HORIZONTAL",FALSE);
 			break;
 		case 30: /* Start Header */
 			addAPPlib(rsrclist,"Not Applicable");
@@ -1079,10 +1179,30 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"TRANSVERSAL EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"REQUIRED EXPRESSION",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"VERTICAL",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"HORIZONTAL",FALSE);
 			break;
 		case 1: /* new line */
-		case 2: /* end line */
 		case 3: /* new box */
+			addAPPlib(rsrclist,"Not Applicable");
+			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET NAME",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET NAMES",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET LABEL",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET PIXMAP",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"XHTML LABEL",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"NUMBER ROWS",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"NUMBER COLUMNS",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"RESOURCE TYPES",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"REQUIRED EXPRESSION",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"VERTICAL",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"HORIZONTAL",FALSE);
+			break;
+		case 2: /* end line */
 		case 4: /* end box */
 		case 13: /* end scrolled window */
 		case 21: /* end tab container */
@@ -1103,6 +1223,10 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",FALSE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",FALSE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"TRANSVERSAL EXPRESSION",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"REQUIRED EXPRESSION",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"VERTICAL",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"HORIZONTAL",FALSE);
 			break;
 		case 20: /* New Tab Container */
 		case 5: /* label */
@@ -1138,6 +1262,10 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",FALSE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",FALSE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"TRANSVERSAL EXPRESSION",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"REQUIRED EXPRESSION",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"VERTICAL",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"HORIZONTAL",TRUE);
 			break;
 		case 24: /* New Popup Menu */
 			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET NAME",FALSE);
@@ -1158,6 +1286,10 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"TRANSVERSAL EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"REQUIRED EXPRESSION",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"VERTICAL",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"HORIZONTAL",TRUE);
 			break;
 		case 26: /* New Toolbar Menu */
 			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET NAME",FALSE);
@@ -1177,6 +1309,10 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"TRANSVERSAL EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"REQUIRED EXPRESSION",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"VERTICAL",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"HORIZONTAL",FALSE);
 			break;
 		case 23: /* Tab Bar */
 			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET NAME",FALSE);
@@ -1199,6 +1335,10 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"TRANSVERSAL EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"REQUIRED EXPRESSION",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"VERTICAL",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"HORIZONTAL",FALSE);
 			break;
 		case 14: /* OPTIONAL SCREEN */
 		case 6: /* button */
@@ -1279,10 +1419,19 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			addAPPlib(rsrclist,"FY...");
 			addAPPlib(rsrclist,"CSV");
 			addAPPlib(rsrclist,"Paperclip");
+			addAPPlib(rsrclist,"Small Delete");
+			addAPPlib(rsrclist,"User Profile");
+			addAPPlib(rsrclist,"Wiki");
+			addAPPlib(rsrclist,"Browse");
+			addAPPlib(rsrclist,"Select");
 
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"TRANSVERSAL EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"REQUIRED EXPRESSION",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"VERTICAL",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"HORIZONTAL",TRUE);
 			break;
 		case 7: /* scrolled list */
 			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET NAME",TRUE);
@@ -1297,6 +1446,10 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"TRANSVERSAL EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"REQUIRED EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"VERTICAL",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"HORIZONTAL",TRUE);
 			break;
 		case 22: /* progress bar */
 			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET NAME",TRUE);
@@ -1311,6 +1464,10 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"TRANSVERSAL EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"REQUIRED EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"VERTICAL",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"HORIZONTAL",TRUE);
 			break;
 		case 9: /* toggle button */
 			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET NAME",TRUE);
@@ -1331,17 +1488,15 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"TRANSVERSAL EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"REQUIRED EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"VERTICAL",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"HORIZONTAL",TRUE);
 			break;
 		case 8: /* scrolled text */
 			addAPPlib(rsrclist,"WordWrap & No Horizontal SB");
 			addAPPlib(rsrclist,"Horizontal SB & No WordWrap");
 			addAPPlib(rsrclist,"Rich XHTML Text");
-#ifdef USING_QT
-#ifdef XXXX
-			addAPPlib(rsrclist,"HTTP URL Richtext");
-			addAPPlib(rsrclist,"FTP  URL Richtext");
-#endif /* XXXX */
-#endif /* USING_QT */
 			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET NAME",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET NAMES",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"WIDGET LABEL",TRUE);
@@ -1353,6 +1508,10 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",TRUE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"TRANSVERSAL EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"REQUIRED EXPRESSION",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"VERTICAL",TRUE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"HORIZONTAL",TRUE);
 			break;
 		case 10: /* frame */
 			addAPPlib(rsrclist,"Shadow In");
@@ -1370,6 +1529,10 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",FALSE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",FALSE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"TRANSVERSAL EXPRESSION",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"REQUIRED EXPRESSION",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"VERTICAL",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"HORIZONTAL",FALSE);
 			break;
 		case 11: /* seperator */
 			addAPPlib(rsrclist,"Horizontal Single Line");
@@ -1391,11 +1554,18 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"EDITABLE EXPRESSION",FALSE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"SENSITIVE EXPRESSION",FALSE);
 			FINDRSCSETSENSITIVE(edit_rsrc,"TRANSVERSAL EXPRESSION",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"REQUIRED EXPRESSION",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"VERTICAL",FALSE);
+			FINDRSCSETSENSITIVE(edit_rsrc,"HORIZONTAL",FALSE);
 			break;
 		default:
 			prterr("Error unrecognized widget type.");
 			break;
 	}
+	if(bs>=BootStrap->numlibs) bs=0;
+	FINDRSCLISTAPPlib(edit_rsrc,"BOOTSTRAP",bs,BootStrap);
+		updatersrc(edit_rsrc,"BOOTSTRAP");
 	if(selectedr>=rsrclist->numlibs) selectedr=0;
 	if(!FINDRSCLISTAPPlib(edit_rsrc,"RESOURCE TYPES",selectedr,rsrclist))
 	{
@@ -1523,7 +1693,7 @@ static void makewlist(char ***wlist)
 					(x+1),wdgttypes[w->type],(w->name!=NULL ?
 					w->name:""),(w->label!=NULL ? w->label:""),
 					w->cols,
-					((!isEMPTY(w->expression)||!isEMPTY(w->editable_expression)||!isEMPTY(w->sensitive_expression)||!isEMPTY(w->transversal_expression))?"True":"False"));
+					((!isEMPTY(w->expression)||!isEMPTY(w->editable_expression)||!isEMPTY(w->sensitive_expression)||!isEMPTY(w->transversal_expression)||!isEMPTY(w->required_expression))?"True":"False"));
 				break;
 			case 1: /* new line */
 			case 2: /* end line */
@@ -1547,7 +1717,7 @@ static void makewlist(char ***wlist)
 				} else *(wlist[0]+x)=Rmalloc(length);
 				sprintf(*(wlist[0]+x),"[%5d] [%s] Expression [%s]",
 					(x+1),wdgttypes[w->type],
-					((!isEMPTY(w->expression)||!isEMPTY(w->editable_expression)||!isEMPTY(w->sensitive_expression)||!isEMPTY(w->transversal_expression))?"True":"False"));
+					((!isEMPTY(w->expression)||!isEMPTY(w->editable_expression)||!isEMPTY(w->sensitive_expression)||!isEMPTY(w->transversal_expression)||!isEMPTY(w->required_expression))?"True":"False"));
 				break;
 			case 5: /* label */
 			case 20: /* new tab container */
@@ -1565,7 +1735,7 @@ static void makewlist(char ***wlist)
 				sprintf(*(wlist[0]+x),"[%5d] [%s] Label: [%s] Expression [%s]",
 					(x+1),wdgttypes[w->type],
 					(w->label!=NULL?w->label:""),
-					((!isEMPTY(w->expression)||!isEMPTY(w->editable_expression)||!isEMPTY(w->sensitive_expression)||!isEMPTY(w->transversal_expression))?"True":"False"));
+					((!isEMPTY(w->expression)||!isEMPTY(w->editable_expression)||!isEMPTY(w->sensitive_expression)||!isEMPTY(w->transversal_expression)||!isEMPTY(w->required_expression))?"True":"False"));
 				break;
 			case 14: /* Optional Screen */
 			case 6: /* button */
@@ -1580,7 +1750,7 @@ static void makewlist(char ***wlist)
 					(x+1),wdgttypes[w->type],
 					(w->name!=NULL?w->name:""),
 					(w->label!=NULL?w->label:""),
-					((!isEMPTY(w->expression)||!isEMPTY(w->editable_expression)||!isEMPTY(w->sensitive_expression)||!isEMPTY(w->transversal_expression))?"True":"False"));
+					((!isEMPTY(w->expression)||!isEMPTY(w->editable_expression)||!isEMPTY(w->sensitive_expression)||!isEMPTY(w->transversal_expression)||!isEMPTY(w->required_expression))?"True":"False"));
 				break;
 			case 7: /* scrolled list */
 				length=RDAstrlen(wdgttypes[w->type])+RDAstrlen(w->name)+RDAstrlen(w->label)+57+8;
@@ -1592,7 +1762,7 @@ static void makewlist(char ***wlist)
 					(x+1),wdgttypes[w->type],
 					(w->name!=NULL?w->name:""),
 					(w->label!=NULL?w->label:""),w->rows,
-					((!isEMPTY(w->expression)||!isEMPTY(w->editable_expression)||!isEMPTY(w->sensitive_expression)||!isEMPTY(w->transversal_expression))?"True":"False"));
+					((!isEMPTY(w->expression)||!isEMPTY(w->editable_expression)||!isEMPTY(w->sensitive_expression)||!isEMPTY(w->transversal_expression)||!isEMPTY(w->required_expression))?"True":"False"));
 				break;
 			case 8: /* scrolled text */
 				length=RDAstrlen(wdgttypes[w->type])+70+RDAstrlen(w->name)+RDAstrlen(w->label)+8;
@@ -1605,7 +1775,7 @@ static void makewlist(char ***wlist)
 					(w->name!=NULL?w->name:""),
 					(w->label!=NULL?w->label:""),
 					w->rows,w->cols,
-					((!isEMPTY(w->expression)||!isEMPTY(w->editable_expression)||!isEMPTY(w->sensitive_expression)||!isEMPTY(w->transversal_expression))?"True":"False"));
+					((!isEMPTY(w->expression)||!isEMPTY(w->editable_expression)||!isEMPTY(w->sensitive_expression)||!isEMPTY(w->transversal_expression)||!isEMPTY(w->required_expression))?"True":"False"));
 				break;
 			default:
 				prterr("Error unrecognized widget type [%d].",w->type);
@@ -1625,6 +1795,9 @@ static void doexit(RDArsrc *mainrsrc)
 	if(rsrcdefaults!=NULL) FreeRDAdefault(rsrcdefaults);
 	if(screen!=NULL) { free_scrn(screen); screen=NULL; }
 	if(HoldRsrc!=NULL) FreeHoldRDArsrc(HoldRsrc);
+	if(BootStrap!=NULL) freeapplib(BootStrap);
+	if(VerAlign!=NULL) freeapplib(VerAlign);
+	if(HorAlign!=NULL) freeapplib(HorAlign);
 	ShutdownSubsystems();
 }
 static void doexit1(RDArsrc *rsrc,RDArsrc *edit_rsrc)
@@ -1680,6 +1853,10 @@ static void makespace(int pos)
 			temp1->editable_expression=NULL;
 			temp1->sensitive_expression=NULL;
 			temp1->transversal_expression=NULL;
+			temp1->required_expression=NULL;
+			temp1->bootstrap=0;
+			temp1->vertical=0;
+			temp1->horizontal=0;
 			++y;
 			temp1=new_wdgt+y;
 		}
@@ -1707,6 +1884,9 @@ static void makespace(int pos)
 		temp1->rows=temp->rows;
 		temp1->cols=temp->cols;
 		temp1->rtype=temp->rtype;
+		temp1->bootstrap=temp->bootstrap;
+		temp1->vertical=temp->vertical;
+		temp1->horizontal=temp->horizontal;
 		if(temp->expression!=NULL)
 		{
 			temp1->expression=stralloc(temp->expression);
@@ -1727,6 +1907,11 @@ static void makespace(int pos)
 			temp1->transversal_expression=stralloc(temp->transversal_expression);
 			Rfree(temp->transversal_expression);
 		} else temp1->transversal_expression=NULL;
+		if(temp->required_expression!=NULL)
+		{
+			temp1->required_expression=stralloc(temp->required_expression);
+			Rfree(temp->required_expression);
+		} else temp1->required_expression=NULL;
 		++y;
 	}
 	Rfree(dfscreen->wdgts);
@@ -1762,6 +1947,9 @@ static void makespace(int pos)
 		temp1->rows=temp->rows;
 		temp1->cols=temp->cols;
 		temp1->rtype=temp->rtype;
+		temp1->bootstrap=temp->bootstrap;
+		temp1->vertical=temp->vertical;
+		temp1->horizontal=temp->horizontal;
 		if(temp->expression!=NULL)
 		{
 			temp1->expression=stralloc(temp->expression);
@@ -1782,6 +1970,11 @@ static void makespace(int pos)
 			temp1->transversal_expression=stralloc(temp->transversal_expression);
 			Rfree(temp->transversal_expression);
 		} else temp1->transversal_expression=NULL;
+		if(temp->required_expression!=NULL)
+		{
+			temp1->required_expression=stralloc(temp->required_expression);
+			Rfree(temp->required_expression);
+		} else temp1->required_expression=NULL;
 	}
 	Rfree(new_wdgt);
 }
@@ -1841,6 +2034,7 @@ static void save_widget(RDArsrc *edit_rsrc,RDArsrc *rsrc)
 		FINDRSCGETSTRING(edit_rsrc,"EDITABLE EXPRESSION",&wdgt->editable_expression);
 		FINDRSCGETSTRING(edit_rsrc,"SENSITIVE EXPRESSION",&wdgt->sensitive_expression);
 		FINDRSCGETSTRING(edit_rsrc,"TRANSVERSAL EXPRESSION",&wdgt->transversal_expression);
+		FINDRSCGETSTRING(edit_rsrc,"REQUIRED EXPRESSION",&wdgt->required_expression);
 	} else {
 		if(wdgt->name!=NULL) Rfree(wdgt->name);
 		wdgt->name=NULL;
@@ -1850,6 +2044,8 @@ static void save_widget(RDArsrc *edit_rsrc,RDArsrc *rsrc)
 		wdgt->sensitive_expression=NULL;
 		if(wdgt->transversal_expression!=NULL) Rfree(wdgt->transversal_expression);
 		wdgt->transversal_expression=NULL;
+		if(wdgt->required_expression!=NULL) Rfree(wdgt->required_expression);
+		wdgt->required_expression=NULL;
 	}
 	if(wdgt->type==0 || wdgt->type==5 || wdgt->type==6 || wdgt->type==7 || 
 		wdgt->type==8 || wdgt->type==9 || wdgt->type==14 || 
@@ -1870,7 +2066,7 @@ static void save_widget(RDArsrc *edit_rsrc,RDArsrc *rsrc)
 		if(wdgt->pixmap!=NULL) Rfree(wdgt->pixmap);
 		wdgt->pixmap=NULL;
 	}
-	if(wdgt->type==5)
+	if(wdgt->type==5 || wdgt->type==9 || wdgt->type==6 || wdgt->type==14)
 	{
 		FINDRSCGETSTRING(edit_rsrc,"XHTML LABEL",&wdgt->XHTML_Label);
 	} else {
@@ -1887,6 +2083,25 @@ static void save_widget(RDArsrc *edit_rsrc,RDArsrc *rsrc)
 	{
 		FINDRSCGETSHORT(edit_rsrc,"NUMBER COLUMNS",&wdgt->cols);
 	} else wdgt->cols=0;
+	if(wdgt->type==0 || wdgt->type==1 || wdgt->type==3 || wdgt->type==6 || wdgt->type==7 || 
+		wdgt->type==8 || wdgt->type==9 || wdgt->type==12 || wdgt->type==15 || 
+		wdgt->type==16 || wdgt->type==17 || wdgt->type==18 || wdgt->type==19 || wdgt->type==24 
+		|| wdgt->type==26 || wdgt->type==28)
+	{
+		FINDRSCGETSHORT(edit_rsrc,"BOOTSTRAP",&wdgt->bootstrap);
+	} else wdgt->bootstrap=0;
+	if(wdgt->type==0 || wdgt->type==6 || wdgt->type==7 || wdgt->type==8 || 
+		wdgt->type==9 || wdgt->type==10 || wdgt->type==12 || 
+		wdgt->type==15 || wdgt->type==16 || wdgt->type==17 || 
+		wdgt->type==18 || wdgt->type==19 || wdgt->type==24 ||
+		wdgt->type==26 || wdgt->type==28)
+	{
+		FINDRSCGETSHORT(edit_rsrc,"VERTICAL ALIGNMENT",&wdgt->vertical);
+		FINDRSCGETSHORT(edit_rsrc,"HORIZONTAL ALIGNMENT",&wdgt->horizontal);
+	} else {
+		wdgt->vertical=0;
+		wdgt->horizontal=0;
+	}
 	if(wdgt->type==6 || wdgt->type==8 || wdgt->type==10 || 
 		wdgt->type==11 || wdgt->type==14 || wdgt->type==15 || 
 		wdgt->type==9 || wdgt->type==5 || wdgt->type==16 || 
@@ -1971,7 +2186,7 @@ static void edit_current(RDArsrc *rsrc,RDArsrc *edit_rsrc)
 {
 	dfwdgt *wdgt;
 	char *name=NULL,*libname=NULL;
-	int l,x;
+	int l,x,y=0;
 	
 	if(FINDRSCSETFUNC(edit_rsrc,"SAVE",save_widget,rsrc)) return;
 	readallwidgets(rsrc);
@@ -2000,10 +2215,17 @@ static void edit_current(RDArsrc *rsrc,RDArsrc *edit_rsrc)
 		FINDRSCSETSHORT(edit_rsrc,"NUMBER ROWS",wdgt->rows);
 		FINDRSCSETSHORT(edit_rsrc,"NUMBER COLUMNS",wdgt->cols);
 		FINDRSCSETINT(edit_rsrc,"RESOURCE TYPES",wdgt->rtype);
+		y=wdgt->bootstrap;
+		FINDRSCSETINT(edit_rsrc,"BOOTSTRAP",y);
+		y=wdgt->vertical;
+		FINDRSCSETINT(edit_rsrc,"VERTICAL ALIGNMENT",y);
+		y=wdgt->horizontal;
+		FINDRSCSETINT(edit_rsrc,"HORIZONTAL ALIGNMENT",y);
 		FINDRSCSETSTRING(edit_rsrc,"EXPRESSION",wdgt->expression);
 		FINDRSCSETSTRING(edit_rsrc,"EDITABLE EXPRESSION",wdgt->editable_expression);
 		FINDRSCSETSTRING(edit_rsrc,"SENSITIVE EXPRESSION",wdgt->sensitive_expression);
 		FINDRSCSETSTRING(edit_rsrc,"TRANSVERSAL EXPRESSION",wdgt->transversal_expression);
+		FINDRSCSETSTRING(edit_rsrc,"REQUIRED EXPRESSION",wdgt->required_expression);
 	}
 	x=0;
 	FINDRSCLISTAPPlib(edit_rsrc,"WIDGET NAMES",x,RSRClist);
@@ -2015,7 +2237,7 @@ static void copy_widget(RDArsrc *rsrc,RDArsrc *edit_rsrc)
 {
 	dfwdgt *wdgt;
 	char *name=NULL,*libname=NULL;
-	int l,x;
+	int l,x,y=0;
 	
 	if(FINDRSCSETFUNC(edit_rsrc,"SAVE",save_widget_below,rsrc)) return;
 	if(FINDRSCSETFUNC(edit_rsrc,"QUIT",quit_widget_belowtest,rsrc)) return;
@@ -2045,10 +2267,17 @@ static void copy_widget(RDArsrc *rsrc,RDArsrc *edit_rsrc)
 		FINDRSCSETSHORT(edit_rsrc,"NUMBER ROWS",wdgt->rows);
 		FINDRSCSETSHORT(edit_rsrc,"NUMBER COLUMNS",wdgt->cols);
 		FINDRSCSETINT(edit_rsrc,"RESOURCE TYPES",wdgt->rtype);
+		y=wdgt->bootstrap;
+		FINDRSCSETINT(edit_rsrc,"BOOTSTRAP",y);
+		y=wdgt->vertical;
+		FINDRSCSETINT(edit_rsrc,"VERTICAL ALIGNMENT",y);
+		y=wdgt->horizontal;
+		FINDRSCSETINT(edit_rsrc,"HORIZONTAL ALIGNMENT",y);
 		FINDRSCSETSTRING(edit_rsrc,"EXPRESSION",wdgt->expression);
 		FINDRSCSETSTRING(edit_rsrc,"EDITABLE EXPRESSION",wdgt->editable_expression);
 		FINDRSCSETSTRING(edit_rsrc,"SENSITIVE EXPRESSION",wdgt->sensitive_expression);
 		FINDRSCSETSTRING(edit_rsrc,"TRANSVERSAL EXPRESSION",wdgt->transversal_expression);
+		FINDRSCSETSTRING(edit_rsrc,"REQUIRED EXPRESSION",wdgt->required_expression);
 	}
 	x=0;
 	FINDRSCLISTAPPlib(edit_rsrc,"WIDGET NAMES",x,RSRClist);
@@ -2081,6 +2310,10 @@ static void add(RDArsrc *rsrc,RDArsrc *edit_rsrc)
 	} else {
 		FINDRSCSETSTRING(edit_rsrc,"WIDGET NAME",RSRClist->libs[0]);
 	}
+	x=0;
+	FINDRSCSETINT(edit_rsrc,"BOOTSTRAP",x);
+	FINDRSCSETINT(edit_rsrc,"VERTICAL ALIGNMENT",x);
+	FINDRSCSETINT(edit_rsrc,"HORIZONTAL ALIGNMENT",x);
 	FINDRSCSETSTRING(edit_rsrc,"WIDGET LABEL","");
 	FINDRSCSETSTRING(edit_rsrc,"WIDGET PIXMAP","");
 	FINDRSCSETSTRING(edit_rsrc,"XHTML LABEL","");
@@ -2091,6 +2324,7 @@ static void add(RDArsrc *rsrc,RDArsrc *edit_rsrc)
 	FINDRSCSETSTRING(edit_rsrc,"EDITABLE EXPRESSION","");
 	FINDRSCSETSTRING(edit_rsrc,"SENSITIVE EXPRESSION","");
 	FINDRSCSETSTRING(edit_rsrc,"TRANSVERSAL EXPRESSION","");
+	FINDRSCSETSTRING(edit_rsrc,"REQUIRED EXPRESSION","");
 	changewidgetlist(edit_rsrc);
 	editdefaults=GetDefaults(edit_rsrc);
 	APPmakescrn(edit_rsrc,TRUE,NULL,NULL,FALSE);
@@ -2151,6 +2385,9 @@ static void scnmove(RDArsrc *rsrc,short direction)
 	temp1->rows=temp->rows;
 	temp1->cols=temp->cols;
 	temp1->rtype=temp->rtype;
+	temp1->bootstrap=temp->bootstrap;
+	temp1->vertical=temp->vertical;
+	temp1->horizontal=temp->horizontal;
 	if(temp->expression!=NULL)
 	{
 		temp1->expression=stralloc(temp->expression);
@@ -2171,6 +2408,11 @@ static void scnmove(RDArsrc *rsrc,short direction)
 		temp1->transversal_expression=stralloc(temp->transversal_expression);
 		Rfree(temp->transversal_expression);
 	} else temp1->transversal_expression=NULL;
+	if(temp->required_expression!=NULL)
+	{
+		temp1->required_expression=stralloc(temp->required_expression);
+		Rfree(temp->required_expression);
+	} else temp1->required_expression=NULL;
 
 	/* STEP 2 */
 	temp->type=temp2->type;
@@ -2197,6 +2439,9 @@ static void scnmove(RDArsrc *rsrc,short direction)
 	temp->rows=temp2->rows;
 	temp->cols=temp2->cols;
 	temp->rtype=temp2->rtype;
+	temp->bootstrap=temp2->bootstrap;
+	temp->vertical=temp2->vertical;
+	temp->horizontal=temp2->horizontal;
 	if(temp2->expression!=NULL)
 	{
 		temp->expression=stralloc(temp2->expression);
@@ -2217,6 +2462,11 @@ static void scnmove(RDArsrc *rsrc,short direction)
 		temp->transversal_expression=stralloc(temp2->transversal_expression);
 		Rfree(temp2->transversal_expression);
 	} else temp->transversal_expression=NULL;
+	if(temp2->required_expression!=NULL)
+	{
+		temp->required_expression=stralloc(temp2->required_expression);
+		Rfree(temp2->required_expression);
+	} else temp->required_expression=NULL;
 
 	/* STEP 3 */
 	temp2->type=temp1->type;
@@ -2243,6 +2493,9 @@ static void scnmove(RDArsrc *rsrc,short direction)
 	temp2->rows=temp1->rows;
 	temp2->cols=temp1->cols;
 	temp2->rtype=temp1->rtype;
+	temp2->bootstrap=temp1->bootstrap;
+	temp2->vertical=temp1->vertical;
+	temp2->horizontal=temp1->horizontal;
 	if(temp1->expression!=NULL)
 	{
 		temp2->expression=stralloc(temp1->expression);
@@ -2263,6 +2516,11 @@ static void scnmove(RDArsrc *rsrc,short direction)
 		temp2->transversal_expression=stralloc(temp1->transversal_expression);
 		Rfree(temp1->transversal_expression);
 	} else temp2->transversal_expression=NULL;
+	if(temp1->required_expression!=NULL)
+	{
+		temp2->required_expression=stralloc(temp1->required_expression);
+		Rfree(temp1->required_expression);
+	} else temp2->required_expression=NULL;
 
 	Rfree(temp1);
 	makewlist(&wlist);
@@ -2320,6 +2578,9 @@ static void delete_widget(RDArsrc *rsrc)
 			temp1->rows=temp->rows;
 			temp1->cols=temp->cols;
 			temp1->rtype=temp->rtype;
+			temp1->bootstrap=temp->bootstrap;
+			temp1->vertical=temp->vertical;
+			temp1->horizontal=temp->horizontal;
 			if(temp->expression!=NULL)
 			{
 				temp1->expression=stralloc(temp->expression);
@@ -2343,6 +2604,12 @@ static void delete_widget(RDArsrc *rsrc)
 					stralloc(temp->transversal_expression);
 				Rfree(temp->transversal_expression);
 			} else temp1->transversal_expression=NULL;
+			if(temp->required_expression!=NULL)
+			{
+				temp1->required_expression=
+					stralloc(temp->required_expression);
+				Rfree(temp->required_expression);
+			} else temp1->required_expression=NULL;
 			++y;
 		} else {
 			if(temp->name!=NULL) Rfree(temp->name);
@@ -2356,6 +2623,8 @@ static void delete_widget(RDArsrc *rsrc)
 				Rfree(temp->sensitive_expression);
 			if(temp->transversal_expression!=NULL)
 				Rfree(temp->transversal_expression);
+			if(temp->required_expression!=NULL)
+				Rfree(temp->required_expression);
 		}
 	}
 	Rfree(dfscreen->wdgts);
@@ -2388,6 +2657,9 @@ static void delete_widget(RDArsrc *rsrc)
 		temp1->rows=temp->rows;
 		temp1->cols=temp->cols;
 		temp1->rtype=temp->rtype;
+		temp1->bootstrap=temp->bootstrap;
+		temp1->vertical=temp->vertical;
+		temp1->horizontal=temp->horizontal;
 		if(temp->expression!=NULL)
 		{
 			temp1->expression=stralloc(temp->expression);
@@ -2410,6 +2682,12 @@ static void delete_widget(RDArsrc *rsrc)
 			temp1->transversal_expression=stralloc(temp->transversal_expression);
 			Rfree(temp->transversal_expression);
 		} else temp1->transversal_expression=NULL;
+		if(temp->required_expression!=NULL)
+		{
+			temp1->required_expression=stralloc(temp->required_expression);
+			if(temp->required_expression!=NULL) 
+				Rfree(temp->required_expression);
+		} else temp1->required_expression=NULL;
 	}
 	Rfree(new_wdgt);
 	makewlist(&wlist);
@@ -2437,24 +2715,27 @@ static void save_screen(RDArsrc *rsrc,RDArsrc *edit_rsrc)
 	{
 		if((wdgt->type==5 || wdgt->type==9) && wdgt->rtype==1)
 		{
-			ADVaddwdgt(screen,wdgt->type,wdgt->name,wdgt->label,
+			ADV2addwdgt(screen,wdgt->type,wdgt->name,wdgt->label,
 				wdgt->pixmap,wdgt->XHTML_Label,wdgt->rows,
 				wdgt->cols,wdgt->rtype,wdgt->expression,
 				wdgt->editable_expression,wdgt->sensitive_expression,
-				wdgt->transversal_expression);
+				wdgt->transversal_expression,wdgt->required_expression,
+				wdgt->bootstrap,wdgt->vertical,wdgt->horizontal);
 		} else if((wdgt->type==6 || wdgt->type==14 )&& wdgt->rtype==5) 
 		{
-			ADVaddwdgt(screen,wdgt->type,wdgt->name,wdgt->label,
+			ADV2addwdgt(screen,wdgt->type,wdgt->name,wdgt->label,
 				wdgt->pixmap,wdgt->XHTML_Label,wdgt->rows,
 				wdgt->cols,wdgt->rtype,wdgt->expression,
 				wdgt->editable_expression,wdgt->sensitive_expression,
-				wdgt->transversal_expression);
+				wdgt->transversal_expression,wdgt->required_expression,
+				wdgt->bootstrap,wdgt->vertical,wdgt->horizontal);
 		} else {
-			ADVaddwdgt(screen,wdgt->type,wdgt->name,wdgt->label,
+			ADV2addwdgt(screen,wdgt->type,wdgt->name,wdgt->label,
 				NULL,wdgt->XHTML_Label,wdgt->rows,
 				wdgt->cols,wdgt->rtype,wdgt->expression,
 				wdgt->editable_expression,wdgt->sensitive_expression,
-				wdgt->transversal_expression);
+				wdgt->transversal_expression,wdgt->required_expression,
+				wdgt->bootstrap,wdgt->vertical,wdgt->horizontal);
 		}
 	}
 	if(FINDRSCGETSTRING(rsrc,"LIBRARY NAME",&libname))
@@ -2799,6 +3080,10 @@ static void new_screen(RDArsrc *mainrsrc)
 	wp->sensitive_expression=NULL;
 	wp->editable_expression=NULL;
 	wp->transversal_expression=NULL;
+	wp->required_expression=NULL;
+	wp->bootstrap=0;
+	wp->vertical=0;
+	wp->horizontal=0;
 	makewlist(&wlist);
 	x=0;
 	libx=Rmalloc(RDAstrlen(dirx)+RDAstrlen(scr_libs->libs[l])+2);
@@ -2847,8 +3132,12 @@ static void new_screen(RDArsrc *mainrsrc)
 	addstdrsrc(edit_rsrc,"NUMBER ROWS",SHORTV,3,0,TRUE);
 	addstdrsrc(edit_rsrc,"NUMBER COLUMNS",SHORTV,3,0,TRUE);
 	addlstrsrc(edit_rsrc,"RESOURCE TYPES",0,TRUE,changersctype,rsrclist->numlibs,&rsrclist->libs,NULL);
+	addlstrsrc(edit_rsrc,"BOOTSTRAP",0,TRUE,NULL,BootStrap->numlibs,&BootStrap->libs,NULL);
+	addlstrsrc(edit_rsrc,"VERTICAL ALIGNMENT",0,TRUE,NULL,VerAlign->numlibs,&VerAlign->libs,NULL);
+	addlstrsrc(edit_rsrc,"HORIZONTAL ALIGNMENT",0,TRUE,NULL,HorAlign->numlibs,&HorAlign->libs,NULL);
 	addsctrsrc(edit_rsrc,"EXPRESSION",0,NULL,TRUE);
 	addsctrsrc(edit_rsrc,"EDITABLE EXPRESSION",0,NULL,TRUE);
+	addsctrsrc(edit_rsrc,"REQUIRED EXPRESSION",0,NULL,TRUE);
 	addsctrsrc(edit_rsrc,"SENSITIVE EXPRESSION",0,NULL,TRUE);
 	addsctrsrc(edit_rsrc,"TRANSVERSAL EXPRESSION",0,NULL,TRUE);
 	addbtnrsrc(edit_rsrc,"DFLIST",TRUE,dflist_wdgt,rsrc);
@@ -2904,12 +3193,16 @@ static void okfunction(RDArsrc *mainrsrc)
 		wp=dfscreen->wdgts;
 		memset(wp,0,sizeof(dfwdgt));
 		wp->type=1;
+		wp->bootstrap=0;
+		wp->vertical=0;
+		wp->horizontal=0;
 		wp->name=NULL;
 		wp->label=NULL;
 		wp->pixmap=NULL;
 		wp->expression=NULL;
 		wp->sensitive_expression=NULL;
 		wp->editable_expression=NULL;
+		wp->required_expression=NULL;
 		wp->transversal_expression=NULL;
 	} else {
 		/* information read from bin editing */
@@ -2929,6 +3222,9 @@ static void okfunction(RDArsrc *mainrsrc)
 			wp->rows=wdgt->rows;
 			wp->cols=wdgt->cols;
 			wp->rtype=wdgt->rtype;
+			wp->bootstrap=wdgt->bootstrap;
+			wp->vertical=wdgt->vertical;
+			wp->horizontal=wdgt->horizontal;
 			wp->expression=stralloc(wdgt->expression);
 			if(wdgt->editable_expression!=NULL)
 			{
@@ -2942,6 +3238,10 @@ static void okfunction(RDArsrc *mainrsrc)
 			{
 				wp->transversal_expression=stralloc(wdgt->transversal_expression);
 			} else wp->transversal_expression=NULL;
+			if(wdgt->required_expression!=NULL)
+			{
+				wp->required_expression=stralloc(wdgt->required_expression);
+			} else wp->required_expression=NULL;
 		}
 	}
 	makewlist(&wlist);
@@ -2988,6 +3288,9 @@ static void okfunction(RDArsrc *mainrsrc)
 	addstdrsrc(edit_rsrc,"NUMBER ROWS",SHORTV,3,0,TRUE);
 	addstdrsrc(edit_rsrc,"NUMBER COLUMNS",SHORTV,3,0,TRUE);
 	addlstrsrc(edit_rsrc,"RESOURCE TYPES",0,TRUE,changersctype,rsrclist->numlibs,&rsrclist->libs,NULL);
+	addlstrsrc(edit_rsrc,"BOOTSTRAP",0,TRUE,NULL,BootStrap->numlibs,&BootStrap->libs,NULL);
+	addlstrsrc(edit_rsrc,"VERTICAL ALIGNMENT",0,TRUE,NULL,VerAlign->numlibs,&VerAlign->libs,NULL);
+	addlstrsrc(edit_rsrc,"HORIZONTAL ALIGNMENT",0,TRUE,NULL,HorAlign->numlibs,&HorAlign->libs,NULL);
 	addsctrsrc(edit_rsrc,"EXPRESSION",0,NULL,TRUE);
 	addbtnrsrc(edit_rsrc,"EXPRESSION LOAD VALUE",TRUE,BrowseLoadValue,"EXPRESSION");
 	addbtnrsrc(edit_rsrc,"EXPRESSION LOAD OPERAND",TRUE,loadoperand,"EXPRESSION");
@@ -2998,6 +3301,11 @@ static void okfunction(RDArsrc *mainrsrc)
 	addbtnrsrc(edit_rsrc,"EDITABLE EXPRESSION LOAD OPERAND",TRUE,loadoperand,"EDITABLE EXPRESSION");
 	addbtnrsrc(edit_rsrc,"EDITABLE EXPRESSION LOAD GROUPER",TRUE,loadgrouper,"EDITABLE EXPRESSION");
 	addbtnrsrc(edit_rsrc,"EDITABLE EXPRESSION LOAD CONTROL",TRUE,loadcontrol,"EDITABLE EXPRESSION");
+	addsctrsrc(edit_rsrc,"REQUIRED EXPRESSION",0,NULL,TRUE);
+	addbtnrsrc(edit_rsrc,"REQUIRED EXPRESSION LOAD VALUE",TRUE,BrowseLoadValue,"REQUIRED EXPRESSION");
+	addbtnrsrc(edit_rsrc,"REQUIRED EXPRESSION LOAD OPERAND",TRUE,loadoperand,"REQUIRED EXPRESSION");
+	addbtnrsrc(edit_rsrc,"REQUIRED EXPRESSION LOAD GROUPER",TRUE,loadgrouper,"REQUIRED EXPRESSION");
+	addbtnrsrc(edit_rsrc,"REQUIRED EXPRESSION LOAD CONTROL",TRUE,loadcontrol,"REQUIRED EXPRESSION");
 	addsctrsrc(edit_rsrc,"SENSITIVE EXPRESSION",0,NULL,TRUE);
 	addbtnrsrc(edit_rsrc,"SENSITIVE EXPRESSION LOAD VALUE",TRUE,BrowseLoadValue,"SENSITIVE EXPRESSION");
 	addbtnrsrc(edit_rsrc,"SENSITIVE EXPRESSION LOAD OPERAND",TRUE,loadoperand,"SENSITIVE EXPRESSION");
@@ -3007,11 +3315,11 @@ static void okfunction(RDArsrc *mainrsrc)
 	addbtnrsrc(edit_rsrc,"TRANSVERSAL EXPRESSION LOAD VALUE",TRUE,BrowseLoadValue,"TRANSVERSAL EXPRESSION");
 	addbtnrsrc(edit_rsrc,"TRANSVERSAL EXPRESSION LOAD OPERAND",TRUE,loadoperand,"TRANSVERSAL EXPRESSION");
 	addbtnrsrc(edit_rsrc,"TRANSVERSAL EXPRESSION LOAD GROUPER",TRUE,loadgrouper,"TRANSVERSAL EXPRESSION");
+	addbtnrsrc(edit_rsrc,"TRANSVERSAL EXPRESSION LOAD CONTROL",TRUE,loadcontrol,"TRANSVERSAL EXPRESSION");
 	addbtnrsrc(edit_rsrc,"DFLIST",TRUE,dflist_wdgt,mainrsrc);
 	addbtnrsrc(edit_rsrc,"DFVIR",TRUE,dfvir_wdgt,mainrsrc);
 	addbtnrsrc(edit_rsrc,"DFLOAD",TRUE,dfload_wdgt,mainrsrc);
 	addbtnrsrc(edit_rsrc,"DFMENU",TRUE,dfmenu_wdgt,mainrsrc);
-	addbtnrsrc(edit_rsrc,"TRANSVERSAL EXPRESSION LOAD CONTROL",TRUE,loadcontrol,"TRANSVERSAL EXPRESSION");
 	addrfcbrsrc(edit_rsrc,"SAVE",TRUE,save_widget,rsrc);
 	addrfcbrsrc(edit_rsrc,"QUIT",TRUE,quit_widgettest,rsrc);
 	addrfcbrsrc(edit_rsrc,"HELP",TRUE,screenhelp,NULL);
@@ -3159,6 +3467,7 @@ int main(int argc,char **argv)
 	rsrclist=APPlibNEW();
 	addAPPlib(rsrclist,"WordWrap & No Horizontal SB");
 	addAPPlib(rsrclist,"Horizontal SB & No WordWrap");
+	addAPPlib(rsrclist,"Rich XHTML Text");
 	dir_libs=APPlibNEW();
 	defdir=Rmalloc(RDAstrlen(CURRENTDIRECTORY)+RDAstrlen(USERLOGIN)+2);
 #ifndef WIN32
@@ -3241,6 +3550,26 @@ int main(int argc,char **argv)
 			FINDRSCSETINT(mainrsrc,"SCREEN LIST",s);
 		}
 	}
+	BootStrap=APPlibNEW();
+	addAPPlib(BootStrap,"Default");
+	addAPPlib(BootStrap,"Large");
+	addAPPlib(BootStrap,"Small");
+	addAPPlib(BootStrap,"Extra Small");
+	HorAlign=APPlibNEW();
+	addAPPlib(HorAlign,"Default");
+	addAPPlib(HorAlign,"Left");
+	addAPPlib(HorAlign,"Center");
+	addAPPlib(HorAlign,"Right");
+	addAPPlib(HorAlign,"Justify");
+	VerAlign=APPlibNEW();
+	addAPPlib(VerAlign,"BaseLine");
+	addAPPlib(VerAlign,"Subscript");
+	addAPPlib(VerAlign,"Superscript");
+	addAPPlib(VerAlign,"Top");
+	addAPPlib(VerAlign,"TextTop");
+	addAPPlib(VerAlign,"Middle");
+	addAPPlib(VerAlign,"Bottom");
+	addAPPlib(VerAlign,"TextBottom");
 	addrfcbrsrc(mainrsrc,"ADD",TRUE,new_screen,NULL);
 	addrfcbrsrc(mainrsrc,"SELECT",TRUE,okfunction,NULL);
 	addrfcbrsrc(mainrsrc,"DELETE",TRUE,deletescrntest,NULL);

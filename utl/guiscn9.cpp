@@ -25,7 +25,6 @@ static void GUI_DIAGNOSTIC_SCREEN()
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,4,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,"","","","");
-#ifdef USING_QT
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,3,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
@@ -33,7 +32,6 @@ static void GUI_DIAGNOSTIC_SCREEN()
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,4,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
-#endif /* USING_QT */
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,3,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,"","","","");

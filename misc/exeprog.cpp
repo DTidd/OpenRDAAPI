@@ -4,6 +4,7 @@
 extern char **environ;
 void (*UI_OpenWindow)(char *)=NULL;
 void (*UI_OpenWindowWait)(char *)=NULL;
+char *GetWebIDGSV();
 
 char *RDAPercentEncode(char *s)
 {
@@ -42,7 +43,7 @@ static void process_reaper(int sig,siginfo_t *siginfo,void *context)
 	while (waitpid( 0, &status, WNOHANG) > 0) ;
 }
 
-short xExecuteProgram(char *name,APPlib *args,APPlib *envp,short style,int line,char *file)
+short xExecuteProgram(char *name,APPlib *args,APPlib *envp,short style,APPlib *remove_env,int line,char *file)
 {
 	int pid=0,x=0,count=0;
 	char *progname=NULL,**temp=NULL,*windowData=NULL,*temp1=NULL;
@@ -56,6 +57,7 @@ short xExecuteProgram(char *name,APPlib *args,APPlib *envp,short style,int line,
 		prterr("DIAG ExecuteProgram Executing Program [%s] at line [%d] program [%s].",name,line,file);
 		SEEAPPlib(args);
 		SEEAPPlib(envp);
+		SEEAPPlib(remove_env);
 	}
 	if(name==NULL)
 	{
@@ -157,18 +159,22 @@ short xExecuteProgram(char *name,APPlib *args,APPlib *envp,short style,int line,
 		pid=fork();
 		if (pid == (pid_t) 0) 
 		{
+			for(temp=environ;*temp!=(char *)0;++temp)
+			{
+				putenv(*temp);
+			}
+			if(remove_env!=NULL)
+			{
+				for(x=0;x<remove_env->numlibs;++x)
+				{
+					RDA_UnSetEnv(remove_env->libs[x]);
+				}
+			}
 			if(envp!=NULL)
 			{
-				for(temp=environ;*temp!=(char *)0;++temp)
-				{
-					putenv(*temp);
-				}
 				for(x=0;x<envp->numlibs;++x)
 				{
-					for(x=0;x<envp->numlibs;++x)
-					{
-						RDA_PutEnv(envp->libs[x]);
-					}
+					RDA_PutEnv(envp->libs[x]);
 				}
 			}
 /*lint -e605 */
@@ -198,7 +204,7 @@ short xExecuteProgram(char *name,APPlib *args,APPlib *envp,short style,int line,
 	}
 
 }
-short xExecute2Program(char *name,APPlib *args,APPlib *envp,char add_ext,char quoteargs,int line,char *file)
+short xExecute2Program(char *name,APPlib *args,APPlib *envp,char add_ext,char quoteargs,APPlib *remove_env,int line,char *file)
 {
 	int pid=0,x=0,child_state=0,count=0;
 	char *progname=NULL,**temp=NULL,*windowData=NULL,*temp1=NULL;
@@ -214,6 +220,7 @@ short xExecute2Program(char *name,APPlib *args,APPlib *envp,char add_ext,char qu
 		prterr("DIAG ExecuteProgram Executing Program [%s] at line [%d] program [%s].",name,line,file);
 		SEEAPPlib(args);
 		SEEAPPlib(envp);
+		SEEAPPlib(remove_env);
 	}
 	if(name==NULL)
 	{
@@ -316,11 +323,25 @@ short xExecute2Program(char *name,APPlib *args,APPlib *envp,char add_ext,char qu
 
 		pid = fork ();
 		if (pid == (pid_t) 0) {
+
+			for(temp=environ;*temp!=(char *)0;++temp)
+			{
+				putenv(*temp);
+			}
+
+			if(remove_env!=NULL)
+			{
+				for(x=0;x<remove_env->numlibs;++x)
+				{
+					RDA_UnSetEnv(remove_env->libs[x]);
+				}
+			}
+
 			if(envp!=NULL)
 			{
-				for(temp=environ;*temp!=(char *)0;++temp)
+				for(x=0;x<envp->numlibs;++x)
 				{
-					putenv(*temp);
+					putenv(envp->libs[x]);
 				}
 			}
 /*lint -e605 */
@@ -388,147 +409,6 @@ short xExecute2Program(char *name,APPlib *args,APPlib *envp,char add_ext,char qu
 			return(WEXITSTATUS(child_state));
 		} else { 
 			return(errno); 
-		}
-	}
-}
-short xRunVMimeSendmail(MAIL_VARS *email,int line,char *file)
-{
-	/* This function should take a mail vars structure and
-	 * then run the vmime-sendmail program in a custom
-	 * child environment so as to protect the parent environment 
-	*/
-	int fds[2]; 
-	pid_t pid; 
-	int x=0;
-	int status=0;
-	char *temp=NULL;
-
-	pipe(fds); 
-	pid=fork(); 
-	if (pid == (pid_t) 0) 
-	{
-		/* child */
-		close (fds[1]); 
-		dup2 (fds[0], STDIN_FILENO); 
-
-		if(email->from_name!=NULL)
-		{
-			RDA_SetEnv("VMIME_FROM_NAME",email->from_name);
-		}else{
-			RDA_UnSetEnv("VMIME_FROM_NAME");
-		}
-		if(email->from_addr!=NULL)
-		{
-			RDA_SetEnv("VMIME_FROM_ADDR",email->from_addr);
-		}else{
-			RDA_UnSetEnv("VMIME_FROM_ADDR");
-		}
-		if(email->subject!=NULL)
-		{
-			RDA_SetEnv("VMIME_SUBJECT",email->subject);
-		}else{
-			RDA_UnSetEnv("VMIME_FROM_SUBJECT");
-		}
-		if(email->body!=NULL)
-		{
-			RDA_SetEnv("VMIME_BODY",email->body);
-		}else{
-			RDA_UnSetEnv("VMIME_BODY");
-		}
-		if(email->tolist!=NULL)
-		{
-			RDA_SetEnv("VMIME_TO",email->tolist);
-		}else{
-			RDA_UnSetEnv("VMIME_TO");
-		}
-		if(email->cclist!=NULL)
-		{
-			RDA_SetEnv("VMIME_CC",email->cclist);
-		}else{
-			RDA_UnSetEnv("VMIME_CC");
-		}
-		if(email->bcclist!=NULL)
-		{
-			RDA_SetEnv("VMIME_BCC",email->bcclist);
-		}else{
-			RDA_UnSetEnv("VMIME_BCC");
-		}
-		if(email->ignerr!=0)
-		{
-			RDA_SetEnv("VMIME_IGNERR","1");
-		}else{
-			RDA_UnSetEnv("VMIME_IGNERR");
-		}
-		for(x=0;x<10;x++)
-		{
-			if(email->fname[x]!=NULL)
-			{
-				memset(stemp,0,101);
-				sprintf(stemp,"VMIME_FNAME%d",x);
-				RDA_SetEnv(stemp,email->fname[x]);
-			}else{
-				memset(stemp,0,101);
-				sprintf(stemp,"VMIME_FNAME%d",x);
-				RDA_UnSetEnv(stemp);
-			}
-			if(email->dname[x]!=NULL)
-			{
-				memset(stemp,0,101);
-				sprintf(stemp,"VMIME_DNAME%d",x);
-				RDA_SetEnv(stemp,email->dname[x]);
-			}else{
-				memset(stemp,0,101);
-				sprintf(stemp,"VMIME_DNAME%d",x);
-				RDA_UnSetEnv(stemp);
-			}
-			if(email->mtype[x]!=NULL)
-			{
-				memset(stemp,0,101);
-				sprintf(stemp,"VMIME_MTYPE%d",x);
-				RDA_SetEnv(stemp,email->mtype[x]);
-			}else{
-				memset(stemp,0,101);
-				sprintf(stemp,"VMIME_MTYPE%d",x);
-				RDA_UnSetEnv(stemp);
-			}
-			if(email->fdata[x]!=NULL)
-			{
-				memset(stemp,0,101);
-				sprintf(stemp,"VMIME_FDATA%d",x);
-				RDA_SetEnv(stemp,email->fdata[x]);
-			}else{
-				memset(stemp,0,101);
-				sprintf(stemp,"VMIME_FDATA%d",x);
-				RDA_UnSetEnv(stemp);
-			}
-		}
-
-		temp=getenv("WT_DOC_ROOT");
-		if(temp==NULL)
-		{
-			/* This requires vmime-sendmail to be in the PATH,
-			   Won't work for FastCGI  */
-			execl("/bin/sh","sh","-c","vmime-sendmail.lnx",NULL);
-		}else{
-			/* This prepends path and should work for FastCGI */
-			sprintf(stemp,"%s/vmime-sendmail.lnx",temp);
-			execl("/bin/sh","sh","-c",stemp,NULL);
-		}
-
-	}else if (pid == (pid_t) -1) {
-		/* parent fork failed */
-		close (fds[0]); 
-		close (fds[1]); 
-		return (-1);
-	}else{
-		if(wait(&status)>0) {
-			close (fds[0]); 
-			close (fds[1]); 
-			return(0);
-		}else{
-			close (fds[0]); 
-			close (fds[1]); 
-			return (-1);
 		}
 	}
 }

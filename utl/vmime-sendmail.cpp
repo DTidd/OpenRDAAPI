@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2009-2011 RDA systems Inc.
+// Copyright (C) 2009-2014 RDA systems Inc.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -197,8 +197,10 @@ struct SENDMAIL_VARIABLES
 	char *tolist;
 	char *cclist;
 	char *bcclist;
+	char *replyto;
+	char *srcuser;
 	
-	//  Need some type of arrays or pointers to hold filename, file type, display name in email, and maybe even the actual file data in memeory...
+	//  Need some type of arrays or pointers to hold filename, file type, display name in email, and maybe even the actual file data in memory...
 	char *fname[10];	
 	char *mtype[10];	
 	char *dname[10];	
@@ -690,6 +692,16 @@ int sendattach(SENDMAIL_VARIABLES *mvars)
 		// Email Construction
 		vmime::ref <vmime::message> msg = mb.construct();
 
+		// Add reply to header if value exists.
+		if(mvars->replyto!=NULL)
+		{
+			vmime::ref <vmime::header> hdr = msg->getHeader();
+			vmime::headerFieldFactory *hfFactory = vmime::headerFieldFactory::getInstance();		
+			vmime::ref <vmime::headerField> ReplyToField =  hfFactory->create(vmime::fields::REPLY_TO);
+			ReplyToField->setValue(vmime::text (mvars->replyto));
+			hdr->appendField(ReplyToField);
+		}
+
 		// Raw text generation
 		const vmime::string dataToSend = msg->generate();
 
@@ -714,7 +726,25 @@ int sendattach(SENDMAIL_VARIABLES *mvars)
 		//system_command("msmtp.exe -d -t <C:\\email.txt");
 		//RunSilent("msmtp.exe -d -t <\\\\pipe\\SamplePipe");
 #else
-		pipe=popen("msmtp -t","w");
+		char const *approot=getenv("VM_HOST_ROOT");
+		if(approot!=NULL) 
+		{
+			std::string msmtpcmd("msmtp -C ");
+			msmtpcmd.append(approot);
+			msmtpcmd.append("/approot/msmtprc -X ");
+			msmtpcmd.append(approot);
+			msmtpcmd.append("/approot/openrda/");
+			if(mvars->srcuser!=NULL)
+			{
+				msmtpcmd.append(mvars->srcuser);
+				msmtpcmd.append("/msmtp.log -t");
+			}else{
+				msmtpcmd.append("/unknown-msmtp.log -t");
+			}
+			pipe=popen(msmtpcmd.c_str(),"w");
+		}else{
+			pipe=popen("msmtp -t","w");
+		}
 		if(pipe==NULL) {
 			cerr <<std::endl <<"ERROR SENDING EMAIL: MSMTP Failed.  Ensure MSMTP Is Installed..." <<std::endl;
 			if(!mvars->ignerr) {
@@ -941,6 +971,8 @@ int main(int argc, char* argv[])
 	mvars->tolist=NULL;
 	mvars->cclist=NULL;
 	mvars->bcclist=NULL;
+	mvars->replyto=NULL;
+	mvars->srcuser=NULL;
 	mvars->ignerr=0;
 	
 	//  Need some type of arrays or pointers to hold filename, file type, display name in email, and maybe even the actual file data in memeory...
@@ -953,13 +985,33 @@ int main(int argc, char* argv[])
 		mvars->fdata[x]=NULL;	
 	}
 
-	mvars->from_name=getEnvVar("VMIME_FROM_NAME");
-	mvars->from_addr=getEnvVar("VMIME_FROM_ADDR");
-	mvars->subject=getEnvVar("VMIME_SUBJECT");
-	mvars->body=getenv("VMIME_BODY");
-	mvars->tolist=getEnvVar("VMIME_TO");
-	mvars->cclist=getEnvVar("VMIME_CC");
-	mvars->bcclist=getEnvVar("VMIME_BCC");
+	temp1=getEnvVar("VMIME_SRCDOMAIN");
+	mvars->srcuser=getEnvVar("VMIME_LOGIN_ID");
+
+	if((temp1!=NULL)&&(mvars->srcuser!=NULL))
+	{
+		memset(stemp,0,512);
+		sprintf(stemp,"%s@%s",mvars->srcuser,temp1);
+		delete temp1;
+
+		mvars->from_name=getEnvVar("VMIME_FROM_NAME");
+		mvars->from_addr=new char[(strlen(stemp))+1];
+		strcpy(mvars->from_addr,stemp);
+		mvars->subject=getEnvVar("VMIME_SUBJECT");
+		mvars->body=getenv("VMIME_BODY");
+		mvars->tolist=getEnvVar("VMIME_TO");
+		mvars->cclist=getEnvVar("VMIME_CC");
+		mvars->bcclist=getEnvVar("VMIME_BCC");
+		mvars->replyto=getEnvVar("VMIME_FROM_ADDR");
+	}else{
+		mvars->from_name=getEnvVar("VMIME_FROM_NAME");
+		mvars->from_addr=getEnvVar("VMIME_FROM_ADDR");
+		mvars->subject=getEnvVar("VMIME_SUBJECT");
+		mvars->body=getenv("VMIME_BODY");
+		mvars->tolist=getEnvVar("VMIME_TO");
+		mvars->cclist=getEnvVar("VMIME_CC");
+		mvars->bcclist=getEnvVar("VMIME_BCC");
+	}
 
 //	mvars->fname[0] = new char[50];
 //	mvars->mtype[0] = new char[50];

@@ -256,7 +256,6 @@ static void doftpget(RDArsrc *r)
 		ADVaddwdgt(tmprsrc->scn,2,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(tmprsrc->scn,4,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(tmprsrc->scn,2,"","","","",0,0,0,"","","","");
-#ifdef USING_QT
 		ADVaddwdgt(tmprsrc->scn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(tmprsrc->scn,3,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(tmprsrc->scn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
@@ -264,7 +263,6 @@ static void doftpget(RDArsrc *r)
 		ADVaddwdgt(tmprsrc->scn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(tmprsrc->scn,4,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(tmprsrc->scn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
-#endif /* USING_QT */
 		ADVaddwdgt(tmprsrc->scn,1,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(tmprsrc->scn,3,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(tmprsrc->scn,1,"","","","",0,0,0,"","","","");
@@ -844,7 +842,6 @@ static void ftpget(RDArsrc *r)
 		ADVaddwdgt(tmprsrc->scn,2,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(tmprsrc->scn,4,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(tmprsrc->scn,2,"","","","",0,0,0,"","","","");
-#ifdef USING_QT
 		ADVaddwdgt(tmprsrc->scn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(tmprsrc->scn,3,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(tmprsrc->scn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
@@ -852,7 +849,6 @@ static void ftpget(RDArsrc *r)
 		ADVaddwdgt(tmprsrc->scn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(tmprsrc->scn,4,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(tmprsrc->scn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
-#endif /* USING_QT */
 		ADVaddwdgt(tmprsrc->scn,1,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(tmprsrc->scn,3,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(tmprsrc->scn,1,"","","","",0,0,0,"","","","");
@@ -1260,23 +1256,8 @@ int main(int argc,char **argv)
 #endif
 	addstdrsrc(mainrsrc,"DESTINATION PATH",VARIABLETEXT,0,dest_path,TRUE);
 	ptypes=APPlibNEW();
-	addAPPlib(ptypes,"Motif");
-	addAPPlib(ptypes,"Gtk");
-	addAPPlib(ptypes,"Qt");
-#ifdef WIN32
-#ifdef USING_QT
-	ptype=2;
-#else
-	ptype=1;
-#endif
-#endif 
-#ifndef WIN32
-#ifdef USING_QT
-	ptype=2;
-#else
+	addAPPlib(ptypes,"Wt");
 	ptype=0;
-#endif
-#endif
 	addlstrsrc(mainrsrc,"TYPES",&ptype,TRUE,NULL,ptypes->numlibs,&ptypes->libs,NULL);
 	addstdrsrc(mainrsrc,"UNPACK ZIPS",BOOLNS,1,&defexe,TRUE);
 	addstdrsrc(mainrsrc,"DEFAULT LIBRARIES",BOOLNS,1,&deflib,TRUE);

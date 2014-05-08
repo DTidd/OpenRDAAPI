@@ -17,7 +17,6 @@
 /*CPP_OPART mkdat7 */
 /*CPP_OPART mkdat8 */
 /*CPP_OPART mkdat9 */
-/*CPP_OPART mkdat10 */
 /*CPP_OPART mkdat11 */
 /*CPP_OPART mkdat12 */
 /*CPP_OPART mkdat13 */
@@ -70,7 +69,7 @@ extern void mk_crtie(void),DOFTPZIP(void),DAT2CONV(void);
 extern void CHKTAPE(void),MTNDATLOG(void),MTNDATTRN(void);
 extern void SCRIPTconvzip(void),PURGEDATLOGTRN(void);
 extern void SCRIPTdatazip(void),IBSBACKUP(void),LOGSTAT(void);
-extern void SCRIPTfixcdrecordlog(void),DFGSV_DATABASE(void);
+extern void DFGSV_DATABASE(void);
 
 struct RPTSTRUCTs RptAvl[]=
 {
@@ -104,7 +103,6 @@ struct RPTSTRUCTs RptAvl[]=
 	{"CHKTAPE        ","DISPLAYTAPE/CHKTAPE",CHKTAPE},
 	{"CONV ZIP SCRIPT","Conversion Zip Script ",SCRIPTconvzip},
 	{"data ZIP SCRIPT","data directory Zip Script ",SCRIPTdatazip},
-	{"Fix Backup Log SCRIPT","fix cdrecord log Script ",SCRIPTfixcdrecordlog},
 };
 
 static void quit_print(RDArsrc *prsrc)
@@ -417,7 +415,7 @@ static void MAKE_DATABASE()
 		ADVaddwdgt(scrn,5,"","Resource List","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,"","","","");
-		ADVaddwdgt(scrn,7,"RESOURCE LIST","Resource List","","",25,0,0,"","","","");
+		ADVaddwdgt(scrn,7,"RESOURCE LIST","Resource List","","",20,0,0,"","","","");
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,3,"","","","",0,0,0,"","","","");
