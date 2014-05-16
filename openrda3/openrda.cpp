@@ -1457,18 +1457,21 @@ int main(int argc,char **argv)
 	hb->addWidget(text,500);
 
 	P=new Wt::WPushButton((Wt::WContainerWidget *)v2);
+	P->setToolTip("Home",PlainText);
 	P->addStyleClass("OpenRDA Home");
 	hb->addWidget(P);
 	P->setDefault(FALSE);
 	P->clicked().connect(boost::bind(&go_home));
 
 	P=new Wt::WPushButton((Wt::WContainerWidget *)v2);
+	P->setToolTip("My Settings",PlainText);
 	P->addStyleClass("OpenRDA MySettings");
 	hb->addWidget(P);
 	P->setDefault(FALSE);
 	P->clicked().connect(boost::bind(&MyUserProfile));
 
 	P=new Wt::WPushButton((Wt::WContainerWidget *)v2);
+	P->setToolTip("Sign Out",PlainText);
 	P->addStyleClass("OpenRDA SignOut");
 	hb->addWidget(P);
 	P->setDefault(FALSE);

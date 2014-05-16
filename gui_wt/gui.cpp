@@ -1,5 +1,6 @@
 /*lint -library */
 /*LIBRARY for gui functions */
+/*CPP_OPART NumericField */
 /*CPP_OPART SingleThreadedApplication */
 /*CPP_OPART guiacct */
 /*CPP_OPART accfuncs */

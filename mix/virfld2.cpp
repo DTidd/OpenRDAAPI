@@ -2368,7 +2368,8 @@ short xGLOBALSubData(char **tmp,char *modulename,int line,char *file)
 	if(!RDAstrcmp(modulename,"DEV_LICENSE"))
 	{
 		sprintf(*tmp,"%d",FALSE);
-		temp=RDA_GetEnv("DEV_LICENSE");
+		temp=getenv("DEV_LICENSE");
+		if(temp==NULL) temp=RDA_GetEnv("DEV_LICENSE");
 		if(temp!=NULL)
 		{
 			temp1=strtok(temp," ");

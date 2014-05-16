@@ -67,7 +67,6 @@ int RDA_UserAgent=0;
 #ifdef _USE_GOOGLE_ANALYTICS_ 
 
 // pass smodule and screen name to _trackPageview 
-
 std::string googleCmd = 
 	"if (window.pageTracker) {"
 	"""try {"
@@ -362,7 +361,7 @@ int WT_RDA_SetEnv(char *name,char *value,int line,char *file)
 	setenv(name,value,TRUE);
 	myAPP=Wt::WApplication::instance();
 	n1=new string(name);
-	if(Skip_OpenRDA_Cookies==FALSE) 
+	if(Skip_OpenRDA_Cookies==FALSE && RDAstrcmp(name,"RDADIAG") && RDAstrcmp(name,"DEV_LICENSE")) 
 	{
 		addAPPlib(OpenRDA_Cookies,name);
 	}
@@ -407,7 +406,7 @@ int WT_RDA_PutEnv(char *namevalue,int line,char *file)
 		*temp2=0;
 		++temp2;
 	}
-	if(Skip_OpenRDA_Cookies==FALSE) 
+	if(Skip_OpenRDA_Cookies==FALSE && RDAstrcmp(name,"RDADIAG") && RDAstrcmp(name,"DEV_LICENSE")) 
 	{
 		addAPPlib(OpenRDA_Cookies,name);
 	}
@@ -454,7 +453,7 @@ int WT_RDA_UnSetEnv(char *name,int line,char *file)
 		prterr("DIAG WT_RDA_UnSetEnv Cookie [%s] at line [%d] program [%s].",(name!=NULL ? name:""),line,(file!=NULL ? file:""));
 	}
 	if(isEMPTY(name)) return;
-	if(RDAstrcmp(name,"RDADIAG"))
+	if(RDAstrcmp(name,"RDADIAG") && RDAstrcmp(name,"DEV_LICENSE"))
 	{
 		unsetenv(name);
 	}	
@@ -1105,6 +1104,11 @@ void xINITGUI(int argc,char *argv[],char *d,int line,char *file)
 	char *temp=NULL,*pname=NULL;
 	Wt::WString *c=NULL;
 
+	if(diaggui)
+	{
+		temp=getenv("DEV_LICENSE");
+		std::cerr << "Proof DEV_LICENSE is set or not [" << (temp!=NULL ? temp:"") << "]" << std::endl;
+	}
 	USE_DIAGNOSTIC_SCREENS=FALSE;
 	MODULE_GROUP=0;
 	inside_rfkw=FALSE;
@@ -1970,6 +1974,7 @@ short xupdatemember(RDArmem *member,int line,char *file)
 	char *value=NULL,*temp1=NULL,*temp2=NULL;
 	void (*func)(...)=NULL;
 	RDArsrc *rs;
+	NumericField *NF=NULL;
 	Wt::WString *text=NULL;
 	Wt::WComboBox *CB=NULL;
 	Wt::WSelectionBox *SB=NULL;
@@ -1986,7 +1991,7 @@ short xupdatemember(RDArmem *member,int line,char *file)
 	char *temp_str=NULL,*temp=NULL;
 	int x=0,cp=0;
 	std::stringstream ss1;
-	int z=0;
+	int z=0,iv=0;
 	int Dm=0,Dd=0,Dy=0;
 	double pMin=0.0,pMax=0.0,pVal=0.0;
 
@@ -2232,21 +2237,10 @@ short xupdatemember(RDArmem *member,int line,char *file)
 				if(member->validobject!=NULL) LE->validate();
 				break;
 			case DOLLARS_NOCENTS:
-				value=famtncents((*member->value.float_value*100),
-					(member->cols?member->cols:member->field_length),
-					' ');
-				unpad(value);
-				if(!USER_INTERFACE)
-				{
-					LE=(Wt::WLineEdit *)member->w;
-					text=new Wt::WString(value);
-					LE->setText(*text);
-					cp=(member->cols?member->cols:member->field_length)-1;
-					ss1 << WW->jsRef() << ".selectionStart = " << cp-1 << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-					WW->doJavaScript(ss1.str());
-					if(text!=NULL) text->~WString();
-					if(member->validobject!=NULL) LE->validate();
-				}
+				NF=(NumericField *)member->w;
+				NF->setValue((double)*member->value.float_value/100);
+				LE=(Wt::WLineEdit *)member->w;
+				if(member->validobject!=NULL) LE->validate();
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -2261,21 +2255,10 @@ short xupdatemember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 				break;
 			case DOLLARS:
-				value=famt(*member->value.float_value,
-					(member->cols?member->cols:member->field_length));
-				unpad(value);
-				if(!USER_INTERFACE)
-				{
-					LE=(Wt::WLineEdit *)member->w;
-					text=new Wt::WString(value);
-					LE->setText(*text);
-					cp=(member->cols?member->cols:member->field_length)-1;
-					ss1 << WW->jsRef() << ".selectionStart = " << cp-1 << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-					WW->doJavaScript(ss1.str());
-					if(text!=NULL) text->~WString();
-					if(member->validobject!=NULL) LE->validate();
-
-				}
+				NF=(NumericField *)member->w;
+				NF->setValue((double)*member->value.float_value/100);
+				LE=(Wt::WLineEdit *)member->w;
+				if(member->validobject!=NULL) LE->validate();
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -2290,20 +2273,10 @@ short xupdatemember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 				break;
 			case SDECIMALV:
-				value=floatamt(*member->value.float_value,
-					(member->cols?(member->cols-1):(member->field_length-1)));
-				unpad(value);
-				if(!USER_INTERFACE)
-				{
-					LE=(Wt::WLineEdit *)member->w;
-					text=new Wt::WString(value);
-					LE->setText(*text);
-					cp=(member->cols?member->cols:member->field_length)-1;
-					ss1 << WW->jsRef() << ".selectionStart = " << cp-1 << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-					WW->doJavaScript(ss1.str());
-					if(text!=NULL) text->~WString();
-					if(member->validobject!=NULL) LE->validate();
-				}
+				NF=(NumericField *)member->w;
+				NF->setValue((double)*member->value.float_value);
+				LE=(Wt::WLineEdit *)member->w;
+				if(member->validobject!=NULL) LE->validate();
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -2318,17 +2291,15 @@ short xupdatemember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 				break;
 			case DECIMALV:
-				value=ufloatamt(*member->value.float_value,
-					(member->cols?member->cols:member->field_length));
-				unpad(value);
-				if(!USER_INTERFACE)
+				if(*member->value.float_value<0)
 				{
-					LE=(Wt::WLineEdit *)member->w;
-					text=new Wt::WString(value);
-					LE->setText(*text);
-					if(text!=NULL) text->~WString();
-					if(member->validobject!=NULL) LE->validate();
+					prterr("Error Resource [%s] is negative [%f] and by definition cannot be for a DECIMALV.  This will automatically be set to 0.",member->rscrname,*member->value.float_value);
+					*member->value.float_value=0;
 				}
+				NF=(NumericField *)member->w;
+				NF->setValue((double)*member->value.float_value);
+				LE=(Wt::WLineEdit *)member->w;
+				if(member->validobject!=NULL) LE->validate();
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -2343,20 +2314,10 @@ short xupdatemember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 				break;
 			case SDOUBLEV:
-				value=floatamt(*member->value.float_value,
-					(member->cols?(member->cols-1):(member->field_length-1)));
-				unpad(value);
-				if(!USER_INTERFACE)
-				{
-					LE=(Wt::WLineEdit *)member->w;
-					text=new Wt::WString(value);
-					LE->setText(*text);
-					cp=(member->cols?member->cols:member->field_length)-1;
-					ss1 << WW->jsRef() << ".selectionStart = " << cp-1 << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-					WW->doJavaScript(ss1.str());
-					if(text!=NULL) text->~WString();
-					if(member->validobject!=NULL) LE->validate();
-				}
+				NF=(NumericField *)member->w;
+				NF->setValue(*member->value.float_value);
+				LE=(Wt::WLineEdit *)member->w;
+				if(member->validobject!=NULL) LE->validate();
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -2371,21 +2332,15 @@ short xupdatemember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 				break;
 			case DOUBLEV:
-				if(member->field_length>member->cols)
+				if(*member->value.float_value<0)
 				{
-					value=Rmalloc(member->field_length+1);
-				} else value=Rmalloc(member->cols+1);
-				sprintf(value,"%*.0f",(member->cols ?
-					member->cols:member->field_length),
-					*member->value.float_value);
-				if(!USER_INTERFACE)
-				{
-					LE=(Wt::WLineEdit *)member->w;
-					text=new Wt::WString(value);
-					LE->setText(*text);
-					if(text!=NULL) text->~WString();
-					if(member->validobject!=NULL) LE->validate();
+					prterr("Error Resource [%s] is negative [%.0f] and by definition cannot be for a DOUBLEV.  This will automatically be set to 0.",member->rscrname,*member->value.float_value);
+					*member->value.float_value=0;
 				}
+				NF=(NumericField *)member->w;
+				NF->setValue((double)*member->value.float_value);
+				LE=(Wt::WLineEdit *)member->w;
+				if(member->validobject!=NULL) LE->validate();
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -2400,17 +2355,16 @@ short xupdatemember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 				break;
 			case SHORTV:
-				memset(stemp,0,101);
-				sprintf(stemp,"%*d",(member->cols ? member->cols:member->field_length),*member->value.short_value);
-				value=stralloc(stemp);
-				if(!USER_INTERFACE)
+				if(*member->value.short_value<0)
 				{
-					LE=(Wt::WLineEdit *)member->w;
-					text=new Wt::WString(value);
-					LE->setText(*text);
-					if(text!=NULL) text->~WString();
-					if(member->validobject!=NULL) LE->validate();
+					prterr("Error Resource [%s] is negative [%d] and by definition cannot be for a SHORTV.  This will automatically be set to 0.",member->rscrname,*member->value.short_value);
+					*member->value.short_value=0;
 				}
+				NF=(NumericField *)member->w;
+				iv=*member->value.short_value;
+				NF->setValue((int)iv);
+				LE=(Wt::WLineEdit *)member->w;
+				if(member->validobject!=NULL) LE->validate();
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -2425,20 +2379,11 @@ short xupdatemember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 				break;
 			case SSHORTV:
-				value=sintamt(*member->value.short_value,
-					(member->cols?member->cols:member->field_length));
-				unpad(value);
-				if(!USER_INTERFACE)
-				{
-					LE=(Wt::WLineEdit *)member->w;
-					text=new Wt::WString(value);
-					LE->setText(*text);
-					cp=(member->cols?member->cols:member->field_length)-1;
-					ss1 << WW->jsRef() << ".selectionStart = " << cp-1 << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-					WW->doJavaScript(ss1.str());
-					if(text!=NULL) text->~WString();
-					if(member->validobject!=NULL) LE->validate();
-				}
+				NF=(NumericField *)member->w;
+				iv=*member->value.short_value;
+				NF->setValue((int)iv);
+				LE=(Wt::WLineEdit *)member->w;
+				if(member->validobject!=NULL) LE->validate();
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -2453,17 +2398,16 @@ short xupdatemember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 				break;
 			case LONGV:
-				memset(stemp,0,101);
-				sprintf(stemp,"%*d",(member->cols ? member->cols:member->field_length),*member->value.integer_value);
-				value=stralloc(stemp);
-				if(!USER_INTERFACE)
+				if(*member->value.integer_value<0)
 				{
-					LE=(Wt::WLineEdit *)member->w;
-					text=new Wt::WString(value);
-					LE->setText(*text);
-					if(text!=NULL) text->~WString();
-					if(member->validobject!=NULL) LE->validate();
+					prterr("Error Resource [%s] is negative [%d] and by definition cannot be for a LONGV.  This will automatically be set to 0.",member->rscrname,*member->value.integer_value);
+					*member->value.integer_value=0;
 				}
+				NF=(NumericField *)member->w;
+				iv=*member->value.integer_value;
+				NF->setValue((int)iv);
+				LE=(Wt::WLineEdit *)member->w;
+				if(member->validobject!=NULL) LE->validate();
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -2501,19 +2445,11 @@ short xupdatemember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 				break;
 			case SLONGV:
-				value=sintamt(*member->value.integer_value,
-					(member->cols?member->cols:member->field_length));
-				if(!USER_INTERFACE)
-				{
-					LE=(Wt::WLineEdit *)member->w;
-					text=new Wt::WString(value);
-					LE->setText(*text);
-					cp=(member->cols?member->cols:member->field_length)-1;
-					ss1 << WW->jsRef() << ".selectionStart = " << cp-1 << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-					WW->doJavaScript(ss1.str());
-					if(text!=NULL) text->~WString();
-					if(member->validobject!=NULL) LE->validate();
-				}
+				NF=(NumericField *)member->w;
+				iv=*member->value.integer_value;
+				NF->setValue((int)iv);
+				LE=(Wt::WLineEdit *)member->w;
+				if(member->validobject!=NULL) LE->validate();
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -5669,6 +5605,7 @@ void xreadmember(RDArmem *member,int line,char *file)
 {
 	unsigned l;
 	char *value=NULL,*value2use=NULL;
+	NumericField *NF=NULL;
 	Wt::WString text;
 	Wt::WDate QD;
 	Wt::WDateEdit *DE=NULL;
@@ -5943,12 +5880,19 @@ void xreadmember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 			break;
 		case DOLLARS:
+			NF=(NumericField *)member->w;
+			*member->value.float_value=NF->doubleValue()*100;
+#ifdef USE_RDA_DIAGNOSTICS
+			if(diaggui || diaggui_field)
+			{
+				prterr("DIAG Resource [%s] has value [%f].",
+					member->rscrname,*member->value.float_value);
+			}
+#endif /* USE_RDA_DIAGNOSTICS */
+			break;
 		case DOLLARS_NOCENTS:
-			LE=(Wt::WLineEdit *)member->w;
-			text=LE->text();
-			s1=text.toUTF8();
-			value=stralloc(s1.c_str());
-			*member->value.float_value=stripfamt(value);
+			NF=(NumericField *)member->w;
+			*member->value.float_value=NF->doubleValue();
 #ifdef USE_RDA_DIAGNOSTICS
 			if(diaggui || diaggui_field)
 			{
@@ -5958,14 +5902,8 @@ void xreadmember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 			break;
 		case DECIMALV:
-			LE=(Wt::WLineEdit *)member->w;
-			text=LE->text();
-			s1=text.toUTF8();
-			value=stralloc(s1.c_str());
-			if(!isEMPTY(value))
-			{
-			*member->value.float_value=atof((char *)value);
-			} else *member->value.float_value=0;
+			NF=(NumericField *)member->w;
+			*member->value.float_value=NF->doubleValue();
 #ifdef USE_RDA_DIAGNOSTICS
 			if(diaggui || diaggui_field)
 			{
@@ -5975,11 +5913,8 @@ void xreadmember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 			break;
 		case SDECIMALV:
-			LE=(Wt::WLineEdit *)member->w;
-			text=LE->text();
-			s1=text.toUTF8();
-			value=stralloc(s1.c_str());
-			*member->value.float_value=convneg(value);
+			NF=(NumericField *)member->w;
+			*member->value.float_value=NF->doubleValue();
 #ifdef USE_RDA_DIAGNOSTICS
 			if(diaggui || diaggui_field)
 			{
@@ -5989,11 +5924,8 @@ void xreadmember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 			break;
 		case SDOUBLEV:
-			LE=(Wt::WLineEdit *)member->w;
-			text=LE->text();
-			s1=text.toUTF8();
-			value=stralloc(s1.c_str());
-			*member->value.float_value=convneg(value);
+			NF=(NumericField *)member->w;
+			*member->value.float_value=NF->doubleValue();
 #ifdef USE_RDA_DIAGNOSTICS
 			if(diaggui || diaggui_field)
 			{
@@ -6003,14 +5935,8 @@ void xreadmember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 			break;
 		case DOUBLEV:
-			LE=(Wt::WLineEdit *)member->w;
-			text=LE->text();
-			s1=text.toUTF8();
-			value=stralloc(s1.c_str());
-			if(!isEMPTY(value))
-			{
-				*member->value.float_value=atof((char *)value);
-			} else *member->value.float_value=0;
+			NF=(NumericField *)member->w;
+			*member->value.float_value=NF->doubleValue();
 #ifdef USE_RDA_DIAGNOSTICS
 			if(diaggui || diaggui_field)
 			{
@@ -6020,14 +5946,8 @@ void xreadmember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 			break;
 		case SHORTV:
-			LE=(Wt::WLineEdit *)member->w;
-			text=LE->text();
-			s1=text.toUTF8();
-			value=stralloc(s1.c_str());
-			if(!isEMPTY(value))
-			{
-				*member->value.short_value=Ratoi((char *)value); 
-			} else *member->value.short_value=0;
+			NF=(NumericField *)member->w;
+			*member->value.short_value=NF->unsignedValue();
 #ifdef USE_RDA_DIAGNOSTICS
 			if(diaggui || diaggui_field)
 			{
@@ -6037,11 +5957,8 @@ void xreadmember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 			break;
 		case SSHORTV:
-			LE=(Wt::WLineEdit *)member->w;
-			text=LE->text();
-			s1=text.toUTF8();
-			value=stralloc(s1.c_str());
-			*member->value.short_value=convshortneg((char *)value); 
+			NF=(NumericField *)member->w;
+			*member->value.short_value=NF->intValue();
 #ifdef USE_RDA_DIAGNOSTICS
 			if(diaggui || diaggui_field)
 			{
@@ -6051,14 +5968,8 @@ void xreadmember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 			break;
 		case LONGV:
-			LE=(Wt::WLineEdit *)member->w;
-			text=LE->text();
-			s1=text.toUTF8();
-			value=stralloc(s1.c_str());
-			if(!isEMPTY(value))
-			{
-				*member->value.integer_value=Ratoi((char *)value);
-			} else *member->value.integer_value=0;
+			NF=(NumericField *)member->w;
+			*member->value.integer_value=NF->unsignedValue();
 #ifdef USE_RDA_DIAGNOSTICS
 			if(diaggui || diaggui_field)
 			{
@@ -6068,12 +5979,8 @@ void xreadmember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 			break;
 		case SLONGV:
-			LE=(Wt::WLineEdit *)member->w;
-			text=LE->text();
-			s1=text.toUTF8();
-			value=stralloc(s1.c_str());
-			*member->value.integer_value=convintneg((char *)value);
-
+			NF=(NumericField *)member->w;
+			*member->value.integer_value=NF->intValue();
 #ifdef USE_RDA_DIAGNOSTICS
 			if(diaggui || diaggui_field)
 			{
@@ -8258,7 +8165,9 @@ short xMEMBERSETEDITABLE(RDArmem *member,short editable,short which,int line,cha
 		} else if(member->w!=NULL && member->popup_w==NULL && member->field_type==BOOLNS)
 		{
 			CB=(Wt::WCheckBox *)member->w;
+/*
 			CB->setReadOnly((editable ? FALSE:TRUE));
+*/
 		} else if(member->w!=NULL && member->popup_w==NULL && member->field_type==BUTTONS)
 		{
 			wFormW->setEnabled((editable ? TRUE:FALSE));

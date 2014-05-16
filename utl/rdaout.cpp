@@ -1240,12 +1240,19 @@ void savetext(RDArsrc *saversrc,RDArsrc *mainrsrc)
 	} else {
 		member=mainrsrc->rscs+x;
 	}
-	if(FINDRSCGETSTRING(saversrc,"DESTINATION",&destination)) return;
-	temp=Rmalloc(RDAstrlen(CURRENTDIRECTORY)+RDAstrlen(destination)+5);
-	sprintf(temp,"%s/%s",CURRENTDIRECTORY,destination);
-	if(destination!=NULL) Rfree(destination);
-	destination=stralloc(temp);
-	if(temp!=NULL) Rfree(temp);
+	if(FINDRSCGETSTRING(saversrc,"DESTINATION",&destination)) 
+	{
+		return;
+	}
+
+	if(strncmp(destination,CURRENTDIRECTORY,(RDAstrlen(CURRENTDIRECTORY)))!=0)	
+	{
+		temp=Rmalloc(RDAstrlen(CURRENTDIRECTORY)+RDAstrlen(destination)+5);
+		sprintf(temp,"%s/%s",CURRENTDIRECTORY,destination);
+		if(destination!=NULL) Rfree(destination);
+		destination=stralloc(temp);
+		if(temp!=NULL) Rfree(temp);
+	}
 	if((fp=fopen(destination,"w"))!=NULL)
 	{
 #ifdef WIN32

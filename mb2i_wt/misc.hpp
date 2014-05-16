@@ -405,35 +405,18 @@ int xFileExists(char *,short,int,char *);
 short CheckDevLicense(char *);
 char *READargument(char **,short *);
 
-#define ADVExecuteProgramB(a,b,c,d)	xExecuteProgram(a,b,c,d,__LINE__,__FILE__)
-#define ADVExecuteProgram(a,b,c)	xExecuteProgram(a,b,c,0,__LINE__,__FILE__)
-#define ExecuteProgram(a,b)	xExecuteProgram(a,b,NULL,0,__LINE__,__FILE__)
-short xExecuteProgram(char *,APPlib *,APPlib *,short,int,char *);
+#define ADVExecuteProgramB(a,b,c,d)	xExecuteProgram(a,b,c,d,NULL,__LINE__,__FILE__)
+#define ADVExecuteProgram(a,b,c)	xExecuteProgram(a,b,c,0,NULL,__LINE__,__FILE__)
+#define ExecuteProgram(a,b)	xExecuteProgram(a,b,NULL,0,NULL,__LINE__,__FILE__)
+#define ADV4ExecuteProgramB(a,b,c,d,f)	xExecuteProgram(a,b,c,d,f,__LINE__,__FILE__)
+short xExecuteProgram(char *,APPlib *,APPlib *,short,APPlib *,int,char *);
 
-#define ADVExecute2Program(a,b,c)	xExecute2Program(a,b,c,TRUE,TRUE,__LINE__,__FILE__)
-#define ADV2Execute2Program(a,b,c,d)	xExecute2Program(a,b,c,d,TRUE,__LINE__,__FILE__)
-#define ADV3Execute2Program(a,b,c,d,e)	xExecute2Program(a,b,c,d,e,__LINE__,__FILE__)
-#define Execute2Program(a,b)	xExecute2Program(a,b,NULL,TRUE,TRUE,__LINE__,__FILE__)
-short xExecute2Program(char *,APPlib *,APPlib *,char,char,int,char *);
-struct SENDMAIL_VARIABLES 
-{
-	char *from_name;
-	char *from_addr;
-	char *subject;
-	char *body;
-	char *tolist;
-	char *cclist;
-	char *bcclist;
-	char *fname[10];	
-	char *mtype[10];	
-	char *dname[10];	
-	char *fdata[10];	
-	int ignerr;
-};
-#define RunVMimeSendmail(a)	xRunVMimeSendmail(a,__LINE__,__FILE__)
-typedef struct SENDMAIL_VARIABLES MAIL_VARS;
-short xRunVMimeSendmail(MAIL_VARS *,int,char *);
-
+#define ADVExecute2Program(a,b,c)	xExecute2Program(a,b,c,TRUE,TRUE,NULL,__LINE__,__FILE__)
+#define ADV2Execute2Program(a,b,c,d)	xExecute2Program(a,b,c,d,TRUE,NULL,__LINE__,__FILE__)
+#define ADV3Execute2Program(a,b,c,d,e)	xExecute2Program(a,b,c,d,e,NULL,__LINE__,__FILE__)
+#define ADV4Execute2Program(a,b,c,d,e,f)	xExecute2Program(a,b,c,d,e,f,__LINE__,__FILE__)
+#define Execute2Program(a,b)	xExecute2Program(a,b,NULL,TRUE,TRUE,NULL,__LINE__,__FILE__)
+short xExecute2Program(char *,APPlib *,APPlib *,char,char,APPlib *,int,char *);
 
 struct BINs
 {

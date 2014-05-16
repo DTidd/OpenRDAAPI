@@ -7052,7 +7052,8 @@ static void ArchiveExport(IEfile *importx)
 	sprintf(stemp,"ARCHIVE\\.%s\\%s",importx->module,fname);
 #endif
 	addAPPlib(args,stemp);
-	Execute2Program("COPYFILE",args);
+	
+	RDACopyFile(args->libs[0],args->libs[1]);
 	if(args!=NULL) freeapplib(args);
 	
 	ZERNRD(a_fileno);

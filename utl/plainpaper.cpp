@@ -65,7 +65,7 @@ static void getForm()
 	if(plst.filename!=NULL) Rfree(plst.filename);
 	plst.filename=stralloc(temp);
 	plst.stream=NULL;
-	sprintf(nam,"ftp://%s/./forms/%s",(ftpsvr!=NULL ? ftpsvr:""),temp);
+	sprintf(nam,"ftp://%s/./forms/w2forms.7z",(ftpsvr!=NULL ? ftpsvr:""));
 	if(temp!=NULL) Rfree(temp);
 	curl_easy_setopt(RDAcurl,CURLOPT_URL,nam);
 	curl_easy_setopt(RDAcurl,CURLOPT_FTP_USE_EPSV,epsv);
@@ -90,7 +90,7 @@ static void getForm()
 	}
 #endif /* USE PROXY */
 	
-	/* curl_easy_setopt(RDAcurl,CURLOPT_VERBOSE,FALSE); */
+	curl_easy_setopt(RDAcurl,CURLOPT_VERBOSE,FALSE); 
 	curl_easy_setopt(RDAcurl,CURLOPT_WRITEFUNCTION,getprogram);
 	curl_easy_setopt(RDAcurl,CURLOPT_FILE,&plst);
 
@@ -101,6 +101,7 @@ static void getForm()
 	if(( (!strncmp(&namx[RDAstrlen(namx)-3],".7z",3)) || (!strncmp(&namx[RDAstrlen(namx)-4],".zip",4))))
 	{
 #ifndef WIN32
+		RDA_NOGUI=1;
 		args=APPlibNEW();
 		addAPPlib(args,"x");
 		addAPPlib(args,"-aoa");
@@ -111,6 +112,7 @@ static void getForm()
 		ADVExecute2Program("7za",args,NULL);
 		if(args!=NULL) freeapplib(args);
 		unlink(plst.filename);
+		RDA_NOGUI=0;
 
 #endif
 #ifdef WIN32

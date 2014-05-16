@@ -431,2091 +431,12 @@ void scrolledtext_length(RDArmem *member)
 	member->app_update=FALSE;
 #endif /* _USING_OUR_CALLBACKS_ */
 }
-void combo_func(RDArmem *member)
-{
-#ifdef _USING_OUR_CALLBACKS_
-	RDArsrc *rsrc=NULL;
-	char *value=NULL,*temp=NULL;
-	std::string s1;
-	Wt::WString text;
-	Wt::WComboBox *CB=(Wt::WComboBox *)member->w;
-	int x=0;
-
-	if(member->app_update==TRUE) return;
-	member->app_update=TRUE;
-	if(member->editable && member->user_editable)
-	{
-		text=CB->currentText();
-		s1=text.toUTF8();
-		temp=s1.c_str();
-		for(x=0;x<member->items;++x)
-		{
-			value=*(member->list[0]+x);
-			if(!RDAstrcmp(value,temp)) break;
-		}
-		if(x>=member->items) x=0;
-		*member->value.integer_value=x;
-		member->app_update=FALSE;
-		ExecuteRDArmemFunction(member);
-		rsrc=member->parent;
-		if(!isEMPTY(member->transversal_expression))
-		{
-			ComputeNewTransversalADV(rsrc,rsrc->EvalStr,rsrc->EvalStrArgs,rsrc->SubFunc,rsrc->SubFuncArgs,member->transversal_expression);
-		}
-	} else {
-		CB->setValueText(CB->itemText(*member->value.integer_value));
-	}
-#endif /* _USING_OUR_CALLBACKS_ */
-}
-#define USING_FORMATTEDSTRING_CALLBACK
-void formattedstring_callback(RDArmem *member,const Wt::WKeyEvent& e)
-{
-#ifdef USING_FORMATTEDSTRING_CALLBACK
-#ifdef _USING_OUR_CALLBACKS_
-	Wt::WLineEdit *LE=(Wt::WLineEdit *)member->w;
-	Wt::WString text1,text2,text3,*textx=NULL;
-	std::string s1,s2,s3;
-	char *t1=NULL,*t2=NULL,*t3=NULL,*t4=NULL;
-	char *mask=NULL,*temp=NULL,*temp1=NULL,*ns=NULL;
-	char tempx[512],tempy[512],*rval=NULL;
-	int cp=LE->cursorPosition(),ss=LE->selectionStart();
-	short x=0,y=0,z=0,special_key=0;
-	Wt::WWebWidget *WW=NULL;
-	std::stringstream ss1;
-
-	if(member->app_update==TRUE) return;
-	member->app_update=TRUE;
-	WW=(Wt::WWidget *)LE;
-	if(member->editable && member->user_editable)
-	{
-		if(LE->hasSelectedText())
-		{
-			text3=LE->selectedText();
-			s3=text3.toUTF8();
-			t3=s3.c_str();	
-		}
-		if(e.key()==Key_Backspace)
-		{
-			special_key=1;
-		} else if(e.key()==Key_Delete)
-		{
-			special_key=2;
-		} else if(e.key()==Key_Insert || e.key()==45)
-		{
-			special_key=3;
-			t3=NULL;
-			ss=cp;
-		} else if(e.key()==Key_Left)
-		{
-			special_key=4;
-			if(cp>0)
-			{
-				ss1 << WW->jsRef() << ".selectionStart = " << cp-1 << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-				WW->doJavaScript(ss1.str());
-				cp-=1;
-			}
-		} else if(e.key()==Key_Right)
-		{
-			special_key=5;
-			if(cp<member->field_length)
-			{
-				ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp+1 << ";";
-				WW->doJavaScript(ss1.str());
-				cp+=1;
-			}
-		} else {
-			text2=e.text();
-			s2=text2.toUTF8();
-			t2=s2.c_str();
-			memset(tempy,0,512);
-			x=0;
-			for(temp1=t2;*temp1;++temp1) 
-			{
-				if(isdigit(*temp1) || isalpha(*temp1)) tempy[x++]=*temp1;
-			}
-			sprintf(t2,"%s",tempy);
-			memset(tempy,0,512);
-			x=0;
-		}
-		text1=LE->text();
-		s1=text1.toUTF8();
-		t1=s1.c_str();
-		if(diaggui)
-		{
-			prterr("DIAG formattedstring_callack member->rscrname [%s] definition [%s] value [%s] key [%s] selected [%s] selectedStart [%d] cursorPosition [%d] special_key [%d]",(member->rscrname!=NULL ? member->rscrname:""),(member->definition!=NULL ? member->definition:""),(t1!=NULL ? t1:""),(t2!=NULL ? t2:""),(t3!=NULL ? t3:""),ss,cp,special_key);
-		}
-		if(!isEMPTY(t1) && !RDAstrcmp(t1,t3) && isEMPTY(t2))
-		{
-			member->app_update=FALSE;
-			return;
-		} else if(isEMPTY(t2) && isEMPTY(t3) && special_key==0)
-		{
-			if(RDAstrlen(t1)>RDAstrlen(member->definition))
-			{
-				t1[RDAstrlen(member->definition)]=0;
-				textx=new Wt::WString(t1,UTF8);
-				LE->setText(*textx);
-				textx->~WString();
-			}
-			if(diaggui)
-			{
-				prterr("DIAG formattedstring_callback returning [%s] ",(t1!=NULL ? t1:""));
-			}
-			member->app_update=FALSE;
-			return;
-		}
-
-		switch(special_key)
-		{
-			default:
-			case 0: /* Normal */
-				x=0;
-				memset(tempx,0,512);
-				for(y=0,temp=t1;(*temp && y<RDAstrlen(t1));++temp,++y)
-				{
-					if(y==cp && !isEMPTY(t2) && ss==(-1))
-					{
-						if(!isEMPTY(t3))
-						{
-							for(temp1=t3;*temp1;++temp1)
-							{
-								tempx[x++]=*temp1;
-							}
-						}
-						tempx[x++]=*temp;
-					} else if(y==ss && ss!=(-1))
-					{
-/* Insert Key Strokes */
-						if(!isEMPTY(t3))
-						{
-							for(temp1=t2;*temp1;++temp1)
-							{
-								tempx[x++]=*temp1;
-							}
-						}
-					} else if(ss!=(-1) && y>ss && y<(ss+RDAstrlen(t3)))
-					{
-					} else {
-						tempx[x++]=*temp;
-					}
-				} 
-				if(cp>=RDAstrlen(t1) && ss==(-1))
-				{
-					if(t2!=NULL)
-					{
-						for(temp1=t2;*temp1;++temp1)
-						{
-							tempx[x++]=*temp1;
-						}
-					}
-				}
-				break;
-			case 1: /* Backspace */
-				memset(tempx,0,512);
-				for(y=0,temp=t1;(*temp && y<RDAstrlen(t1));++temp,++y)
-				{
-					if(y==cp && !isEMPTY(t2) && ss==(-1))
-					{
-						for(temp1=t2;*temp1;++temp1)
-						{
-							tempx[x++]=*temp1;
-						}
-						tempx[x++]=*temp;
-					} else if(y==ss && ss!=(-1))
-					{
-/* Insert Key Strokes */
-						if(!isEMPTY(t2))
-						{
-							for(temp1=t2;*temp1;++temp1)
-							{
-								tempx[x++]=*temp1;
-							}
-						}
-					} else if(ss!=(-1) && y>ss && y<(ss+RDAstrlen(t3)))
-					{
-					} else {
-						tempx[x++]=*temp;
-					}
-				} 
-				break;
-			case 2: /* Delete */
-				memset(tempx,0,512);
-				for(y=0,temp=t1;(*temp && y<RDAstrlen(t1));++temp,++y)
-				{
-					if(y==cp && !isEMPTY(t2))
-					{
-						for(temp1=t2;*temp1;++temp1)
-						{
-							tempx[x++]=*temp1;
-						}
-						tempx[x++]=*temp;
-					} else if(y==ss && ss!=(-1))
-					{
-						if(!isEMPTY(t2))
-						{
-							for(temp1=t2;*temp1;++temp1)
-							{
-								tempx[x++]=*temp1;
-							}
-						}
-					} else if(y==(ss+1) && ss!=(-1))
-					{
-					} else {
-						tempx[x++]=*temp;
-					}
-				} 
-				break;
-			case 3: /* Insert */
-				memset(tempx,0,512);
-				for(y=0,temp=t1;(*temp && y<RDAstrlen(t1));++temp,++y)
-				{
-					if(y==cp && !isEMPTY(t2))
-					{
-						for(temp1=t2;*temp1;++temp1)
-						{
-							tempx[x++]=*temp1;
-						}
-						tempx[x++]=*temp;
-					} else if(y==ss && ss!=(-1))
-					{
-						if(!isEMPTY(t2))
-						{
-							for(temp1=t2;*temp1;++temp1)
-							{
-								tempx[x++]=*temp1;
-							}
-						}
-					} else {
-						tempx[x++]=*temp;
-					}
-				} 
-				break;
-		}
-		x=0;
-		y=0;
-		memset(tempy,0,512);
-		for(x=0,temp=tempx;*temp && x<512;++x,++temp)
-		{
-			if(isdigit(*temp) || isalpha(*temp)) 
-			{
-				tempy[y++]=*temp;	
-			} else if(*temp!=' ' && *temp!='-' && *temp!='/' && *temp!=':' && *temp!='(' && *temp!=')' && *temp!=']' && *temp!='[' && *temp!='\'' && *temp!='\"' && *temp!=',')
-			{
-				tempy[y++]=*temp;	
-			}
-		}
-		t4=Rmalloc(RDAstrlen(member->definition)+1);
-		x=0;
-		memset(t4,0,RDAstrlen(member->definition)+1);
-		for(z=0,mask=member->definition,ns=t4;*mask && x<RDAstrlen(tempy);++mask,++ns,++z)
-		{
-			if((*mask=='*' || *mask=='A' || *mask=='N' || *mask=='X') && (x<RDAstrlen(tempy)))
-			{
-				*ns=tempy[x];
-				++x;
-			} else if((*mask=='*' || *mask=='A' || *mask=='N' || *mask=='X'))
-			{
-				break;
-			} else *ns=*mask;
-		}
-		if(diaggui)
-		{
-			prterr("DIAG formattedstring_callback returning [%s] ",(t4!=NULL ? t4:""));
-		}
-		if(RDAstrlen(t4)>RDAstrlen(member->definition))
-		{
-			t4[RDAstrlen(member->definition)]=0;
-		}
-		textx=new Wt::WString(t4,UTF8);
-		LE->setText(*textx);
-		textx->~WString();
-		if(special_key==0)
-		{
-			if(RDAstrlen(t4)>RDAstrlen(t1)) 
-			{
-				cp=RDAstrlen(t4);
-				ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-				WW->doJavaScript(ss1.str());
-			} else if(RDAstrlen(t2)==1)
-			{
-				for(z=cp,mask=member->definition+cp;*mask;++mask,++z)
-				{
-					if((*mask=='*' || *mask=='A' || *mask=='N' || *mask=='X') && (z<RDAstrlen(t4)))
-					{
-						cp=z;
-						break;
-					}
-				}
-				ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp+1 << ";";
-				WW->doJavaScript(ss1.str());
-			} else {
-				cp+=RDAstrlen(t2)-1;
-				for(z=cp,mask=member->definition+cp;*mask;++mask,++z)
-				{
-					if((*mask=='*' || *mask=='A' || *mask=='N' || *mask=='X') && (z<RDAstrlen(t4)))
-					{
-						cp=z;
-						break;
-					}
-				}
-				ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-				WW->doJavaScript(ss1.str());
-			}
-		}
-		if(t4!=NULL) Rfree(t4);
-	}
-	member->app_update=FALSE;
-#endif /* _USING_OUR_CALLBACKS_ */
-#endif /* USING_FORMATTEDSTRING_CALLBACK */
-}
-void formattedstring_callbackKeyUp(RDArmem *member,const Wt::WKeyEvent& e)
-{
-	int k=e.key();
-
-	if(k==Key_Backspace || k==Key_Delete || k==Key_Left || k==Key_Right 
-		|| k==Key_Insert)
-	{
-		formattedstring_callback(member,e);
-	}
-}
-char *GUIstripdigitsdecimal(char *data1)
-{
-	char *temp=NULL;
-	int x=0;
-	if(isEMPTY(data1)) return(NULL);
-	memset(stemp,0,101);
-	for(x=0,temp=data1;*temp;++temp) if(isdigit(*temp) || *temp=='.') stemp[x++]=*temp;
-	temp=stralloc(stemp);
-	return(temp);
-}
-char *GUIstripdigits(char *data1)
-{
-	char *temp=NULL;
-	int x=0;
-	if(isEMPTY(data1)) return(NULL);
-	memset(stemp,0,101);
-	for(x=0,temp=data1;*temp;++temp) if(isdigit(*temp)) stemp[x++]=*temp;
-	temp=stralloc(stemp);
-	return(temp);
-}
-double GUIstripfamt(char *data1)
-{
-	int x=0;
-	char *temp=NULL;
-	double amount=0.0;
-	short neg_flag=FALSE;
-
-	if(isEMPTY(data1)) return(0.0);
-	if(RDAstrstr(data1,"-")) neg_flag=TRUE;
-	memset(stemp,0,101);
-	for(x=0,temp=data1;*temp;++temp)
-	{
-		if(isdigit(*temp))
-		{
-			stemp[x]=*temp;
-			++x;
-		}
-	}
-	amount=atof(stemp);
-	if(neg_flag==TRUE)
-	{
-		amount*=(-1);
-	}
-	return amount;
-}
-char *xMergeInputStrings(char *m,char *k,char *s,int ss,int cp,short sp,int line,char *file)
-{
-	char tempx[512],*temp=NULL,*temp1=NULL,*r=NULL;
-	int x=0,y=0;
-
-#ifdef USE_RDA_DIAGNOSTICS
-	if(diaggui)
-	{
-		prterr("DIAG MergeInputStrings Existing [%s] Keyed [%s] Selected [%s] Start [%d] CursorPosition [%d] Special [%d] at line [%d] program [%s].",(m!=NULL ? m:""),(k!=NULL ? k:""),(s!=NULL ? s:""),ss,cp,sp,line,file);
-	}
-#endif /* USE_RDA_DIAGNOSTICS */
-	if(isEMPTY(k) && isEMPTY(s) && ss==(-1) && sp==0)
-	{
-		r=stralloc(m);
-		return(r);
-	} else if(!isEMPTY(m) && !RDAstrcmp(m,s) && isEMPTY(k))
-	{
-		r=stralloc(m);
-		return(r);
-	}
-	x=0;
-	switch(sp)
-	{
-		default:
-		case 0: /* Normal */
-			memset(tempx,0,512);
-			for(y=0,temp=m;(*temp && y<RDAstrlen(m));++temp,++y)
-			{
-#ifdef USE_RDA_DIAGNOSTICS
-				if(diaggui)
-				{
-					prterr("DIAG \t\ty [%d] ss [%d] k [%s] x [%d] *temp [%c] tempx [%s] cp [%d] RDAstrlen(m) [%d] ",y,ss,(k!=NULL ? k:""),x,*temp,tempx,cp,RDAstrlen(m));
-				}
-#endif /* USE_RDA_DIAGNOSTICS */
-				if(y==cp && !isEMPTY(k) && ss==(-1))
-				{
-					for(temp1=k;*temp1;++temp1)
-					{
-						tempx[x++]=*temp1;
-					}
-					tempx[x++]=*temp;
-				} else if(y==ss && ss!=(-1))
-				{
-					if(!isEMPTY(k))
-					{
-/* Insert Key Strokes */
-#ifdef USE_RDA_DIAGNOSTICS
-						if(diaggui)
-						{
-							prterr("DIAG \t\t\tk [%s] ",(k!=NULL ? k:""));
-						}
-#endif /* USE_RDA_DIAGNOSTICS */
-						for(temp1=k;*temp1;++temp1)
-						{
-							tempx[x++]=*temp1;
-						}
-#ifdef USE_RDA_DIAGNOSTICS
-						if(diaggui)
-						{
-							prterr("DIAG \t\t\tx [%d] ",x,tempx);
-						}
-#endif /* USE_RDA_DIAGNOSTICS */
-					}
-				} else if(ss!=(-1) && y>ss && y<(ss+RDAstrlen(s)))
-				{
-				} else {
-					tempx[x++]=*temp;
-				}
-			} 
-			if(cp>=RDAstrlen(m) && ss==(-1))
-			{
-				if(k!=NULL)
-				{
-					for(temp1=k;*temp1;++temp1)
-					{
-						tempx[x++]=*temp1;
-					}
-				}
-			}
-			break;
-		case 1:  /* Backspace */
-			memset(tempx,0,512);
-			for(y=0,temp=m;(*temp && y<RDAstrlen(m));++temp,++y)
-			{
-#ifdef USE_RDA_DIAGNOSTICS
-				if(diaggui)
-				{
-					prterr("DIAG \t\ty [%d] ss [%d] k [%s] x [%d] *temp [%c] tempx [%s] cp [%d] RDAstrlen(m) [%d] ",y,ss,(k!=NULL ? k:""),x,*temp,tempx,cp,RDAstrlen(m));
-				}
-#endif /* USE_RDA_DIAGNOSTICS */
-				if(y==cp && !isEMPTY(k))
-				{
-					for(temp1=k;*temp1;++temp1)
-					{
-						tempx[x++]=*temp1;
-					}
-					tempx[x++]=*temp;
-				} else if(y==ss && ss!=(-1))
-				{
-/* Insert Key Strokes */
-					if(!isEMPTY(k))
-					{
-#ifdef USE_RDA_DIAGNOSTICS
-						if(diaggui)
-						{
-							prterr("DIAG \t\t\tk [%s] ",(k!=NULL ? k:""));
-						}
-#endif /* USE_RDA_DIAGNOSTICS */
-						for(temp1=k;*temp1;++temp1)
-						{
-							tempx[x++]=*temp1;
-						}
-#ifdef USE_RDA_DIAGNOSTICS
-						if(diaggui)
-						{
-							prterr("DIAG \t\t\tx [%d] ",x,tempx);
-						}
-#endif /* USE_RDA_DIAGNOSTICS */
-					}
-				} else if(ss!=(-1) && y>ss && y<(ss+RDAstrlen(s)))
-				{
-				} else {
-					tempx[x++]=*temp;
-				}
-			} 
-			break;
-		case 2:  /* Delete */
-			memset(tempx,0,512);
-			for(y=0,temp=m;(*temp && y<RDAstrlen(m));++temp,++y)
-			{
-#ifdef USE_RDA_DIAGNOSTICS
-				if(diaggui)
-				{
-					prterr("DIAG \t\ty [%d] ss [%d] k [%s] x [%d] *temp [%c] tempx [%s] cp [%d] RDAstrlen(m) [%d] ",y,ss,(k!=NULL ? k:""),x,*temp,tempx,cp,RDAstrlen(m));
-				}
-#endif /* USE_RDA_DIAGNOSTICS */
-				if(y==cp && !isEMPTY(k))
-				{
-					for(temp1=k;*temp1;++temp1)
-					{
-						tempx[x++]=*temp1;
-					}
-					tempx[x++]=*temp;
-				} else if(y==ss && ss!=(-1))
-				{
-					if(!isEMPTY(k))
-					{
-#ifdef USE_RDA_DIAGNOSTICS
-						if(diaggui)
-						{
-							prterr("DIAG \t\t\tk [%s] ",(k!=NULL ? k:""));
-						}
-#endif /* USE_RDA_DIAGNOSTICS */
-						for(temp1=k;*temp1;++temp1)
-						{
-							tempx[x++]=*temp1;
-						}
-#ifdef USE_RDA_DIAGNOSTICS
-						if(diaggui)
-						{
-							prterr("DIAG \t\t\tx [%d] ",x,tempx);
-						}
-#endif /* USE_RDA_DIAGNOSTICS */
-					}
-				} else if(y==(ss+1) && ss!=(-1))
-				{
-				} else {
-					tempx[x++]=*temp;
-				}
-			} 
-			break;
-		case 3:  /* Insert */
-			memset(tempx,0,512);
-			for(y=0,temp=m;(*temp && y<RDAstrlen(m));++temp,++y)
-			{
-#ifdef USE_RDA_DIAGNOSTICS
-				if(diaggui)
-				{
-					prterr("DIAG \t\ty [%d] ss [%d] k [%s] x [%d] *temp [%c] tempx [%s] ",y,ss,(k!=NULL ? k:""),x,*temp,tempx);
-				}
-#endif /* USE_RDA_DIAGNOSTICS */
-				if(y==cp && !isEMPTY(k))
-				{
-					for(temp1=k;*temp1;++temp1)
-					{
-						tempx[x++]=*temp1;
-					}
-					tempx[x++]=*temp;
-				} else if(y==ss && ss!=(-1))
-				{
-					if(!isEMPTY(k))
-					{
-#ifdef USE_RDA_DIAGNOSTICS
-						if(diaggui)
-						{
-							prterr("DIAG \t\t\tk [%s] ",(k!=NULL ? k:""));
-						}
-#endif /* USE_RDA_DIAGNOSTICS */
-						for(temp1=k;*temp1;++temp1)
-						{
-							tempx[x++]=*temp1;
-						}
-#ifdef USE_RDA_DIAGNOSTICS
-						if(diaggui)
-						{
-							prterr("DIAG \t\t\tx [%d] ",x,tempx);
-						}
-#endif /* USE_RDA_DIAGNOSTICS */
-					}
-				} else {
-					tempx[x++]=*temp;
-				}
-			} 
-			break;
-	}	
-	r=stralloc(tempx);
-#ifdef USE_RDA_DIAGNOSTICS
-	if(diaggui)
-	{
-		prterr("DIAG \tMergeInputStrings returning [%s] ",(r!=NULL ? r:""));
-	}
-#endif /* USE_RDA_DIAGNOSTICS */
-	return(r);
-}
-void dollar_amt(RDArmem *member,const Wt::WKeyEvent& e)
-{
-#ifdef _USING_OUR_CALLBACKS_
-	Wt::WLineEdit *LE=(Wt::WLineEdit *)member->w;
-	Wt::WWidget *WW=(Wt::WWidget *)LE;
-	Wt::WString text,*text1=NULL,stext;
-	char *t=NULL,m=FALSE,*t1=NULL,*t2=NULL,*t3=NULL,*t4=NULL;
-	char *seltext=NULL;
-	double f=0.0;
-	int sels=LE->selectionStart(),cp=LE->cursorPosition(),col=(member->cols!=0 ? member->cols:member->field_length);
-	int sellen=0;
-	std::string s1,s2,ss;
-	std::stringstream ss1;
-	short special_key=0;
-	
-	if(member->app_update==TRUE) return;
-	member->app_update=TRUE;
-	s1=e.text().toUTF8();
-	if(s1.empty()) t1=NULL;
-		else t1=s1.c_str();
-	if(member->editable && member->user_editable)
-	{
-		if(LE->hasSelectedText())
-		{
-			stext=LE->selectedText();
-			ss=stext.toUTF8();
-			seltext=ss.c_str();	
-			sellen=RDAstrlen(seltext);
-		}
-		if(e.key()==Key_Backspace && t1==NULL)
-		{
-			special_key=1;
-		} else if(e.key()==Key_Delete && t1==NULL)
-		{
-			special_key=2;
-		} else if(e.key()==Key_Insert && t1==NULL)
-		{
-			special_key=3;
-			seltext=NULL;
-			sels=cp;
-		} else if(e.key()==Key_Left && t1==NULL)
-		{
-			special_key=4;
-			if(cp>0)
-			{
-				WW=(Wt::WWidget *)LE;
-				ss1 << WW->jsRef() << ".selectionStart = " << cp-1 << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-				WW->doJavaScript(ss1.str());
-				cp-=1;
-			}
-		} else if(e.key()==Key_Right && t1==NULL)
-		{
-			special_key=5;
-			if(cp<=member->field_length)
-			{
-				WW=(Wt::WWidget *)LE;
-				ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp+1 << ";";
-				WW->doJavaScript(ss1.str());
-				cp+=1;
-			}
-		}
-		m=FALSE;
-		text=LE->text();
-		s2=text.toUTF8();
-		t=s2.c_str();
-		t3=MergeInputStrings(t,t1,seltext,sels,cp,special_key);
-		if(RDAstrstr(t3,"-")) m=TRUE;
-		if(RDAstrstr(t3,"+")) m=FALSE;
-		t4=GUIstripdigits(t3);
-		if(!isEMPTY(t4))
-		{
-			f=atof(t4);
-			if(m==TRUE) f*=(-1);
-		} else {
-			f=0.0;
-		}
-		if(t3!=NULL) Rfree(t3);
-	} else {
-		f=*member->value.float_value;
-	}
-	t=famt(f,col);
-	unpad(t);
-	text1 = new Wt::WString(t,UTF8);
-	LE->setText(*text1);
-	text1->~WString();
-	if(t!=NULL) Rfree(t);
-	if(t4!=NULL) Rfree(t4);
-	member->app_update=FALSE;
-
-	if(special_key!=4 && special_key!=5 && special_key!=1 && cp<col)
-	{
-		WW=(Wt::WWidget *)LE;
-		ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-		WW->doJavaScript(ss1.str());
-	} else if(special_key==1)
-	{
-		if(cp==0) cp=col-1;
-		else cp+=1;
-		WW=(Wt::WWidget *)LE;
-		ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-		WW->doJavaScript(ss1.str());
-	} else if(cp>=col)
-	{
-		cp=col-1;
-		WW=(Wt::WWidget *)LE;
-		ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-		WW->doJavaScript(ss1.str());
-	}
-#endif /* _USING_OUR_CALLBACKS_ */
-}
-void dollar_amtCHG(RDArmem *member)
-{
-#ifdef _USING_OUR_CALLBACKS_
-	Wt::WLineEdit *LE=(Wt::WLineEdit *)member->w;
-	Wt::WWidget *WW=(Wt::WWidget *)LE;
-	Wt::WString *text1=NULL;
-	char *t=NULL,m=FALSE,*t3=NULL,*t4=NULL;
-	double f=0.0;
-	int col=(member->cols!=0 ? member->cols:member->field_length);
-	std::stringstream ss1;
-	
-	if(member->app_update==TRUE) return;
-	member->app_update=TRUE;
-	if(member->editable && member->user_editable)
-	{
-		m=FALSE;
-		t=LE->text().toUTF8().c_str();
-		t3=MergeInputStrings(t,"","",(-1),col-1,0);
-		if(RDAstrstr(t3,"-")) m=TRUE;
-		if(RDAstrstr(t3,"+")) m=FALSE;
-		t4=GUIstripdigits(t3);
-		if(!isEMPTY(t4))
-		{
-			f=atof(t4);
-			if(m==TRUE) f*=(-1);
-		} else {
-			f=0.0;
-		}
-		if(t3!=NULL) Rfree(t3);
-	} else {
-		f=*member->value.float_value;
-	}
-	t=famt(f,col);
-	unpad(t);
-	text1 = new Wt::WString(t,UTF8);
-	LE->setText(*text1);
-	text1->~WString();
-	if(t!=NULL) Rfree(t);
-	if(t4!=NULL) Rfree(t4);
-	member->app_update=FALSE;
-
-	WW=(Wt::WWidget *)LE;
-	ss1 << WW->jsRef() << ".selectionStart = " << col-1 << ";" << WW->jsRef() << ".selectionEnd = " << col-1 << ";";
-	WW->doJavaScript(ss1.str());
-#endif /* _USING_OUR_CALLBACKS_ */
-}
-void dollar_amtKeyUp(RDArmem *member,const Wt::WKeyEvent& e)
-{
-	int k=e.key();
-
-	if(k==Key_Backspace || k==Key_Delete || k==Key_Left || k==Key_Right 
-		|| k==Key_Insert)
-	{
-		dollar_amt(member,e);
-	}
-}
-void dollar_nc_amt(RDArmem *member,const Wt::WKeyEvent& e)
-{
-#ifdef _USING_OUR_CALLBACKS_
-	Wt::WLineEdit *LE=(Wt::WLineEdit *)member->w;
-	Wt::WWidget *WW=(Wt::WWidget *)LE;
-	std::stringstream ss1;
-	Wt::WString text,*text1=NULL,stext;
-	char *t=NULL,m=FALSE,*t1=NULL,*t2=NULL,*t3=NULL,*t4=NULL;
-	char *seltext=NULL;
-	double f=0.0;
-	int sels=LE->selectionStart(),cp=LE->cursorPosition(),col=(member->cols!=0 ? member->cols:member->field_length);
-	std::string s1,s2,ss;
-	short special_key=0;
-	
-	if(member->app_update==TRUE) return;
-	member->app_update=TRUE;
-	s1=e.text().toUTF8();
-	if(s1.empty()) t1=NULL;
-		else t1=s1.c_str();
-	if(member->editable && member->user_editable)
-	{
-		if(LE->hasSelectedText())
-		{
-			stext=LE->selectedText();
-			ss=stext.toUTF8();
-			seltext=ss.c_str();	
-		}
-		if(e.key()==Key_Backspace && t1==NULL)
-		{
-			special_key=1;
-		} else if(e.key()==Key_Delete && t1==NULL)
-		{
-			special_key=2;
-		} else if(e.key()==Key_Insert && t1==NULL)
-		{
-			special_key=3;
-			seltext=NULL;
-			sels=cp;
-		} else if(e.key()==Key_Left && t1==NULL)
-		{
-			special_key=4;
-			if(cp>0)
-			{
-				WW=(Wt::WWidget *)LE;
-				ss1 << WW->jsRef() << ".selectionStart = " << cp-1 << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-				WW->doJavaScript(ss1.str());
-				cp-=1;
-			}
-		} else if(e.key()==Key_Right && t1==NULL)
-		{
-			special_key=5;
-			if(cp<=member->field_length)
-			{
-				WW=(Wt::WWidget *)LE;
-				ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp+1 << ";";
-				WW->doJavaScript(ss1.str());
-				cp+=1;
-			}
-		}
-		text=LE->text();
-		s2=text.toUTF8();
-		t=s2.c_str();
-		t3=MergeInputStrings(t,t1,seltext,sels,cp,special_key);
-		if(RDAstrstr(t3,"-")) m=TRUE;
-		if(RDAstrstr(t3,"+")) m=FALSE;
-		t4=GUIstripdigits(t3);
-		if(t3!=NULL) Rfree(t3);
-		if(!isEMPTY(t4))
-		{
-			f=atof(t4)*100;
-			if(m==TRUE) f*=(-1);
-		} else {
-			f=0.0;
-		}
-	} else {
-		f=*member->value.float_value;
-	}
-	t=famtncents(f,col,' ');
-	unpad(t);
-	text1 = new Wt::WString(t,UTF8);
-	LE->setText(*text1);
-	text1->~WString();
-	if(t!=NULL) Rfree(t);
-	if(t4!=NULL) Rfree(t4);
-	member->app_update=FALSE;
-
-	if(special_key!=4 && special_key!=5 && special_key!=1 && cp<col)
-	{
-		WW=(Wt::WWidget *)LE;
-		ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-		WW->doJavaScript(ss1.str());
-	} else if(special_key==1)
-	{
-		if(cp==0) cp=col-1;
-		else cp+=1;
-		WW=(Wt::WWidget *)LE;
-		ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-		WW->doJavaScript(ss1.str());
-	} else if(cp>=col)
-	{
-		cp=col-1;
-		WW=(Wt::WWidget *)LE;
-		ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-		WW->doJavaScript(ss1.str());
-	}
-
-#endif /* _USING_OUR_CALLBACKS_ */
-}
-void dollar_nc_amtCHG(RDArmem *member)
-{
-#ifdef _USING_OUR_CALLBACKS_
-	Wt::WLineEdit *LE=(Wt::WLineEdit *)member->w;
-	Wt::WWidget *WW=(Wt::WWidget *)LE;
-	Wt::WString text,*text1=NULL,stext;
-	char *t=NULL,m=FALSE,*t3=NULL,*t4=NULL;
-	double f=0.0;
-	int col=(member->cols!=0 ? member->cols:member->field_length);
-	std::stringstream ss1;
-
-	if(member->app_update==TRUE) return;
-	member->app_update=TRUE;
-	if(member->editable && member->user_editable)
-	{
-		t=LE->text().toUTF8().c_str();
-		t3=MergeInputStrings(t,"","",(-1),col-1,0);
-		if(RDAstrstr(t3,"-")) m=TRUE;
-		if(RDAstrstr(t3,"+")) m=FALSE;
-		t4=GUIstripdigits(t3);
-		if(t3!=NULL) Rfree(t3);
-		if(!isEMPTY(t4))
-		{
-			f=atof(t4)*100;
-			if(m==TRUE) f*=(-1);
-		} else {
-			f=0.0;
-		}
-	} else {
-		f=*member->value.float_value;
-	}
-	t=famtncents(f,col,' ');
-	unpad(t);
-	text1 = new Wt::WString(t,UTF8);
-	LE->setText(*text1);
-	text1->~WString();
-	if(t4!=NULL) Rfree(t4);
-	member->app_update=FALSE;
-
-	WW=(Wt::WWidget *)LE;
-	ss1 << WW->jsRef() << ".selectionStart = " << col-1 << ";" << WW->jsRef() << ".selectionEnd = " << col-1 << ";";
-	WW->doJavaScript(ss1.str());
-
-#endif /* _USING_OUR_CALLBACKS_ */
-}
-void dollar_nc_amtKeyUp(RDArmem *member,const Wt::WKeyEvent& e)
-{
-	int k=e.key();
-
-	if(k==Key_Backspace || k==Key_Delete || k==Key_Left || k==Key_Right 
-		|| k==Key_Insert)
-	{
-		dollar_nc_amt(member,e);
-	}
-}
-void unsigned_integer(RDArmem *member,const Wt::WKeyEvent& e)
-{
-#ifdef _USING_OUR_CALLBACKS_
-	Wt::WLineEdit *LE=(Wt::WLineEdit *)member->w;
-	Wt::WWidget *WW=(Wt::WWidget *)LE;
-	std::stringstream ss1;
-	Wt::WString text,*text1=NULL,stext;
-	char *t=NULL,*t1=NULL,*t2=NULL,*t3=NULL,*t4=NULL;
-	char *seltext=NULL;
-	int f=0;
-	int sels=LE->selectionStart(),cp=LE->cursorPosition(),col=(member->cols!=0 ? member->cols:member->field_length);
-	std::string s1,s2,ss;
-	short special_key=0;
-	
-	if(member->app_update==TRUE) return;
-	member->app_update=TRUE;
-	s1=e.text().toUTF8();
-	if(s1.empty()) t1=NULL;
-		else t1=s1.c_str();
-	if(member->editable && member->user_editable)
-	{
-		if(LE->hasSelectedText())
-		{
-			stext=LE->selectedText();
-			ss=stext.toUTF8();
-			seltext=ss.c_str();	
-		}
-		if(e.key()==Key_Backspace && t1==NULL)
-		{
-			special_key=1;
-		} else if(e.key()==Key_Delete && t1==NULL)
-		{
-			special_key=2;
-		} else if(e.key()==Key_Insert && t1==NULL)
-		{
-			special_key=3;
-			seltext=NULL;
-			sels=cp;
-		} else if(e.key()==Key_Left && t1==NULL)
-		{
-			special_key=4;
-			if(cp>0)
-			{
-				WW=(Wt::WWidget *)LE;
-				ss1 << WW->jsRef() << ".selectionStart = " << cp-1 << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-				WW->doJavaScript(ss1.str());
-				cp-=1;
-			}
-		} else if(e.key()==Key_Right && t1==NULL)
-		{
-			special_key=5;
-			if(cp<member->field_length)
-			{
-				WW=(Wt::WWidget *)LE;
-				ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp+1 << ";";
-				WW->doJavaScript(ss1.str());
-				cp+=1;
-			}
-		}
-		text=LE->text();
-		s2=text.toUTF8();
-		t=s2.c_str();
-		t3=MergeInputStrings(t,t1,seltext,sels,cp,special_key);
-		t4=GUIstripdigits(t3);
-		if(t3!=NULL) Rfree(t3);
-		if(!isEMPTY(t4))
-		{
-			f=convintneg(t4);
-			if(f<0) f*=(-1);
-		} else {
-			f=0;
-		}
-		memset(stemp,0,101);
-		sprintf(stemp,"%*d",(member->cols ? member->cols:member->field_length),f);
-	} else {
-		memset(stemp,0,101);
-		if(member->field_type==SHORTV)
-		{
-			sprintf(stemp,"%*d",col,*member->value.short_value);
-		} else {
-			sprintf(stemp,"%*d",col,*member->value.integer_value);
-		}
-	}
-	stemp[col]=0;
-	text1 = new Wt::WString(stemp,UTF8);
-	LE->setText(*text1);
-	text1->~WString();
-	if(t4!=NULL) Rfree(t4);
-	member->app_update=FALSE;
-
-	if(special_key!=4 && special_key!=5 && special_key!=1)
-	{
-		WW=(Wt::WWidget *)LE;
-		ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-		WW->doJavaScript(ss1.str());
-	} else if(special_key==1)
-	{
-		if(cp==0) cp=col;
-		else cp+=1;
-		WW=(Wt::WWidget *)LE;
-		ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-		WW->doJavaScript(ss1.str());
-	}
-
-#endif /* _USING_OUR_CALLBACKS_ */
-}
-void unsigned_integerCHG(RDArmem *member)
-{
-#ifdef _USING_OUR_CALLBACKS_
-	Wt::WLineEdit *LE=(Wt::WLineEdit *)member->w;
-	Wt::WWidget *WW=(Wt::WWidget *)LE;
-	std::stringstream ss1;
-	Wt::WString *text1=NULL;
-	char *t=NULL,*t3=NULL,*t4=NULL;
-	int f=0;
-	int col=(member->cols!=0 ? member->cols:member->field_length);
-	
-	if(member->app_update==TRUE) return;
-	member->app_update=TRUE;
-	if(member->editable && member->user_editable)
-	{
-		t=LE->text().toUTF8().c_str();
-		t3=MergeInputStrings(t,"","",(-1),col,0);
-		t4=GUIstripdigits(t3);
-		if(t3!=NULL) Rfree(t3);
-		if(!isEMPTY(t4))
-		{
-			f=convintneg(t4);
-			if(f<0) f*=(-1);
-		} else {
-			f=0;
-		}
-		memset(stemp,0,101);
-		sprintf(stemp,"%*d",(member->cols ? member->cols:member->field_length),f);
-	} else {
-		memset(stemp,0,101);
-		if(member->field_type==SHORTV)
-		{
-			sprintf(stemp,"%*d",col,*member->value.short_value);
-		} else {
-			sprintf(stemp,"%*d",col,*member->value.integer_value);
-		}
-	}
-	stemp[col]=0;
-	text1 = new Wt::WString(stemp,UTF8);
-	LE->setText(*text1);
-	text1->~WString();
-	if(t4!=NULL) Rfree(t4);
-	member->app_update=FALSE;
-
-	WW=(Wt::WWidget *)LE;
-	ss1 << WW->jsRef() << ".selectionStart = " << col << ";" << WW->jsRef() << ".selectionEnd = " << col << ";";
-	WW->doJavaScript(ss1.str());
-#endif /* _USING_OUR_CALLBACKS_ */
-}
-void unsigned_integerKeyUp(RDArmem *member,const Wt::WKeyEvent& e)
-{
-	int k=e.key();
-
-	if(k==Key_Backspace || k==Key_Delete || k==Key_Left || k==Key_Right 
-		|| k==Key_Insert)
-	{
-		unsigned_integer(member,e);
-	}
-}
-void signed_integer(RDArmem *member,const Wt::WKeyEvent& e)
-{
-#ifdef _USING_OUR_CALLBACKS_
-	Wt::WLineEdit *LE=(Wt::WLineEdit *)member->w;
-	Wt::WWidget *WW=(Wt::WWidget *)LE;
-	std::stringstream ss1;
-	Wt::WString text,*text1=NULL,stext;
-	char *t=NULL,*t1=NULL,*t2=NULL,*t3=NULL,*t4=NULL,m=FALSE;
-	char *seltext=NULL;
-	int f=0;
-	int sels=LE->selectionStart(),cp=LE->cursorPosition(),col=(member->cols!=0 ? member->cols:member->field_length);
-	std::string s1,s2,ss;
-	short special_key=0;
-	
-	if(member->app_update==TRUE) return;
-	member->app_update=TRUE;
-	s1=e.text().toUTF8();
-	if(s1.empty()) t1=NULL;
-		else t1=s1.c_str();
-	if(member->editable && member->user_editable)
-	{
-		if(LE->hasSelectedText())
-		{
-			stext=LE->selectedText();
-			ss=stext.toUTF8();
-			seltext=ss.c_str();	
-		}
-		if(e.key()==Key_Backspace && t1==NULL)
-		{
-			special_key=1;
-		} else if(e.key()==Key_Delete && t1==NULL)
-		{
-			special_key=2;
-		} else if(e.key()==Key_Insert && t1==NULL)
-		{
-			special_key=3;
-			seltext=NULL;
-			sels=cp;
-		} else if(e.key()==Key_Left && t1==NULL)
-		{
-			special_key=4;
-			if(cp>0)
-			{
-				WW=(Wt::WWidget *)LE;
-				ss1 << WW->jsRef() << ".selectionStart = " << cp-1 << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-				WW->doJavaScript(ss1.str());
-				cp-=1;
-			}
-		} else if(e.key()==Key_Right && t1==NULL)
-		{
-			special_key=5;
-			if(cp<=member->field_length)
-			{
-				WW=(Wt::WWidget *)LE;
-				ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp+1 << ";";
-				WW->doJavaScript(ss1.str());
-				cp+=1;
-			}
-		}
-		text=LE->text();
-		s2=text.toUTF8();
-		t=s2.c_str();
-		t3=MergeInputStrings(t,t1,seltext,sels,cp,special_key);
-		if(RDAstrstr(t3,"-")) m=TRUE;
-		if(RDAstrstr(t3,"+")) m=FALSE;
-		t4=GUIstripdigits(t3);
-		if(!isEMPTY(t4))
-		{
-			f=convintneg(t4);
-			if(m==TRUE) f*=(-1);
-			
-		} else {
-			f=0;
-		}
-		if(t3!=NULL) Rfree(t3);
-	} else {
-		if(member->field_type==SHORTV)
-		{
-			f=*member->value.short_value;
-		} else {
-			f=*member->value.integer_value;
-		}
-	}
-	t=sintamt(f,col);
-	text1 = new Wt::WString(t,UTF8);
-	LE->setText(*text1);
-	text1->~WString();
-	if(t!=NULL) Rfree(t);
-	if(t4!=NULL) Rfree(t4);
-	member->app_update=FALSE;
-
-	if(special_key!=4 && special_key!=5 && special_key!=1 && cp<col)
-	{
-		WW=(Wt::WWidget *)LE;
-		ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-		WW->doJavaScript(ss1.str());
-	} else if(special_key==1)
-	{
-		if(cp==0) cp=col-1;
-		else cp+=1;
-		WW=(Wt::WWidget *)LE;
-		ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-		WW->doJavaScript(ss1.str());
-	} else if(cp>=col)
-	{
-		cp=col-1;
-		WW=(Wt::WWidget *)LE;
-		ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-		WW->doJavaScript(ss1.str());
-	}
-
-#endif /* _USING_OUR_CALLBACKS_ */
-}
-void signed_integerCHG(RDArmem *member)
-{
-#ifdef _USING_OUR_CALLBACKS_
-	Wt::WLineEdit *LE=(Wt::WLineEdit *)member->w;
-	Wt::WWidget *WW=(Wt::WWidget *)LE;
-	std::stringstream ss1;
-	Wt::WString text,*text1=NULL,stext;
-	char *t=NULL,*t3=NULL,*t4=NULL,m=FALSE;
-	int f=0;
-	int col=(member->cols!=0 ? member->cols:member->field_length);
-	
-	if(member->app_update==TRUE) return;
-	member->app_update=TRUE;
-	if(member->editable && member->user_editable)
-	{
-		t=LE->text().toUTF8().c_str();
-		t3=MergeInputStrings(t,"","",(-1),col-1,0);
-		if(RDAstrstr(t3,"-")) m=TRUE;
-		if(RDAstrstr(t3,"+")) m=FALSE;
-		t4=GUIstripdigits(t3);
-		if(!isEMPTY(t4))
-		{
-			f=convintneg(t4);
-			if(m==TRUE) f*=(-1);
-			
-		} else {
-			f=0;
-		}
-		if(t3!=NULL) Rfree(t3);
-	} else {
-		if(member->field_type==SHORTV)
-		{
-			f=*member->value.short_value;
-		} else {
-			f=*member->value.integer_value;
-		}
-	}
-	t=sintamt(f,col);
-	text1 = new Wt::WString(t,UTF8);
-	LE->setText(*text1);
-	text1->~WString();
-	if(t!=NULL) Rfree(t);
-	if(t4!=NULL) Rfree(t4);
-	member->app_update=FALSE;
-
-	WW=(Wt::WWidget *)LE;
-	ss1 << WW->jsRef() << ".selectionStart = " << col-1 << ";" << WW->jsRef() << ".selectionEnd = " << col-1 << ";";
-	WW->doJavaScript(ss1.str());
-#endif /* _USING_OUR_CALLBACKS_ */
-}
-void signed_integerKeyUp(RDArmem *member,const Wt::WKeyEvent& e)
-{
-	int k=e.key();
-
-	if(k==Key_Backspace || k==Key_Delete || k==Key_Left || k==Key_Right 
-		|| k==Key_Insert)
-	{
-		signed_integer(member,e);
-	}
-}
-void unsigned_double(RDArmem *member,const Wt::WKeyEvent& e)
-{
-#ifdef _USING_OUR_CALLBACKS_
-	Wt::WLineEdit *LE=(Wt::WLineEdit *)member->w;
-	Wt::WWidget *WW=(Wt::WWidget *)LE;
-	std::stringstream ss1;
-	Wt::WString text,*text1=NULL,stext;
-	char *t=NULL,*t1=NULL,*t2=NULL,*t3=NULL,*t4=NULL;
-	char *seltext=NULL;
-	double f=0.0;
-	int sels=LE->selectionStart(),cp=LE->cursorPosition(),col=(member->cols!=0 ? member->cols:member->field_length);
-	std::string s1,s2,ss;
-	short special_key=0;
-	
-	if(member->app_update==TRUE) return;
-	member->app_update=TRUE;
-	s1=e.text().toUTF8();
-	if(s1.empty()) t1=NULL;
-		else t1=s1.c_str();
-	if(member->editable && member->user_editable)
-	{
-		if(LE->hasSelectedText())
-		{
-			stext=LE->selectedText();
-			ss=stext.toUTF8();
-			seltext=ss.c_str();	
-		}
-		if(e.key()==Key_Backspace && t1==NULL)
-		{
-			special_key=1;
-		} else if(e.key()==Key_Delete && t1==NULL)
-		{
-			special_key=2;
-		} else if(e.key()==Key_Insert && t1==NULL)
-		{
-			special_key=3;
-			seltext=NULL;
-			sels=cp;
-		} else if(e.key()==Key_Left && t1==NULL)
-		{
-			special_key=4;
-			if(cp>0)
-			{
-				WW=(Wt::WWidget *)LE;
-				ss1 << WW->jsRef() << ".selectionStart = " << cp-1 << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-				WW->doJavaScript(ss1.str());
-				cp-=1;
-			}
-		} else if(e.key()==Key_Right && t1==NULL)
-		{
-			special_key=5;
-			if(cp<member->field_length)
-			{
-				WW=(Wt::WWidget *)LE;
-				ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp+1 << ";";
-				WW->doJavaScript(ss1.str());
-				cp+=1;
-			}
-		}
-		text=LE->text();
-		s2=text.toUTF8();
-		t=s2.c_str();
-		t3=MergeInputStrings(t,t1,seltext,sels,cp,special_key);
-		t4=GUIstripdigits(t3);
-		if(t3!=NULL) Rfree(t3);
-		if(!isEMPTY(t4))
-		{
-			f=convneg(t4);
-			if(f<0) f*=(-1);
-		} else {
-			f=0.0;
-		}
-	} else {
-		f=*member->value.float_value;
-	}
-	memset(stemp,0,101);
-	sprintf(stemp,"%*.0f",col,f);
-	stemp[col]=0;
-	text1 = new Wt::WString(stemp,UTF8);
-	LE->setText(*text1);
-	text1->~WString();
-	if(t4!=NULL) Rfree(t4);
-	member->app_update=FALSE;
-
-	if(special_key!=4 && special_key!=5 && special_key!=1)
-	{
-		WW=(Wt::WWidget *)LE;
-		ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-		WW->doJavaScript(ss1.str());
-	} else if(special_key==1)
-	{
-		if(cp==0) cp=col;
-		else cp+=1;
-		WW=(Wt::WWidget *)LE;
-		ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-		WW->doJavaScript(ss1.str());
-	}
-
-#endif /* _USING_OUR_CALLBACKS_ */
-}
-void unsigned_doubleCHG(RDArmem *member)
-{
-#ifdef _USING_OUR_CALLBACKS_
-	Wt::WLineEdit *LE=(Wt::WLineEdit *)member->w;
-	Wt::WWidget *WW=(Wt::WWidget *)LE;
-	std::stringstream ss1;
-	Wt::WString text,*text1=NULL,stext;
-	char *t=NULL,*t3=NULL,*t4=NULL;
-	double f=0.0;
-	int col=(member->cols!=0 ? member->cols:member->field_length);
-	
-	if(member->app_update==TRUE) return;
-	member->app_update=TRUE;
-	if(member->editable && member->user_editable)
-	{
-		t=LE->text().toUTF8().c_str();
-		t3=MergeInputStrings(t,"","",(-1),col,0);
-		t4=GUIstripdigits(t3);
-		if(t3!=NULL) Rfree(t3);
-		if(!isEMPTY(t4))
-		{
-			f=convneg(t4);
-			if(f<0) f*=(-1);
-		} else {
-			f=0.0;
-		}
-	} else {
-		f=*member->value.float_value;
-	}
-	memset(stemp,0,101);
-	sprintf(stemp,"%*.0f",col,f);
-	stemp[col]=0;
-	text1 = new Wt::WString(stemp,UTF8);
-	LE->setText(*text1);
-	text1->~WString();
-	if(t4!=NULL) Rfree(t4);
-	member->app_update=FALSE;
-
-	WW=(Wt::WWidget *)LE;
-	ss1 << WW->jsRef() << ".selectionStart = " << col << ";" << WW->jsRef() << ".selectionEnd = " << col << ";";
-	WW->doJavaScript(ss1.str());
-#endif /* _USING_OUR_CALLBACKS_ */
-}
-void unsigned_doubleKeyUp(RDArmem *member,const Wt::WKeyEvent& e)
-{
-	int k=e.key();
-
-	if(k==Key_Backspace || k==Key_Delete || k==Key_Left || k==Key_Right 
-		|| k==Key_Insert)
-	{
-		unsigned_double(member,e);
-	}
-}
-void signed_double(RDArmem *member,const Wt::WKeyEvent& e)
-{
-#ifdef _USING_OUR_CALLBACKS_
-	Wt::WLineEdit *LE=(Wt::WLineEdit *)member->w;
-	Wt::WWidget *WW=(Wt::WWidget *)LE;
-	std::stringstream ss1;
-	Wt::WString text,*text1=NULL,stext;
-	char *t=NULL,*t1=NULL,*t2=NULL,*t3=NULL,*t4=NULL,m=FALSE,*temp=NULL;
-	char *seltext=NULL;
-	double f=0.0;
-	int sels=LE->selectionStart(),cp=LE->cursorPosition(),col=(member->cols!=0 ? member->cols:member->field_length);
-	std::string s1,s2,ss;
-	short special_key=0;
-	
-	if(member->app_update==TRUE) return;
-	member->app_update=TRUE;
-	s1=e.text().toUTF8();
-	if(s1.empty()) t1=NULL;
-		else t1=s1.c_str();
-	if(member->editable && member->user_editable)
-	{
-		if(LE->hasSelectedText())
-		{
-			stext=LE->selectedText();
-			ss=stext.toUTF8();
-			seltext=ss.c_str();	
-		}
-		if(e.key()==Key_Backspace && t1==NULL)
-		{
-			special_key=1;
-		} else if(e.key()==Key_Delete && t1==NULL)
-		{
-			special_key=2;
-		} else if(e.key()==Key_Insert && t1==NULL)
-		{
-			special_key=3;
-			seltext=NULL;
-			sels=cp;
-		} else if(e.key()==Key_Left && t1==NULL)
-		{
-			special_key=4;
-			if(cp>0)
-			{
-				WW=(Wt::WWidget *)LE;
-				ss1 << WW->jsRef() << ".selectionStart = " << cp-1 << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-				WW->doJavaScript(ss1.str());
-				cp-=1;
-			}
-		} else if(e.key()==Key_Right && t1==NULL)
-		{
-			special_key=5;
-			if(cp<=member->field_length)
-			{
-				WW=(Wt::WWidget *)LE;
-				ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp+1 << ";";
-				WW->doJavaScript(ss1.str());
-				cp+=1;
-			}
-		}
-		text=LE->text();
-		s2=text.toUTF8();
-		t=s2.c_str();
-		t3=MergeInputStrings(t,t1,seltext,sels,cp,special_key);
-		if(RDAstrstr(t3,"-")) m=TRUE;
-		if(RDAstrstr(t3,"+")) m=FALSE;
-		t4=GUIstripdigits(t3);
-		if(t3!=NULL) Rfree(t3);
-		if(!isEMPTY(t4))
-		{
-			f=convneg(t4);
-			if(m==TRUE) f*=(-1);
-			sprintf(stemp,"%f",f);
-			for(temp=stemp;*temp;++temp) if(*temp=='.') *temp=0;
-			if(!RDAstrcmp(stemp,"-0")) sprintf(stemp,"0");
-			f=atof(stemp);
-		} else {
-			f=0;
-		}
-	} else {
-		f=*member->value.float_value;
-	}
-	t=floatamt(f,(col-1));
-	unpad(t);
-	text1 = new Wt::WString(t,UTF8);
-	LE->setText(*text1);
-	text1->~WString();
-	if(t!=NULL) Rfree(t);
-	if(t4!=NULL) Rfree(t4);
-	member->app_update=FALSE;
-
-
-	if(special_key!=4 && special_key!=5 && special_key!=1 && cp<col)
-	{
-		WW=(Wt::WWidget *)LE;
-		ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-		WW->doJavaScript(ss1.str());
-	} else if(special_key==1)
-	{
-		if(cp==0) cp=col-1;
-		else cp+=1;
-		WW=(Wt::WWidget *)LE;
-		ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-		WW->doJavaScript(ss1.str());
-	} else if(cp>=col)
-	{
-		cp=col-1;
-		WW=(Wt::WWidget *)LE;
-		ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-		WW->doJavaScript(ss1.str());
-	}
-
-#endif /* _USING_OUR_CALLBACKS_ */
-}
-void signed_doubleCHG(RDArmem *member)
-{
-#ifdef _USING_OUR_CALLBACKS_
-	Wt::WLineEdit *LE=(Wt::WLineEdit *)member->w;
-	Wt::WWidget *WW=(Wt::WWidget *)LE;
-	Wt::WString *text1=NULL;
-	std::stringstream ss1;
-	char *t=NULL,*t3=NULL,*t4=NULL,m=FALSE,*temp=NULL;
-	double f=0.0;
-	int col=(member->cols!=0 ? member->cols:member->field_length);
-	
-	if(member->app_update==TRUE) return;
-	member->app_update=TRUE;
-	if(member->editable && member->user_editable)
-	{
-		t=LE->text().toUTF8().c_str();
-		t3=MergeInputStrings(t,"","",(-1),col-1,0);
-		if(RDAstrstr(t3,"-")) m=TRUE;
-		if(RDAstrstr(t3,"+")) m=FALSE;
-		t4=GUIstripdigits(t3);
-		if(t3!=NULL) Rfree(t3);
-		if(!isEMPTY(t4))
-		{
-			f=convneg(t4);
-			if(m==TRUE) f*=(-1);
-			sprintf(stemp,"%f",f);
-			for(temp=stemp;*temp;++temp) if(*temp=='.') *temp=0;
-			if(!RDAstrcmp(stemp,"-0")) sprintf(stemp,"0");
-			f=atof(stemp);
-		} else {
-			f=0;
-		}
-	} else {
-		f=*member->value.float_value;
-	}
-	t=floatamt(f,(col-1));
-	unpad(t);
-	text1 = new Wt::WString(t,UTF8);
-	LE->setText(*text1);
-	text1->~WString();
-	if(t!=NULL) Rfree(t);
-	if(t4!=NULL) Rfree(t4);
-	member->app_update=FALSE;
-
-
-	WW=(Wt::WWidget *)LE;
-	ss1 << WW->jsRef() << ".selectionStart = " << col-1 << ";" << WW->jsRef() << ".selectionEnd = " << col-1 << ";";
-	WW->doJavaScript(ss1.str());
-#endif /* _USING_OUR_CALLBACKS_ */
-}
-void signed_doubleKeyUp(RDArmem *member,const Wt::WKeyEvent& e)
-{
-	int k=e.key();
-
-	if(k==Key_Backspace || k==Key_Delete || k==Key_Left || k==Key_Right 
-		|| k==Key_Insert)
-	{
-		signed_double(member,e);
-	}
-}
-char *myfloatamt(double amount,int len,int digs)
-{
-	int x,y,length,d=0;
-	int neg_flag=FALSE;
-	char *ret_string=NULL,*val_string=NULL,padchar=' ';
-
-	sprintf(stemp,"%.09f",amount);
-	if((RDAstrstr(stemp,"-")!=NULL))
-	{
-		neg_flag=TRUE;
-		amount*=(-1);
-	}
-	sprintf(stemp,"%.09f",amount);
-	ret_string=stralloc(stemp);
-	length=RDAstrlen(ret_string);
-	val_string=Rmalloc(len+2);
-	d=0;
-	for(x=0;x<length-1;++x) 
-	{
-		if(ret_string[x]=='.')
-		{
-			d=x;
-			break;
-		}
-	}
-	for(x=length-1;(x>(-1+d+digs));x--)
-	{
-		if (ret_string[x]=='0')
-		{
-			ret_string[x]=0;
-		} else if (ret_string[x]=='.') 
-		{
-			ret_string[x]=0;
-			break;
-		} else break;
-	}
-	length=RDAstrlen(ret_string);
-	y=(len-length);
-	x=0;
-	if(y>(-1))
-	{
-		for(x=0;x<y;x++)
-		{
-			val_string[x]=padchar;
-		}
-	} 
-	if(y<0) y=0;
-	for(x=0;y<(len);x++)
-	{
-		val_string[y++]=ret_string[x];
-	}
-	if(ret_string!=NULL) Rfree(ret_string);
-	val_string[len]=(neg_flag?'-':' ');
-	val_string[len+1]=0;
-	return(val_string);
-}
-void signed_floatamt(RDArmem *member,const Wt::WKeyEvent& e)
-{
-#ifdef _USING_OUR_CALLBACKS_
-	Wt::WLineEdit *LE=(Wt::WLineEdit *)member->w;
-	Wt::WWidget *WW=(Wt::WWidget *)LE;
-	std::stringstream ss1;
-	Wt::WString text,*text1=NULL,stext;
-	char *t=NULL,*t1=NULL,*t2=NULL,*t3=NULL,*t4=NULL,m=FALSE,*temp=NULL;
-	char *seltext=NULL;
-	double f=0.0;
-	int sels=LE->selectionStart(),cp=LE->cursorPosition(),col=(member->cols!=0 ? member->cols:member->field_length),digs=0;
-	std::string s1,s2,ss;
-	short special_key=0;
-	
-	if(member->app_update==TRUE) return;
-	member->app_update=TRUE;
-	s1=e.text().toUTF8();
-	if(s1.empty()) t1=NULL;
-		else t1=s1.c_str();
-	if(member->editable && member->user_editable)
-	{
-		if(LE->hasSelectedText())
-		{
-			stext=LE->selectedText();
-			ss=stext.toUTF8();
-			seltext=ss.c_str();	
-		}
-		if(e.key()==Key_Backspace && t1==NULL)
-		{
-			special_key=1;
-		} else if(e.key()==Key_Delete && t1==NULL)
-		{
-			special_key=2;
-		} else if(e.key()==Key_Insert && t1==NULL)
-		{
-			special_key=3;
-			seltext=NULL;
-			sels=cp;
-		} else if(e.key()==Key_Left && t1==NULL)
-		{
-			special_key=4;
-			if(cp>0)
-			{
-				WW=(Wt::WWidget *)LE;
-				ss1 << WW->jsRef() << ".selectionStart = " << cp-1 << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-				WW->doJavaScript(ss1.str());
-				cp-=1;
-			}
-		} else if(e.key()==Key_Right && t1==NULL)
-		{
-			special_key=5;
-			if(cp<=member->field_length)
-			{
-				WW=(Wt::WWidget *)LE;
-				ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp+1 << ";";
-				WW->doJavaScript(ss1.str());
-				cp+=1;
-			}
-		}
-		text=LE->text();
-		s2=text.toUTF8();
-		t=s2.c_str();
-		t3=MergeInputStrings(t,t1,seltext,sels,cp,special_key);
-		if(RDAstrstr(t3,"-")) m=TRUE;
-		if(RDAstrstr(t3,"+")) m=FALSE;
-		t4=GUIstripdigitsdecimal(t3);
-		digs=0;
-		temp=RDAstrstr(t4,".");
-		if(temp!=NULL)
-		{
-			digs=1;
-			++temp;
-			for(;*temp;++temp) ++digs;
-		}
-		if(t3!=NULL) Rfree(t3);
-		if(!isEMPTY(t4))
-		{
-			f=convneg(t4);
-			if(m==TRUE) f*=(-1);
-			memset(stemp,0,101);
-			sprintf(stemp,"%f",f);
-			f=atof(stemp);
-			t=myfloatamt(f,(col-1),digs);
-		} else {
-			f=0;
-			t=floatamt(f,(col-1));
-		}
-	} else {
-		f=*member->value.float_value;
-		t=floatamt(f,(col-1));
-	}
-	unpad(t);
-	text1 = new Wt::WString(t,UTF8);
-	LE->setText(*text1);
-	text1->~WString();
-	if(t!=NULL) Rfree(t);
-	if(t4!=NULL) Rfree(t4);
-	member->app_update=FALSE;
-
-
-	if(special_key!=4 && special_key!=5 && special_key!=1 && cp<col)
-	{
-		WW=(Wt::WWidget *)LE;
-		ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-		WW->doJavaScript(ss1.str());
-	} else if(special_key==1)
-	{
-		if(cp==0) cp=col-1;
-		else cp+=1;
-		WW=(Wt::WWidget *)LE;
-		ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-		WW->doJavaScript(ss1.str());
-	} else if(cp>=col)
-	{
-		cp=col-1;
-		WW=(Wt::WWidget *)LE;
-		ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-		WW->doJavaScript(ss1.str());
-	}
-
-#endif /* _USING_OUR_CALLBACKS_ */
-}
-void signed_floatamtCHG(RDArmem *member)
-{
-#ifdef _USING_OUR_CALLBACKS_
-	Wt::WLineEdit *LE=(Wt::WLineEdit *)member->w;
-	Wt::WWidget *WW=(Wt::WWidget *)LE;
-	Wt::WString *text1=NULL;
-	std::stringstream ss1;
-	char *t=NULL,*t3=NULL,*t4=NULL,m=FALSE,*temp=NULL;
-	double f=0.0;
-	int col=(member->cols!=0 ? member->cols:member->field_length),digs=0;
-	
-	if(member->app_update==TRUE) return;
-	member->app_update=TRUE;
-	if(member->editable && member->user_editable)
-	{
-		t=LE->text().toUTF8().c_str();
-		t3=MergeInputStrings(t,"","",(-1),(col-1),0);
-		if(RDAstrstr(t3,"-")) m=TRUE;
-		if(RDAstrstr(t3,"+")) m=FALSE;
-		t4=GUIstripdigitsdecimal(t3);
-		digs=0;
-		temp=RDAstrstr(t4,".");
-		if(temp!=NULL)
-		{
-			digs=1;
-			++temp;
-			for(;*temp;++temp) ++digs;
-		}
-		if(t3!=NULL) Rfree(t3);
-		if(!isEMPTY(t4))
-		{
-			f=convneg(t4);
-			if(m==TRUE) f*=(-1);
-			memset(stemp,0,101);
-			sprintf(stemp,"%f",f);
-			f=atof(stemp);
-			t=myfloatamt(f,(col-1),digs);
-		} else {
-			f=0;
-			t=floatamt(f,(col-1));
-		}
-	} else {
-		f=*member->value.float_value;
-		t=floatamt(f,(col-1));
-	}
-	unpad(t);
-	text1 = new Wt::WString(t,UTF8);
-	LE->setText(*text1);
-	text1->~WString();
-	if(t!=NULL) Rfree(t);
-	if(t4!=NULL) Rfree(t4);
-	member->app_update=FALSE;
-
-	WW=(Wt::WWidget *)LE;
-	ss1 << WW->jsRef() << ".selectionStart = " << col-1 << ";" << WW->jsRef() << ".selectionEnd = " << col-1 << ";";
-	WW->doJavaScript(ss1.str());
-#endif /* _USING_OUR_CALLBACKS_ */
-}
-void signed_floatamtKeyUp(RDArmem *member,const Wt::WKeyEvent& e)
-{
-	int k=e.key();
-
-	if(k==Key_Backspace || k==Key_Delete || k==Key_Left || k==Key_Right 
-		|| k==Key_Insert)
-	{
-		signed_floatamt(member,e);
-	}
-}
-char *myufloatamt(double amount,int len,int digs)
-{
-	int x,y,length,d=0;
-	char *ret_string, *val_string, padchar=' ';
-
-	sprintf(stemp,"%.09f",amount);
-	ret_string=stralloc(stemp);
-	length=RDAstrlen(ret_string);
-	val_string=Rmalloc(len+1);
-	d=0;
-	for(x=0;x<length-1;++x) 
-	{
-		if(ret_string[x]=='.')
-		{
-			d=x;
-			break;
-		}
-	}
-	for(x=length-1;(x>(-1+d+digs));x--)
-	{
-		if(ret_string[x]=='0') 
-		{
-			ret_string[x]=0;
-		} else if (ret_string[x]=='.') 
-		{
-			ret_string[x]=0;
-			break;
-		} else break;
-	}
-	length=RDAstrlen(ret_string);
-	y=(len-length);
-	x=0;
-	if(y>(-1))
-	{
-		for(x=0;x<y;++x)
-		{
-			val_string[x]=padchar;
-		}
-	}
-	if(y<0) y=0;
-	for(x=y,y=0;x<len;++x,++y)
-	{
-		val_string[x]=ret_string[y];
-	}
-	if(ret_string!=NULL) Rfree(ret_string);
-	val_string[len]=0;
-	return(val_string);
-}
-void unsigned_floatamt(RDArmem *member,const Wt::WKeyEvent& e)
-{
-#ifdef _USING_OUR_CALLBACKS_
-	Wt::WLineEdit *LE=(Wt::WLineEdit *)member->w;
-	Wt::WWidget *WW=(Wt::WWidget *)LE;
-	std::stringstream ss1;
-	Wt::WString text,*text1=NULL,stext;
-	char *t=NULL,*t1=NULL,*t2=NULL,*t3=NULL,*t4=NULL,*temp=NULL;
-	char *seltext=NULL;
-	double f=0.0;
-	int digs=0;
-	int sels=LE->selectionStart(),cp=LE->cursorPosition(),col=(member->cols!=0 ? member->cols:member->field_length);
-	std::string s1,s2,ss;
-	short special_key=0;
-	
-	if(member->app_update==TRUE) return;
-	member->app_update=TRUE;
-	s1=e.text().toUTF8();
-	if(s1.empty()) t1=NULL;
-		else t1=s1.c_str();
-	if(member->editable && member->user_editable)
-	{
-		if(e.key()==Key_Backspace && t1==NULL)
-		{
-			special_key=1;
-		} else if(e.key()==Key_Delete && t1==NULL)
-		{
-			special_key=2;
-		} else if(e.key()==Key_Insert && t1==NULL)
-		{
-			special_key=3;
-			seltext=NULL;
-			sels=cp;
-		} else if(e.key()==Key_Left && t1==NULL)
-		{
-			special_key=4;
-			if(cp>0)
-			{
-				WW=(Wt::WWidget *)LE;
-				ss1 << WW->jsRef() << ".selectionStart = " << cp-1 << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-				WW->doJavaScript(ss1.str());
-				cp-=1;
-			}
-		} else if(e.key()==Key_Right && t1==NULL)
-		{
-			special_key=5;
-			if(cp<member->field_length)
-			{
-				WW=(Wt::WWidget *)LE;
-				ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp+1 << ";";
-				WW->doJavaScript(ss1.str());
-				cp+=1;
-			}
-		}
-		if(LE->hasSelectedText())
-		{
-			stext=LE->selectedText();
-			ss=stext.toUTF8();
-			seltext=ss.c_str();	
-		}
-		text=LE->text();
-		s2=text.toUTF8();
-		t=s2.c_str();
-		t3=MergeInputStrings(t,t1,seltext,sels,cp,special_key);
-		t4=GUIstripdigitsdecimal(t3);
-		digs=0;
-		temp=RDAstrstr(t4,".");
-		if(temp!=NULL)
-		{
-			digs=1;
-			++temp;
-			for(;*temp;++temp) ++digs;
-		}
-		if(t3!=NULL) Rfree(t3);
-		if(!isEMPTY(t4))
-		{
-			f=convneg(t4);
-			if(f<0) f*=(-1);
-			t=myufloatamt(f,col,digs);
-		} else {
-			f=0;
-			t=ufloatamt(f,col);
-		}
-	} else {
-		f=*member->value.float_value;
-		t=ufloatamt(f,col);
-	}
-	unpad(t);
-	text1 = new Wt::WString(t,UTF8);
-	LE->setText(*text1);
-	text1->~WString();
-	if(t!=NULL) Rfree(t);
-	if(t4!=NULL) Rfree(t4);
-	member->app_update=FALSE;
-
-
-	if(special_key!=4 && special_key!=5 && special_key!=1)
-	{
-		WW=(Wt::WWidget *)LE;
-		ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-		WW->doJavaScript(ss1.str());
-	} else if(special_key==1)
-	{
-		if(cp==0) cp=col;
-		else cp+=1;
-		WW=(Wt::WWidget *)LE;
-		ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
-		WW->doJavaScript(ss1.str());
-	}
-
-#endif /* _USING_OUR_CALLBACKS_ */
-}
-void unsigned_floatamtCHG(RDArmem *member)
-{
-#ifdef _USING_OUR_CALLBACKS_
-	Wt::WLineEdit *LE=(Wt::WLineEdit *)member->w;
-	Wt::WWidget *WW=(Wt::WWidget *)LE;
-	Wt::WString *text1=NULL;
-	std::stringstream ss1;
-	char *t=NULL,*t3=NULL,*t4=NULL,*temp=NULL;
-	double f=0.0;
-	int digs=0;
-	int col=(member->cols!=0 ? member->cols:member->field_length);
-	
-	if(member->app_update==TRUE) return;
-	member->app_update=TRUE;
-	if(member->editable && member->user_editable)
-	{
-		t=LE->text().toUTF8().c_str();
-		t3=MergeInputStrings(t,"","",(-1),col,0);
-		t4=GUIstripdigitsdecimal(t3);
-		digs=0;
-		temp=RDAstrstr(t4,".");
-		if(temp!=NULL)
-		{
-			digs=1;
-			++temp;
-			for(;*temp;++temp) ++digs;
-		}
-		if(t3!=NULL) Rfree(t3);
-		if(!isEMPTY(t4))
-		{
-			f=convneg(t4);
-			if(f<0) f*=(-1);
-			t=myufloatamt(f,col,digs);
-		} else {
-			f=0;
-			t=ufloatamt(f,col);
-		}
-	} else {
-		f=*member->value.float_value;
-		t=ufloatamt(f,col);
-	}
-	unpad(t);
-	text1 = new Wt::WString(t,UTF8);
-	LE->setText(*text1);
-	text1->~WString();
-	if(t!=NULL) Rfree(t);
-	if(t4!=NULL) Rfree(t4);
-	member->app_update=FALSE;
-
-	WW=(Wt::WWidget *)LE;
-	ss1 << WW->jsRef() << ".selectionStart = " << col << ";" << WW->jsRef() << ".selectionEnd = " << col << ";";
-	WW->doJavaScript(ss1.str());
-#endif /* _USING_OUR_CALLBACKS_ */
-}
-void unsigned_floatamtKeyUp(RDArmem *member,const Wt::WKeyEvent& e)
-{
-	int k=e.key();
-	std::string s1;
-
-	if(k==Key_Backspace || k==Key_Delete || k==Key_Left || k==Key_Right 
-		|| k==Key_Insert || k==46)
-	{
-		unsigned_floatamt(member,e);
-	}
-}
 void makefield(Wt::WWidget *parent,RDArmem *member,
 	char *label,char *XHTML_Label,char *pixmap,short rows,short cols,int rtype,
 	Wt::WTable *Parent_Table,int table_row,int table_col,
 	int table_row_span,int table_col_span)
 {
+	NumericField *NF=NULL;
 	Wt::WWidget *WW=NULL;
 	Wt::WFormWidget *wFormW=NULL;
 	Wt::WImage *myImage=NULL;
@@ -2556,7 +477,7 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 	RDArmem *browse_list_desc=NULL;
 	Wt::WText *hold=NULL,*flatpB=NULL;
 	int h=0,w=0,longest=0;
-	int z=0;
+	int z=0,digs=0,iv=0;
 	int Dm=0,Dd=0,Dy=0;
 	RDAacct *holdacct=NULL;
 	std::string *s1=NULL;
@@ -3392,6 +1313,12 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 						c->~WString();
 					} else temp=NULL;
 				}
+				if(!isEMPTY(temp))
+				{
+					member->validobject = new Wt::WRegExpValidator(temp);
+				} else {
+					member->validobject = new Wt::WValidator();
+				}
 				mssc=ModuleScreenStyleClass(rsx);
 				fssc=InputFieldStyleClass(member);
 				memset(GUIstemp,0,1024);
@@ -3416,12 +1343,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				if(mssc!=NULL) Rfree(mssc);
 				if(fssc!=NULL) Rfree(fssc);
 				wFormW=(Wt::WFormWidget *)LE;
-				if(!isEMPTY(temp))
-				{
-					member->validobject = new Wt::WRegExpValidator(temp);
-				} else {
-					member->validobject = new Wt::WValidator();
-				}
 				if(member->validobject!=NULL) LE->setValidator(member->validobject);
 				if(temp!=NULL) Rfree(temp);
 				if(Parent_Table!=NULL)
@@ -3489,11 +1410,10 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 			}
 			break;
 		case DOLLARS_NOCENTS:
-			temp_str=famtncents((*member->value.float_value*100),(cols ? cols:member->field_length),' ');
-			unpad(temp_str);
 			if(!USER_INTERFACE)
 			{
-				LE=new Wt::WLineEdit((Wt::WWidget *)parent);
+				NF=new NumericField((Wt::WWidget *)parent);
+				LE=(Wt::WLineEdit *)NF;
 				WW=(Wt::WWidget *)LE;
 				mssc=ModuleScreenStyleClass(rsx);
 				fssc=InputFieldStyleClass(member);
@@ -3502,36 +1422,39 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				WW->addStyleClass(GUIstemp);
 				if(mssc!=NULL) Rfree(mssc);
 				if(fssc!=NULL) Rfree(fssc);
-				member->w=(Wt::WWidget *)LE;
-				wFormW=(Wt::WFormWidget *)LE;
+				member->w=(NumericField *)NF;
+				wFormW=(Wt::WFormWidget *)NF;
 				if(Parent_Table!=NULL)
 				{
 					tCell->addWidget((Wt::WWidget *)member->w);
 				}
+				memset(GUIstemp,0,1024);
+				sprintf(GUIstemp,"%c",RDA_CURRENCY_SYMBOL);
+				temp_xstr=new Wt::WString(GUIstemp);
+				NF->setCurrencyInput(*temp_xstr,0," ");
+				temp_xstr->~WString();
 				if(member->field_length!=0)
 				{
 					if(cols<=0)
 					{	
 						cols=member->field_length;
 					}
-/* setMaxLength has been commented out for pasting purposes 
-
-					LE->setMaxLength(member->field_length);
-*/
 				}
 				if(cols>0)
 				{
 					h=cols+2;
 				} else h=22;
+				digs=cols-2-(cols-2)/4;
+				NF->setDigits(digs);
+				NF->setDecimal(FALSE);
+				NF->setAllowNegative(TRUE);
+				NF->setValue((double)*member->value.float_value);
 				LE->setTextSize(h);
 				
 				if(Parent_Table!=NULL)
 				{
 					tColumn->setWidth(h);
 				}
-/*
-				member->validobject = new Wt::WRegExpValidator("[-]?[ ]?[$][ ]*[0]?|[$]?[-]?[ ]*[1-9]{1}([,]?[0-9]{3}){0,4}|[$]?[-]?[ ]*[1-9]{1}[0-9]{1}([,]?[0-9]{3}){0,4}|[$]?[-]?[ ]*[1-9]{1}[0-9]{2}([,]?[0-9]{3}){0,3}");
-*/
 				member->validobject = new Wt::WValidator();
 				if(member->validobject!=NULL) LE->setValidator(member->validobject);
 #ifdef USE_RDA_DIAGNOSTICS
@@ -3540,9 +1463,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					prterr("DIAG Setting Resource [%s]'s Initial value [%s].",member->rscrname,member->value.string_value);
 				}
 #endif /* USE_RDA_DIAGNOSTICS */
-				temp_xstr = new Wt::WString(temp_str,UTF8);
-				LE->setText(*temp_xstr);
-				temp_xstr->~WString();
 				if(member->validobject!=NULL) LE->validate();
 				if(!member->editable)
 				{
@@ -3561,22 +1481,17 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					}
 					ADVMEMBERSETEDITABLE(member,member->user_editable,TRUE);
 				}
-				LE->keyPressed().connect(std::bind([=] (const Wt::WKeyEvent& e) { dollar_nc_amt(member,e); }, std::placeholders::_1));
-				LE->keyWentUp().connect(std::bind([=] (const Wt::WKeyEvent& e) { dollar_nc_amtKeyUp(member,e); }, std::placeholders::_1));
 				LE->enterPressed().connect(boost::bind(&activatefunction,member));
-				wFormW->changed().connect(boost::bind(&dollar_nc_amtCHG,member));
 				wFormW->blurred().connect(boost::bind(&losingfocusfunction,member));
 				wFormW->focussed().connect(boost::bind(&gainingfocusfunction,member));
 			}
-			if(temp_str!=NULL) Rfree(temp_str);
 			break;
 		case DOLLARS:
-			temp_str=famt((*member->value.float_value),(cols ? cols:member->field_length));
-			unpad(temp_str);
 			if(!USER_INTERFACE)
 			{
-				LE=new Wt::WLineEdit((Wt::WWidget *)parent);
-				WW=(Wt::WWidget *)LE;
+				NF=new NumericField((Wt::WWidget *)parent);
+				LE=(Wt::WLineEdit *)NF;	
+				WW=(Wt::WWidget *)NF;
 				mssc=ModuleScreenStyleClass(rsx);
 				fssc=InputFieldStyleClass(member);
 				memset(GUIstemp,0,1024);
@@ -3584,27 +1499,33 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				WW->addStyleClass(GUIstemp);
 				if(mssc!=NULL) Rfree(mssc);
 				if(fssc!=NULL) Rfree(fssc);
-				member->w=(Wt::WWidget *)LE;
+				member->w=(Wt::WWidget *)NF;
 				wFormW=(Wt::WFormWidget *)LE;
 				if(Parent_Table!=NULL)
 				{
 					tCell->addWidget((Wt::WWidget *)member->w);
 				}
+				memset(GUIstemp,0,1024);
+				sprintf(GUIstemp,"%c",RDA_CURRENCY_SYMBOL);
+				temp_xstr=new Wt::WString(GUIstemp);
+				NF->setCurrencyInput(*temp_xstr,2," ");
+				temp_xstr->~WString();
 				if(member->field_length!=0)
 				{
 					if(cols<=0)
 					{	
 						cols=member->field_length;
 					}
-/* setMaxLength has been commented out for pasting purposes 
-
-					LE->setMaxLength(member->field_length);
-*/
 				}
 				if(cols>0)
 				{
 					h=cols+2;
 				} else h=22;
+				digs=cols-2-(cols-2)/4;
+				NF->setDigits(digs);
+				NF->setDecimal(TRUE);
+				NF->setAllowNegative(TRUE);
+				NF->setValue((double)*member->value.float_value/100);
 				LE->setTextSize(h);
 				
 				if(Parent_Table!=NULL)
@@ -3612,9 +1533,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					tColumn->setWidth(h);
 				}
 				member->validobject = new Wt::WValidator();
-/*
-				member->validobject = new Wt::WRegExpValidator("[-]?[ ]?[$][ ]*[0]?[.]{1}[0-9]{2}|[$]?[-]?[ ]*[1-9]{1}([,]?[0-9]{3}){0,3}[.]{1}[0-9]{2}|[$]?[-]?[ ]*[1-9]{1}[0-9]{1}([,]?[0-9]{3}){0,3}[.]{1}[0-9]{2}|[$]?[-]?[ ]*[1-9]{1}[0-9]{2}([,]?[0-9]{3}){0,3}[.]{1}[0-9]{2}");
-*/
 				if(member->validobject!=NULL) LE->setValidator(member->validobject);
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
@@ -3622,9 +1540,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					prterr("DIAG Setting Resource [%s]'s Initial value [%s].",member->rscrname,member->value.string_value);
 				}
 #endif /* USE_RDA_DIAGNOSTICS */
-				temp_xstr = new Wt::WString(temp_str,UTF8);
-				LE->setText(*temp_xstr);
-				temp_xstr->~WString();
 				if(member->validobject!=NULL) LE->validate();
 				if(!member->editable)
 				{
@@ -3643,23 +1558,17 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					}
 					ADVMEMBERSETEDITABLE(member,member->user_editable,TRUE);
 				}
-				LE->keyPressed().connect(std::bind([=] (const Wt::WKeyEvent& e) { dollar_amt(member,e); }, std::placeholders::_1));
-				LE->keyWentUp().connect(std::bind([=] (const Wt::WKeyEvent& e) { dollar_amtKeyUp(member,e); }, std::placeholders::_1));
 				LE->enterPressed().connect(boost::bind(&activatefunction,member));
-				wFormW->changed().connect(boost::bind(&dollar_amtCHG,member));
 				wFormW->blurred().connect(boost::bind(&losingfocusfunction,member));
 				wFormW->focussed().connect(boost::bind(&gainingfocusfunction,member));
 			}
-			if(temp_str!=NULL) Rfree(temp_str);
 			break;
 		case DECIMALV:
-			temp_str=ufloatamt(*member->value.float_value,(cols ?
-				cols:member->field_length));
-			unpad(temp_str);
 			if(!USER_INTERFACE)
 			{
-				LE=new Wt::WLineEdit((Wt::WWidget *)parent);
-				WW=(Wt::WWidget *)LE;
+				NF=new NumericField((Wt::WWidget *)parent);
+				LE=(Wt::WLineEdit *)NF;	
+				WW=(Wt::WWidget *)NF;
 				mssc=ModuleScreenStyleClass(rsx);
 				fssc=InputFieldStyleClass(member);
 				memset(GUIstemp,0,1024);
@@ -3667,22 +1576,23 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				WW->addStyleClass(GUIstemp);
 				if(mssc!=NULL) Rfree(mssc);
 				if(fssc!=NULL) Rfree(fssc);
-				member->w=(Wt::WWidget *)LE;
-				wFormW=(Wt::WFormWidget *)LE;
-				if(Parent_Table!=NULL)
-				{
-					tCell->addWidget((Wt::WWidget *)member->w);
-				}
+				member->w=(Wt::WWidget *)NF;
+				wFormW=(Wt::WFormWidget *)NF;
 				if(member->field_length!=0)
 				{
 					if(cols<=0)
 					{	
 						cols=member->field_length;
 					}
-/* setMaxLength has been commented out for pasting purposes 
-
-					LE->setMaxLength(member->field_length);
-*/
+				}
+				digs=cols;
+				NF->setDigits(digs);
+				NF->setDecimal(TRUE);
+				NF->setAllowNegative(FALSE);
+				NF->setValue((double)*member->value.float_value);
+				if(Parent_Table!=NULL)
+				{
+					tCell->addWidget((Wt::WWidget *)member->w);
 				}
 				if(cols>0)
 				{
@@ -3694,13 +1604,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				{
 					tColumn->setWidth(h);
 				}
-/* Validators do not work with our input functions properly 
-
-				doubleValid = new Wt::WDoubleValidator();
-				doubleValid->setBottom(0.00);
-				Valid = (Wt::WValidator *)doubleValid;
-				member->validobject  = (Wt::WValidator *)doubleValid;
-*/
 				member->validobject = new Wt::WValidator((Wt::WObject *)member->w);
 				if(member->validobject!=NULL) LE->setValidator(member->validobject);
 #ifdef USE_RDA_DIAGNOSTICS
@@ -3709,9 +1612,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					prterr("DIAG Setting Resource [%s]'s Initial value [%s].",member->rscrname,member->value.string_value);
 				}
 #endif /* USE_RDA_DIAGNOSTICS */
-				temp_xstr = new Wt::WString(temp_str,UTF8);
-				LE->setText(*temp_xstr);
-				temp_xstr->~WString();
 				if(member->validobject!=NULL) LE->validate();
 				if(!member->editable)
 				{
@@ -3730,23 +1630,17 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					}
 					ADVMEMBERSETEDITABLE(member,member->user_editable,TRUE);
 				}
-				LE->keyPressed().connect(std::bind([=] (const Wt::WKeyEvent& e) { unsigned_floatamt(member,e); }, std::placeholders::_1));
-				LE->keyWentUp().connect(std::bind([=] (const Wt::WKeyEvent& e) { unsigned_floatamtKeyUp(member,e); }, std::placeholders::_1));
 				LE->enterPressed().connect(boost::bind(&activatefunction,member));
-				wFormW->changed().connect(boost::bind(&unsigned_floatamtCHG,member));
 				wFormW->blurred().connect(boost::bind(&losingfocusfunction,member));
 				wFormW->focussed().connect(boost::bind(&gainingfocusfunction,member));
 			}
-			if(temp_str!=NULL) Rfree(temp_str);
 			break;
 		case SDECIMALV:
-			temp_str=floatamt(*member->value.float_value,(cols ? 
-				(cols-1):(member->field_length-1)));
-			unpad(temp_str);
 			if(!USER_INTERFACE)
 			{
-				LE=new Wt::WLineEdit((Wt::WWidget *)parent);
-				WW=(Wt::WWidget *)LE;
+				NF=new NumericField((Wt::WWidget *)parent);
+				LE=(Wt::WLineEdit *)NF;	
+				WW=(Wt::WWidget *)NF;
 				mssc=ModuleScreenStyleClass(rsx);
 				fssc=InputFieldStyleClass(member);
 				memset(GUIstemp,0,1024);
@@ -3766,27 +1660,22 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					{	
 						cols=member->field_length;
 					}
-/* setMaxLength has been commented out for pasting purposes 
-
-					LE->setMaxLength(member->field_length);
-*/
 				}
 				if(cols>0)
 				{
 					h=cols+2;
 				} else h=22;
+				digs=cols;
+				NF->setDigits(digs);
+				NF->setDecimal(TRUE);
+				NF->setAllowNegative(TRUE);
+				NF->setValue((double)*member->value.float_value);
 				LE->setTextSize(h);
 				
 				if(Parent_Table!=NULL)
 				{
 					tColumn->setWidth(h);
 				}
-/* Validators do not work with our input functions properly 
-
-				doubleValid = new Wt::WDoubleValidator();
-				Valid = (Wt::WValidator *)doubleValid;
-				member->validobject  = (Wt::WValidator *)doubleValid;
-*/
 				member->validobject = new Wt::WValidator((Wt::WObject *)member->w);
 				if(member->validobject!=NULL) LE->setValidator(member->validobject);
 #ifdef USE_RDA_DIAGNOSTICS
@@ -3795,9 +1684,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					prterr("DIAG Setting Resource [%s]'s Initial value [%s].",member->rscrname,member->value.string_value);
 				}
 #endif /* USE_RDA_DIAGNOSTICS */
-				temp_xstr = new Wt::WString(temp_str,UTF8);
-				LE->setText(*temp_xstr);
-				temp_xstr->~WString();
 				if(member->validobject!=NULL) LE->validate();
 				if(!member->editable)
 				{
@@ -3816,23 +1702,17 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					}
 					ADVMEMBERSETEDITABLE(member,member->user_editable,TRUE);
 				}
-				LE->keyPressed().connect(std::bind([=] (const Wt::WKeyEvent& e) { signed_floatamt(member,e); }, std::placeholders::_1));
-				LE->keyWentUp().connect(std::bind([=] (const Wt::WKeyEvent& e) { signed_floatamtKeyUp(member,e); }, std::placeholders::_1));
 				LE->enterPressed().connect(boost::bind(&activatefunction,member));
-				wFormW->changed().connect(boost::bind(&signed_floatamtCHG,member));
 				wFormW->blurred().connect(boost::bind(&losingfocusfunction,member));
 				wFormW->focussed().connect(boost::bind(&gainingfocusfunction,member));
 			}
-			if(temp_str!=NULL) Rfree(temp_str);
 			break;
 		case SDOUBLEV:
-			temp_str=floatamt(*member->value.float_value,(cols ? 
-				(cols-1):(member->field_length-1)));
-			unpad(temp_str);
 			if(!USER_INTERFACE)
 			{
-				LE=new Wt::WLineEdit((Wt::WWidget *)parent);
-				WW=(Wt::WWidget *)LE;
+				NF=new NumericField((Wt::WWidget *)parent);
+				LE=(Wt::WLineEdit *)NF;
+				WW=(Wt::WWidget *)NF;
 				mssc=ModuleScreenStyleClass(rsx);
 				fssc=InputFieldStyleClass(member);
 				memset(GUIstemp,0,1024);
@@ -3852,27 +1732,22 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					{	
 						cols=member->field_length;
 					}
-/* setMaxLength has been commented out for pasting purposes 
-
-					LE->setMaxLength(member->field_length);
-*/
 				}
 				if(cols>0)
 				{
 					h=cols+2;
 				} else h=22;
+				digs=cols;
+				NF->setDigits(digs);
+				NF->setDecimal(FALSE);
+				NF->setAllowNegative(TRUE);
+				NF->setValue((double)*member->value.float_value);
 				LE->setTextSize(h);
 				
 				if(Parent_Table!=NULL)
 				{
 					tColumn->setWidth(h);
 				}
-/* Validators do not work with our input functions properly 
-
-				doubleValid = new Wt::WDoubleValidator();
-				Valid = (Wt::WValidator *)doubleValid;
-				member->validobject  = (Wt::WValidator *)doubleValid;
-*/
 				member->validobject = new Wt::WValidator((Wt::WObject *)member->w);
 				if(member->validobject!=NULL) LE->setValidator(member->validobject);
 #ifdef USE_RDA_DIAGNOSTICS
@@ -3881,9 +1756,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					prterr("DIAG Setting Resource [%s]'s Initial value [%s].",member->rscrname,member->value.string_value);
 				}
 #endif /* USE_RDA_DIAGNOSTICS */
-				temp_xstr = new Wt::WString(temp_str,UTF8);
-				LE->setText(*temp_xstr);
-				temp_xstr->~WString();
 				if(member->validobject!=NULL) LE->validate();
 				if(!member->editable)
 				{
@@ -3902,24 +1774,17 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					}
 					ADVMEMBERSETEDITABLE(member,member->user_editable,TRUE);
 				}
-				LE->keyPressed().connect(std::bind([=] (const Wt::WKeyEvent& e) { signed_double(member,e); }, std::placeholders::_1));
-				LE->keyWentUp().connect(std::bind([=] (const Wt::WKeyEvent& e) { signed_doubleKeyUp(member,e); }, std::placeholders::_1));
 				LE->enterPressed().connect(boost::bind(&activatefunction,member));
-				wFormW->changed().connect(boost::bind(&signed_doubleCHG,member));
 				wFormW->blurred().connect(boost::bind(&losingfocusfunction,member));
 				wFormW->focussed().connect(boost::bind(&gainingfocusfunction,member));
 			}
-			if(temp_str!=NULL) Rfree(temp_str);
 			break;
 		case DOUBLEV:
-			memset(stemp,0,101);
-			sprintf(stemp,"%*.0f",(cols ? cols:member->field_length),*member->value.float_value);
-			temp_str=stralloc(stemp);
-			unpad(temp_str);
 			if(!USER_INTERFACE)
 			{
-				LE=new Wt::WLineEdit((Wt::WWidget *)parent);
-				WW=(Wt::WWidget *)LE;
+				NF=new NumericField((Wt::WWidget *)parent);
+				LE=(Wt::WLineEdit *)NF;
+				WW=(Wt::WWidget *)NF;
 				mssc=ModuleScreenStyleClass(rsx);
 				fssc=InputFieldStyleClass(member);
 				memset(GUIstemp,0,1024);
@@ -3939,28 +1804,22 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					{	
 						cols=member->field_length;
 					}
-/* setMaxLength has been commented out for pasting purposes 
-
-					LE->setMaxLength(member->field_length);
-*/
 				}
 				if(cols>0)
 				{
 					h=cols+2;
 				} else h=22;
+				digs=cols;
+				NF->setDigits(digs);
+				NF->setDecimal(FALSE);
+				NF->setAllowNegative(FALSE);
+				NF->setValue((double)*member->value.float_value);
 				LE->setTextSize(h);
 				
 				if(Parent_Table!=NULL)
 				{
 					tColumn->setWidth(h);
 				}
-/* Validators do not work with our input functions properly 
-
-				doubleValid = new Wt::WDoubleValidator();
-				doubleValid->setBottom(0.00);
-				Valid = (Wt::WValidator *)doubleValid;
-				member->validobject  = (Wt::WValidator *)doubleValid;
-*/
 				member->validobject = new Wt::WValidator((Wt::WObject *)member->w);
 				if(member->validobject!=NULL) LE->setValidator(member->validobject);
 #ifdef USE_RDA_DIAGNOSTICS
@@ -3969,9 +1828,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					prterr("DIAG Setting Resource [%s]'s Initial value [%s].",member->rscrname,member->value.string_value);
 				}
 #endif /* USE_RDA_DIAGNOSTICS */
-				temp_xstr = new Wt::WString(temp_str,UTF8);
-				LE->setText(*temp_xstr);
-				temp_xstr->~WString();
 				if(member->validobject!=NULL) LE->validate();
 				if(!member->editable)
 				{
@@ -3990,29 +1846,18 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					}
 					ADVMEMBERSETEDITABLE(member,member->user_editable,TRUE);
 				}
-				LE->keyPressed().connect(std::bind([=] (const Wt::WKeyEvent& e) { unsigned_double(member,e); }, std::placeholders::_1));
-				LE->keyWentUp().connect(std::bind([=] (const Wt::WKeyEvent& e) { unsigned_doubleKeyUp(member,e); }, std::placeholders::_1));
 				LE->enterPressed().connect(boost::bind(&activatefunction,member));
-				wFormW->changed().connect(boost::bind(&unsigned_doubleCHG,member));
 				wFormW->blurred().connect(boost::bind(&losingfocusfunction,member));
 				wFormW->focussed().connect(boost::bind(&gainingfocusfunction,member));
 			}
-			if(temp_str!=NULL) Rfree(temp_str);
 			break;
 		case SHORTV:
 		case LONGV:
-			if(member->field_type==LONGV)
-			{
-				sprintf(stemp,"%*d",(cols ? cols:member->field_length),*member->value.integer_value);
-			} else if(member->field_type==SHORTV)
-			{
-				sprintf(stemp,"%*d",(cols ? cols:member->field_length),*member->value.short_value);
-			}
-			temp_str=stralloc(stemp);
 			if(!USER_INTERFACE)
 			{
-				LE=new Wt::WLineEdit((Wt::WWidget *)parent);
-				WW=(Wt::WWidget *)LE;
+				NF=new NumericField((Wt::WWidget *)parent);
+				LE=(Wt::WLineEdit *)NF;
+				WW=(Wt::WWidget *)NF;
 				mssc=ModuleScreenStyleClass(rsx);
 				fssc=InputFieldStyleClass(member);
 				memset(GUIstemp,0,1024);
@@ -4037,32 +1882,28 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					{	
 						cols=member->field_length;
 					}
-/* setMaxLength has been commented out for pasting purposes 
-
-					LE->setMaxLength(member->field_length);
-*/
 				}
 				if(cols>0)
 				{
 					h=cols+2;
 				} else h=22;
+				digs=cols;
+				NF->setDigits(digs);
+				NF->setDecimal(FALSE);
+				NF->setAllowNegative(FALSE);
+				if(member->field_type==LONGV)
+				{
+					iv=*member->value.integer_value;
+				} else {
+					iv=*member->value.short_value;
+				}
+				NF->setValue((int)iv);
 				LE->setTextSize(h);
 				
 				if(Parent_Table!=NULL)
 				{
 					tColumn->setWidth(h);
 				}
-/* Validators do not work with our input functions properly 
-
-				intValid = new Wt::WIntValidator();
-				intValid->setBottom(0);
-				if(member->field_type==SHORTV)
-				{
-					intValid->setTop(9999);
-				}
-				member->validobject  = (Wt::WValidator *)intValid;
-				if(member->validobject!=NULL) LE->setValidator(member->validobject);
-*/
 				member->validobject = new Wt::WValidator((Wt::WObject *)member->w);
 				if(member->validobject!=NULL) LE->setValidator(member->validobject);
 #ifdef USE_RDA_DIAGNOSTICS
@@ -4076,10 +1917,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					}
 				}
 #endif /* USE_RDA_DIAGNOSTICS */
-				temp_xstr = new Wt::WString(temp_str,UTF8);
-				LE->setText(*temp_xstr);
-				wFormW->validate();
-				temp_xstr->~WString();
 				if(member->validobject!=NULL) LE->validate();
 				if(!member->editable)
 				{
@@ -4098,28 +1935,18 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					}
 					ADVMEMBERSETEDITABLE(member,member->user_editable,TRUE);
 				}
-				LE->keyPressed().connect(std::bind([=] (const Wt::WKeyEvent& e) { unsigned_integer(member,e); }, std::placeholders::_1));
-				LE->keyWentUp().connect(std::bind([=] (const Wt::WKeyEvent& e) { unsigned_integerKeyUp(member,e); }, std::placeholders::_1));
 				LE->enterPressed().connect(boost::bind(&activatefunction,member));
-				wFormW->changed().connect(boost::bind(&unsigned_integerCHG,member));
 				wFormW->blurred().connect(boost::bind(&losingfocusfunction,member));
 				wFormW->focussed().connect(boost::bind(&gainingfocusfunction,member));
 			}
-			if(temp_str!=NULL) Rfree(temp_str);
 			break;
 		case SSHORTV:
 		case SLONGV:
-			if(member->field_type==SSHORTV)
-			{
-				temp_str=sintamt(*member->value.short_value,(cols ? cols:member->field_length));
-			} else {
-				temp_str=sintamt(*member->value.integer_value,(cols ? cols:member->field_length));
-			}
-			unpad(temp_str);
 			if(!USER_INTERFACE)
 			{
-				LE=new Wt::WLineEdit((Wt::WWidget *)parent);
-				WW=(Wt::WWidget *)LE;
+				NF=new NumericField((Wt::WWidget *)parent);
+				LE=(Wt::WLineEdit *)NF;
+				WW=(Wt::WWidget *)NF;
 				mssc=ModuleScreenStyleClass(rsx);
 				fssc=InputFieldStyleClass(member);
 				memset(GUIstemp,0,1024);
@@ -4144,32 +1971,28 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					{	
 						cols=member->field_length;
 					}
-/* setMaxLength has been commented out for pasting purposes 
-
-					LE->setMaxLength(member->field_length);
-*/
 				}
 				if(cols>0)
 				{
 					h=cols+2;
 				} else h=22;
+				digs=cols;
+				NF->setDigits(digs);
+				NF->setDecimal(FALSE);
+				NF->setAllowNegative(TRUE);
+				if(member->field_type==LONGV)
+				{
+					iv=*member->value.integer_value;
+				} else {
+					iv=*member->value.short_value;
+				}
+				NF->setValue((int)iv);
 				LE->setTextSize(h);
 				
 				if(Parent_Table!=NULL)
 				{
 					tColumn->setWidth(h);
 				}
-/* Validators do not work with our input functions properly 
-
-				intValid = new Wt::WIntValidator();
-				if(member->field_type==SSHORTV)
-				{
-					intValid->setBottom(-9999);
-					intValid->setTop(9999);
-				}
-				member->validobject  = (Wt::WValidator *)intValid;
-				if(member->validobject!=NULL) LE->setValidator(member->validobject);
-*/
 				member->validobject = new Wt::WValidator((Wt::WObject *)member->w);
 				if(member->validobject!=NULL) LE->setValidator(member->validobject);
 #ifdef USE_RDA_DIAGNOSTICS
@@ -4183,9 +2006,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					}
 				}
 #endif /* USE_RDA_DIAGNOSTICS */
-				temp_xstr = new Wt::WString(temp_str,UTF8);
-				LE->setText(*temp_xstr);
-				temp_xstr->~WString();
 				if(member->validobject!=NULL) LE->validate();
 				if(!member->editable)
 				{
@@ -4204,14 +2024,10 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					}
 					ADVMEMBERSETEDITABLE(member,member->user_editable,TRUE);
 				}
-				LE->keyPressed().connect(std::bind([=] (const Wt::WKeyEvent& e) { signed_integer(member,e); }, std::placeholders::_1));
-				LE->keyWentUp().connect(std::bind([=] (const Wt::WKeyEvent& e) { signed_integerKeyUp(member,e); }, std::placeholders::_1));
 				LE->enterPressed().connect(boost::bind(&activatefunction,member));
-				wFormW->changed().connect(boost::bind(&signed_integerCHG,member));
 				wFormW->blurred().connect(boost::bind(&losingfocusfunction,member));
 				wFormW->focussed().connect(boost::bind(&gainingfocusfunction,member));
 			}
-			if(temp_str!=NULL) Rfree(temp_str);
 			break;
 		case BUTTONS:
 			if(!USER_INTERFACE)
@@ -4376,7 +2192,7 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 						if(c!=NULL) c->~WString();
 						c=new Wt::WString(member->rscrname);
 					}
-					wFormW->setToolTip(*c,XHTMLText);
+					wFormW->setToolTip(*c,PlainText);
 					if(c!=NULL) c->~WString();
 				}
 				rname=NULL;
@@ -5051,6 +2867,7 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					if(*member->value.integer_value<0 || *member->value.integer_value>member->items) *member->value.integer_value=0;
 					cB->setCurrentIndex(*member->value.integer_value);
 					cB->setValueText(cB->itemText(*member->value.integer_value));
+					cB->clicked().connect(boost::bind(&list_callback,member));
 					cB->activated().connect(boost::bind(&list_callback,member));
 					if(!member->editable)
 					{

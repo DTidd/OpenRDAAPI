@@ -1167,4 +1167,25 @@ short DoInitializeSecurity(void);
 short xLongestAccountCode(short type,int line,char *file);
 char *EscXHTMLLabel(char *,short);
 
+struct SENDMAIL_VARIABLES 
+{
+	char *from_name;
+	char *from_addr;
+	char *subject;
+	char *body;
+	char *tolist;
+	char *cclist;
+	char *bcclist;
+	char *fname[10];	
+	char *mtype[10];	
+	char *dname[10];	
+	char *fdata[10];	
+	int ignerr;
+	char *srcdomain;
+};
+#define RunVMimeSendmail(a)	xRunVMimeSendmail(a,__LINE__,__FILE__)
+typedef struct SENDMAIL_VARIABLES MAIL_VARS;
+short xRunVMimeSendmail(MAIL_VARS *,int,char *);
+char *GetWebIDGSV();
+
 #endif /* MIX_H */

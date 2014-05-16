@@ -171,6 +171,7 @@
 #include <Wt/Http/ResponseContinuation>
 #include <Wt/Http/WtClient>
 #include <Wt/Http/Method>
+#include <NumericField.h>
 
 #ifdef _USE_GOOGLE_ANALYTICS_ 
 extern std::string googleCmd;

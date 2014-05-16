@@ -180,8 +180,9 @@ typedef struct RDAvirtuals RDAvirtual;
 #define addscrtext(w,x,z,y,a)	addwdgt(w,8,x,NULL,NULL,NULL,z,y,a,NULL,NULL,NULL)
 #define addtogbtn(x,y,z,p,w)	addwdgt(x,9,y,z,p,w,0,0,0,NULL,NULL,NULL) 
 
-#define addwdgt(a,b,c,d,p,w,e,f,g,h,i,j)	xaddwdgt(a,b,c,d,p,w,e,f,g,h,i,j,NULL,__LINE__,__FILE__)
-#define ADVaddwdgt(a,b,c,d,p,w,e,f,g,h,i,j,l)	xaddwdgt(a,b,c,d,p,w,e,f,g,h,i,j,l,__LINE__,__FILE__)
+#define addwdgt(a,b,c,d,p,w,e,f,g,h,i,j)	xaddwdgt(a,b,c,d,p,w,e,f,g,h,i,j,NULL,NULL,0,0,0,__LINE__,__FILE__)
+#define ADVaddwdgt(a,b,c,d,p,w,e,f,g,h,i,j,l)	xaddwdgt(a,b,c,d,p,w,e,f,g,h,i,j,l,NULL,0,0,0,__LINE__,__FILE__)
+#define ADV2addwdgt(a,b,c,d,p,w,e,f,g,h,i,j,l,m,n,o,r)	xaddwdgt(a,b,c,d,p,w,e,f,g,h,i,j,l,m,n,o,r,__LINE__,__FILE__)
 
 /* Add Resource Easy Functions */
 #define addlstrsrcnh(r,n,v,e,w,x,z,a)	addrsrcnh(r,0,n,SCROLLEDLIST,0,v,e,w,x,z,a)
@@ -297,7 +298,7 @@ struct RDAwdgts
 	char *required_expression;
 	short bootstrap;
 	short vertical;
-	short horzontal;
+	short horizontal;
 };
 typedef struct RDAwdgts RDAwdgt;
 
@@ -409,7 +410,6 @@ struct RDArmems
 	char app_update;
 	char *transversal_expression;
 	char *required_expression;
-	char *validate_expression;
 	char *definition;
 	char *label;
 	char *XHTML_Label;
@@ -431,7 +431,7 @@ struct RDArmems
 	Wt::WStandardItemModel *wSIM;
 	short bootstrap;
 	short vertical;
-	short horzontal;
+	short horizontal;
 };
 typedef struct RDArmems RDArmem;
 
@@ -517,7 +517,7 @@ void xreadmember(RDArmem *,int,char *);
 void xreadallwidgets(RDArsrc *,short,short,int,char *);
 void xfree_scrn(RDAscrn *,int,char *);
 void xfree_rsrc(RDArsrc *,int,char *);
-void xaddwdgt(RDAscrn *,short,char *,char *,char *,char *,short,short,int,char *,char *,char *,char *,int,char *);
+void xaddwdgt(RDAscrn *,short,char *,char *,char *,char *,short,short,int,char *,char *,char *,char *,char *,short,short,short,int,char *);
 void xaddrsrc(RDArsrc *,short,char *,short,unsigned,void *,char,void (*)(...),short,char ***,void *,void (*)(...),short,int,char *);
 #define getscrnbin(a,b,c)	xgetscrnbin(a,b,c,__LINE__,__FILE__)
 short xgetscrnbin(char *,RDAscrn *,short,int,char *);
@@ -756,5 +756,7 @@ void DisplayRelativeFile(char *);
 char *xUTF8famt(double,int,int,char *);
 void GUI_OpenURL(char *);
 char *RDA_EncodeWhiteSpace(char *);
+#define memberrequired(a)	xmemberrequired(a,__LINE__,__FILE__)
+void xmemberrequired(RDArmem *,int,char *);
 
 #endif /* GUI_HPP */

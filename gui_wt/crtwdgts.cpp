@@ -4051,7 +4051,10 @@ void crtwdgts(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsc,char *label)
 				{
 					CW->addWidget(line_widget);
 				} else {
+/*
 					vb->addWidget((Wt::WWidget *)line_widget,(rowz>0 ? rowz-1:0),Wt::AlignLeft | Wt::AlignJustify);
+*/
+					vb->addWidget((Wt::WWidget *)line_widget,rowz,Wt::AlignLeft | Wt::AlignJustify);
 				}
 #else 
 				CW->addWidget(line_widget);

@@ -672,6 +672,7 @@ void activatefunction(RDArmem *member)
 void toggleactivatefunction(RDArmem *member)
 {
 	RDArsrc *rsrc;
+	Wt::WAbstractToggleButton *aTB=NULL;
 
 	if(member->app_update==TRUE) return;
 	member->app_update=TRUE;
@@ -682,7 +683,8 @@ void toggleactivatefunction(RDArmem *member)
 	NoLosingFocus=member;
 	if(member->editable==FALSE || member->user_editable==FALSE) 
 	{
-		updatemember(member);
+		aTB=(Wt::WAbstractToggleButton *)member->w;
+		aTB->setChecked((*member->value.string_value ? TRUE:FALSE));
 	} else {
 		rsrc=(RDArsrc *)member->parent;
 #ifdef USE_RDA_DIAGNOSTICS

@@ -289,6 +289,7 @@ static void SCN_MENUITEM_BROWSE()
 		ADVaddwdgt(scrn,6,"DEFINE LIST","Define List","","",0,0,15,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,6,"SEARCH BUTTON","Search","","",0,0,12,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,6,"PRINT BROWSE","Print Browse","","",0,0,7,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,6,"CSV","CSV","","",0,0,62,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,4,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
@@ -2543,6 +2544,8 @@ static void DEF_MENUITEM_DEFINE_LIST()
 		addDefaultFieldSHORT(def,"ENVIRONMENT VALUE 5 LENGTH",TRUE,7,0);
 		addDefaultFieldSHORT(def,"VISIBLE EXPRESSION POSITION",TRUE,7,0);
 		addDefaultFieldSHORT(def,"VISIBLE EXPRESSION LENGTH",TRUE,7,0);
+		addDefaultFieldSHORT(def,"UIMETRIC COUNT POSITION",TRUE,7,1);
+		addDefaultFieldSHORT(def,"UIMETRIC COUNT LENGTH",TRUE,7,8);
 
 		defdir=Rmalloc(RDAstrlen(CURRENTDIRECTORY)+RDAstrlen(module)+12);
 #ifndef WIN32
