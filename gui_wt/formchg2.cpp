@@ -944,21 +944,21 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					member->validobject = new Wt::WRegExpValidator("[0-9]{3}-[0-9]{3}-[0-9]{4}");
 					sprintf(stemp,"999-999-9999");
 					c=new Wt::WString(stemp);
-					LE->setInputMask(*c);
+					LE->setInputMask(*c,Wt::WLineEdit::KeepMaskWhileBlurred);
 				} else if(member->field_type==SOCSECNUM)
 				{
 					member->definition=stralloc("nnn-nn-nnnn");	
 					member->validobject = new Wt::WRegExpValidator("[0-9]{3}-[0-9]{2}-[0-9]{4}");
 					sprintf(stemp,"999-99-9999");
 					c=new Wt::WString(stemp);
-					LE->setInputMask(*c);
+					LE->setInputMask(*c,Wt::WLineEdit::KeepMaskWhileBlurred);
 				} else if(member->field_type==ZIPCODE)
 				{
 					member->definition=stralloc("nnnnn-nnnn");	
 					member->validobject = new Wt::WRegExpValidator("([0-9]{5})|([0-9]{5}-[0-9]{4})");
 					sprintf(stemp,"99999-9999");
 					c=new Wt::WString(stemp);
-					LE->setInputMask(*c);
+					LE->setInputMask(*c,Wt::WLineEdit::KeepMaskWhileBlurred);
 				}
 				if(c!=NULL) c->~WString();
 
@@ -1051,7 +1051,7 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					memset(stemp,0,101);
 					sprintf(stemp,"99/99/9999");
 					c=new Wt::WString(stemp);
-					LE->setInputMask(*c);
+					LE->setInputMask(*c,Wt::WLineEdit::KeepMaskWhileBlurred);
 					c->~WString();
 					member->validobject = new Wt::WDateValidator("MM/dd/yyyy");
 /*
@@ -1201,7 +1201,7 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					memset(stemp,0,101);
 					sprintf(stemp,"00:00:00");
 					c=new WString(stemp);
-					LE->setInputMask(*c);
+					LE->setInputMask(*c,Wt::WLineEdit::KeepMaskWhileBlurred);
 					c->~WString();
 					member->validobject = new Wt::WRegExpValidator("[0-9]{2}:[0-9]{2}:[0-9]{2}");
 					if(member->validobject!=NULL) LE->setValidator(member->validobject);
@@ -1309,11 +1309,11 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 							prterr("DIAG Resource [%s] Type [%s] Regex Created: [%s]",member->rscrname, standardfieldtypes[member->field_type], (temp!=NULL ? temp:""));
 						}
 						c=new Wt::WString(member->definition);
-						LE->setInputMask(*c);
+						LE->setInputMask(*c,Wt::WLineEdit::KeepMaskWhileBlurred);
 						c->~WString();
 					} else temp=NULL;
 				}
-				if(!isEMPTY(temp))
+				if(!isEMPTY(temp) && !RDAstrstr(member->rscrname,"IMAGE"))
 				{
 					member->validobject = new Wt::WRegExpValidator(temp);
 				} else {

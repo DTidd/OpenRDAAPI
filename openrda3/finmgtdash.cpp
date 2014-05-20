@@ -1182,7 +1182,7 @@ void xSEE_GenLdgrAct(int line,char *file)
 	{
 		for(x=0,e=myGenLdgrAct;x<numGenLdgrAct;++x,++e)
 		{
-			fprintf(RDA_STDERR,"x [%d] Source [%s] Debits [%.02f] Credits [%.02f] Ending Balance [%.02f]\n",x,(e->source!=NULL ? e->source:""),e->debits/100,e->credits/100,e->ending/100);
+			fprintf(RDA_STDERR,"x [%d] Source [%s] Debits [%.02f] Credits [%.02f] Ending Balance [%.02f] %s\n",x,(e->source!=NULL ? e->source:""),e->debits/100,e->credits/100,e->ending/100,(e->ending!=0 ? "Out of Balance!":""));
 		}
 	}
 }
@@ -1325,13 +1325,14 @@ Wt::WContainerWidget *UnPostedGeneralLedgerActivity()
 	}
 	if(GeneralLedgerUnPosted!=NULL) GeneralLedgerUnPosted->~WStandardItemModel();
 	GeneralLedgerUnPosted=new Wt::WStandardItemModel();
-	GeneralLedgerUnPosted->insertColumns(GeneralLedgerUnPosted->columnCount(),5);
+	GeneralLedgerUnPosted->insertColumns(GeneralLedgerUnPosted->columnCount(),6);
 // headers 
 	GeneralLedgerUnPosted->setHeaderData(0,Wt::WString("Source Module"));
 	GeneralLedgerUnPosted->setHeaderData(1,Wt::WString("Number of Records"));
 	GeneralLedgerUnPosted->setHeaderData(2,Wt::WString("Debits"));		
 	GeneralLedgerUnPosted->setHeaderData(3,Wt::WString("Credits"));
 	GeneralLedgerUnPosted->setHeaderData(4,Wt::WString("Ending Balance"));
+	GeneralLedgerUnPosted->setHeaderData(5,Wt::WString("Remarks"));
 	GeneralLedgerUnPosted->insertRows(GeneralLedgerUnPosted->rowCount(),numGenLdgrAct);
 	count=0;
 	debamt=0.0;
@@ -1353,6 +1354,7 @@ Wt::WContainerWidget *UnPostedGeneralLedgerActivity()
 		credamt+=e->credits;
 		GeneralLedgerUnPosted->setData(x,4,e->ending/100);
 		endamt+=e->ending;
+		GeneralLedgerUnPosted->setData(x,5,Wt::WString((e->ending!=0 ? "Out of Balance!":"")));
 	}
 	GeneralLedgerUnPosted->sort((GenLdgrActValuetoVisual+1),Wt::SortOrder::DescendingOrder);
 	memset(FMstemp,0,1024);

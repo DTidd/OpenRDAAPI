@@ -318,7 +318,15 @@ void losingfocusfunction(RDArmem *member)
 	if(member->editable==FALSE || member->user_editable==FALSE) return;
 	if(member->app_update==TRUE) return;
 	rsrc=(RDArsrc *)member->parent;
-	if(RDA_CaptureAutoComplete!=NULL && (member->field_type==VARIABLETEXT || member->field_type==PLAINTEXT || member->field_type==ZIPCODE))
+	if(member->field_type==DATES && member->rtype==0)
+	{
+		LE=(Wt::WLineEdit *)member->w;
+		if(LE->validate()==Wt::WValidator::State::Invalid)
+		{
+			LE->setFocus();
+			return;
+		}
+	} else if(RDA_CaptureAutoComplete!=NULL && (member->field_type==VARIABLETEXT || member->field_type==PLAINTEXT || member->field_type==ZIPCODE))
 	{
 		readmember(member);
 		RDA_CaptureAutoComplete(rsrc->module,rsrc->screen,member->rscrname,member->value.string_value);

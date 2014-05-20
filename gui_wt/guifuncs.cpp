@@ -5796,7 +5796,7 @@ void xreadmember(RDArmem *member,int line,char *file)
 		case BALANCESHEET:
 		case BEGINNINGBALANCE:
 			LE=(Wt::WLineEdit *)member->w;
-			text=LE->text();
+			text=LE->displayText();
 			s1=text.toUTF8();
 			value=stralloc(s1.c_str());
 			unpad(value);
@@ -8861,14 +8861,17 @@ short xMEMBERSETDEFTYPE(RDArmem *member,short acctype,int line,char *file)
 				prterr("DIAG Resource [%s] Type [%s] Regex Created: [%s]",member->rscrname, standardfieldtypes[member->field_type], (temp2!=NULL ? temp2:""));
 			}
 			LE=(Wt::WLineEdit *)member->w;
-			REv=(Wt::WRegExpValidator *)member->validobject;
-			REv->~WRegExpValidator();
-			member->validobject = new Wt::WRegExpValidator(temp2);
+			if(!RDAstrstr(member->rscrname,"IMAGE"))
+			{
+				REv=(Wt::WRegExpValidator *)member->validobject;
+				REv->~WRegExpValidator();
+				member->validobject = new Wt::WRegExpValidator(temp2);
+			}
 			if(member->validobject!=NULL) LE->setValidator(member->validobject);
 		} else temp2=NULL;
 		LE=(Wt::WLineEdit *)member->w;
 		c=new Wt::WString(member->definition);
-		LE->setInputMask(*c);
+		LE->setInputMask(*c,Wt::WLineEdit::KeepMaskWhileBlurred);
 		c->~WString();
 		if(temp2!=NULL) Rfree(temp2);
 	}

@@ -819,7 +819,7 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 	{
 		case 1: /* New Line */
 		case 3: /* New Box */
-			addAPPlib(BootStrap,"Default");
+			addAPPlib(BootStrap,"Inherit");
 			addAPPlib(BootStrap,"h1");
 			addAPPlib(BootStrap,"h2");
 			addAPPlib(BootStrap,"h3");
@@ -830,7 +830,7 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			break;
 		case 2: /* End Line */
 		case 4: /* End Box */
-			addAPPlib(BootStrap,"Default");
+			addAPPlib(BootStrap,"Inherit");
 			addAPPlib(BootStrap,"h1");
 			addAPPlib(BootStrap,"h2");
 			addAPPlib(BootStrap,"h3");
@@ -840,16 +840,18 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",FALSE);
 			break;
 		default:
-			addAPPlib(BootStrap,"Default");
+			addAPPlib(BootStrap,"Inherit");
 			addAPPlib(BootStrap,"Large");
+			addAPPlib(BootStrap,"Default");
 			addAPPlib(BootStrap,"Small");
 			addAPPlib(BootStrap,"Extra Small");
 			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
 			break;
 		case 7:
 			FINDRSCSETSENSITIVE(edit_rsrc,"DFLIST",TRUE);
-			addAPPlib(BootStrap,"Default");
+			addAPPlib(BootStrap,"Inherit");
 			addAPPlib(BootStrap,"Large");
+			addAPPlib(BootStrap,"Default");
 			addAPPlib(BootStrap,"Small");
 			addAPPlib(BootStrap,"Extra Small");
 			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
@@ -863,16 +865,18 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			} else {
 				FINDRSCSETSENSITIVE(edit_rsrc,"DFLOAD",TRUE);
 			}
-			addAPPlib(BootStrap,"Default");
+			addAPPlib(BootStrap,"Inherit");
 			addAPPlib(BootStrap,"Large");
+			addAPPlib(BootStrap,"Default");
 			addAPPlib(BootStrap,"Small");
 			addAPPlib(BootStrap,"Extra Small");
 			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
 			break;
 		case 0:
 			FINDRSCSETSENSITIVE(edit_rsrc,"DFVIR",TRUE);
-			addAPPlib(BootStrap,"Default");
+			addAPPlib(BootStrap,"Inherit");
 			addAPPlib(BootStrap,"Large");
+			addAPPlib(BootStrap,"Default");
 			addAPPlib(BootStrap,"Small");
 			addAPPlib(BootStrap,"Extra Small");
 			FINDRSCSETSENSITIVE(edit_rsrc,"BOOTSTRAP",TRUE);
@@ -3551,17 +3555,19 @@ int main(int argc,char **argv)
 		}
 	}
 	BootStrap=APPlibNEW();
-	addAPPlib(BootStrap,"Default");
+	addAPPlib(BootStrap,"Inherit");
 	addAPPlib(BootStrap,"Large");
+	addAPPlib(BootStrap,"Default");
 	addAPPlib(BootStrap,"Small");
 	addAPPlib(BootStrap,"Extra Small");
 	HorAlign=APPlibNEW();
-	addAPPlib(HorAlign,"Default");
+	addAPPlib(HorAlign,"Inherit");
 	addAPPlib(HorAlign,"Left");
 	addAPPlib(HorAlign,"Center");
 	addAPPlib(HorAlign,"Right");
 	addAPPlib(HorAlign,"Justify");
 	VerAlign=APPlibNEW();
+	addAPPlib(HorAlign,"Inherit");
 	addAPPlib(VerAlign,"BaseLine");
 	addAPPlib(VerAlign,"Subscript");
 	addAPPlib(VerAlign,"Superscript");

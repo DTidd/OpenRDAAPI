@@ -25,6 +25,9 @@
 /*CPP_OPART cyclemenu */
 /*CPP_OPART finmgtdash */
 /*CPP_OPART venpmtdash */
+/*CPP_OPART prsnnldash */
+/*CPP_OPART bnkrecdash */
+/*CPP_OPART fixassdash */
 /*CPP_OPART purorddash */
 /*CPP_OPART embedfeed */
 /*ADDLIB curl */
@@ -1380,12 +1383,12 @@ int main(int argc,char **argv)
 		MainWindowStatus->setOverflow(Wt::WContainerWidget::OverflowVisible,Horizontal);
 		MainWindowStatus->addStyleClass("OpenRDA ResourceBar");
 		MainWindowDock=new Wt::WContainerWidget(West);
-		MainWindowDock->setOverflow(Wt::WContainerWidget::OverflowAuto,Vertical);
+		MainWindowDock->setOverflow(Wt::WContainerWidget::OverflowVisible,Vertical);
 		MainWindowDock->setOverflow(Wt::WContainerWidget::OverflowVisible,Horizontal);
 		MainWindowDock->addStyleClass("OpenRDA TaskBar");
 	} else {
 		MainWindowDock=new Wt::WContainerWidget();
-		MainWindowDock->setOverflow(Wt::WContainerWidget::OverflowAuto,Vertical);
+		MainWindowDock->setOverflow(Wt::WContainerWidget::OverflowVisible,Vertical);
 		MainWindowDock->setOverflow(Wt::WContainerWidget::OverflowVisible,Horizontal);
 		MainWindowDock->addStyleClass("OpenRDA TaskBar");
 		MainBorderLayout->addWidget((Wt::WWidget *)MainWindowDock,Wt::WBorderLayout::Position::West);

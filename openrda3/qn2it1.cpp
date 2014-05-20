@@ -13,6 +13,11 @@ extern Wt::WContainerWidget *UnProcessedReceipt(void);
 extern Wt::WContainerWidget *UnPostedGeneralLedgerActivity(void);
 extern Wt::WContainerWidget *UnProcessedVoucherStatus(void);
 extern Wt::WContainerWidget *OpenPObyVendorDisplayDashBoard(void);
+extern Wt::WContainerWidget *CurrentEmployeeClass(void);
+extern Wt::WContainerWidget *CurrentEmployeeLocation(void);
+extern Wt::WContainerWidget *BankBalanceByIDView(void);
+extern Wt::WContainerWidget *BankBalanceByCashCodeView(void);
+extern Wt::WContainerWidget *FixedAssetsByCategoryView(void);
 extern int ExpendActValuetoVisual,RevenueActValuetoVisual;
 extern short ExpendActShowTable,RevenueActShowTable;
 extern int JournalEntryValuetoVisual,ReceiptValuetoVisual;
@@ -1360,14 +1365,28 @@ void CreateCenterPanel()
 		tabW=new Wt::WTabWidget(MainWindowCenter);
 		w=OpenPObyVendorDisplayDashBoard();
 		tabW->addTab(w,"Open PO's by Vendor",Wt::WTabWidget::PreLoading);
+	} else if(!RDAstrcmp(CURRENT_MODULE,"FIXASS"))
+	{
+		hbox=new Wt::WHBoxLayout();
+		MainWindowCenter->setLayout(hbox);
+		w=FixedAssetsByCategoryView();
+		hbox->addWidget(w,500);
+	} else if(!RDAstrcmp(CURRENT_MODULE,"BNKREC"))
+	{
+		tabW=new Wt::WTabWidget(MainWindowCenter);
+		w=BankBalanceByCashCodeView();
+		tabW->addTab(w,"by Cash Code",Wt::WTabWidget::PreLoading);
+		w=BankBalanceByIDView();
+		tabW->addTab(w,"by Bank ID",Wt::WTabWidget::PreLoading);
+	} else if(!RDAstrcmp(CURRENT_MODULE,"PRSNNL"))
+	{
+		tabW=new Wt::WTabWidget(MainWindowCenter);
+		w=CurrentEmployeeLocation();
+		tabW->addTab(w,"by Location",Wt::WTabWidget::PreLoading);
+		w=CurrentEmployeeClass();
+		tabW->addTab(w,"by Class",Wt::WTabWidget::PreLoading);
 	} else if(!RDAstrcmp(CURRENT_MODULE,"HOME"))
 	{
-/*
-		tabW=new Wt::WTabWidget(MainWindowCenter);
-		w=CreateFeed("http://www.openrda.com/feed/");
-		tabW->addTab(w,"Blogs",Wt::WTabWidget::PreLoading);
-		tabW->addTab(w,"News",Wt::WTabWidget::PreLoading);
-*/
 		hbox=new Wt::WHBoxLayout();
 		MainWindowCenter->setLayout(hbox);
 		w=CreateFeed("http://www.openrda.net/OpenRDALandingPage.php");
