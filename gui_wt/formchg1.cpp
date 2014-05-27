@@ -46,7 +46,7 @@ void xOpenRDAWiki(char *page,int line,char *file)
 	len=base64_encode_blockend(temp1,&enstate);
 	sprintf(wiki_rdrct,"%s%s",wiki_rdrct,temp1);
 	url=Rmalloc(256);
-	sprintf(url,"http://wiki.openrda.com/index.php?user=%s&passw=%s&wiki_rdrct=%s",user,passw,(wiki_rdrct!=NULL ? wiki_rdrct:""));
+	sprintf(url,"http://wiki.openrda.com/index.php?user=%s&passw=%s&redirect=%s",user,passw,(wiki_rdrct!=NULL ? wiki_rdrct:""));
 	GUI_OpenURL(url);
 	if(temp!=NULL) Rfree(temp);
 	if(temp1!=NULL) Rfree(temp1);

@@ -6,6 +6,7 @@
 #include <olh.hpp>
 #include <mix.hpp>
 
+extern Wt::WContainerWidget *BalSumScatterWidget();
 extern Wt::WContainerWidget *UnPostedExpenditureActivity(void);
 extern Wt::WContainerWidget *UnPostedRevenueActivity(void);
 extern Wt::WContainerWidget *UnProcessedJournalEntry(void);
@@ -1345,6 +1346,13 @@ void CreateCenterPanel()
 	if(!RDAstrcmp(CURRENT_MODULE,"FINMGT"))
 	{
 		tabW=new Wt::WTabWidget(MainWindowCenter);
+		w=BalSumScatterWidget();
+		if(w!=NULL)
+		{
+			tabW->addTab(w,"G/L Scatter",Wt::WTabWidget::PreLoading);
+		} else {
+			prterr("Error:  G/L Scatter didn't generate a container.");TRACE;
+		}
 		w=UnPostedExpenditureActivity();
 		tabW->addTab(w,"Exp Activity",Wt::WTabWidget::PreLoading);
 		w=UnPostedRevenueActivity();

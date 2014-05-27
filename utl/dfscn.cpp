@@ -1103,7 +1103,7 @@ static void changewidgetlist(RDArsrc *edit_rsrc)
 			break;
 		case 0: /* standard resource */
 			addAPPlib(rsrclist,"None");
-			addAPPlib(rsrclist,"Calendar");
+			addAPPlib(rsrclist,"DateEdit");
 			addAPPlib(rsrclist,"Pixmap");
 			addAPPlib(rsrclist,"Password");
 			addAPPlib(rsrclist,"Filename (csv,tsv,txt)");
@@ -3567,7 +3567,7 @@ int main(int argc,char **argv)
 	addAPPlib(HorAlign,"Right");
 	addAPPlib(HorAlign,"Justify");
 	VerAlign=APPlibNEW();
-	addAPPlib(HorAlign,"Inherit");
+	addAPPlib(VerAlign,"Inherit");
 	addAPPlib(VerAlign,"BaseLine");
 	addAPPlib(VerAlign,"Subscript");
 	addAPPlib(VerAlign,"Superscript");

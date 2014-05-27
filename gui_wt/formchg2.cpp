@@ -1088,15 +1088,13 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 						}
 						ADVMEMBERSETEDITABLE(member,member->user_editable,TRUE);
 					}
-/*
-					LE->keyPressed().connect(std::bind([=] (const Wt::WKeyEvent& e) { formattedstring_callback(member,e); }, std::placeholders::_1));
-					LE->keyWentUp().connect(std::bind([=] (const Wt::WKeyEvent& e) { formattedstring_callbackKeyUp(member,e); }, std::placeholders::_1));
-*/
 					LE->enterPressed().connect(boost::bind(&activatefunction,member));
 					wFormW->blurred().connect(boost::bind(&losingfocusfunction,member));
 					wFormW->focussed().connect(boost::bind(&gainingfocusfunction,member));
 				} else {
 					DE=new Wt::WDateEdit((Wt::WWidget *)parent);
+					DE->setFormat("MM/dd/yyyy");
+					DE->setBottom(WDate(1900,1,1));
 					LE=(Wt::WLineEdit *)DE;
 					member->validobject = new Wt::WDateValidator("MM/dd/yyyy");
 					if(member->validobject!=NULL) LE->setValidator(member->validobject);
@@ -1110,15 +1108,10 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					if(fssc!=NULL) Rfree(fssc);
 					wFormW=(Wt::WFormWidget *)DE;
 					member->w=(Wt::WWidget *)DE;
-					DE->setFormat("MM/dd/yyyy");
 					DE->setTextSize(10);
 					DE->setMaxLength(10);
 					DE_Cal=DE->calendar();
 					DE_Cal->setFirstDayOfWeek(7);
-/*
-					aMaze =Wt::WAnimation(Wt::WAnimation::AnimationEffect::SlideInFromLeft | Wt::WAnimation::AnimationEffect::Fade,Wt::WAnimation::TimingFunction::EaseInOut,250);
-					DE->setHidden(FALSE,aMaze);
-*/
 					if(!isEMPTY(member->value.string_value))
 					{
 						sprintf(stemp,"%.2s",&member->value.string_value[0]);
@@ -1127,16 +1120,12 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 						Dd=atoi(stemp);
 						sprintf(stemp,"%.4s",&member->value.string_value[6]);
 						Dy=atoi(stemp);
+						DE->setDate(WDate(Dy,Dm,Dd));	
+/*
 					} else {
-						sprintf(stemp,"%.2s",&CURRENT_DATE10[0]);
-						Dm=atoi(stemp);
-						sprintf(stemp,"%.2s",&CURRENT_DATE10[3]);
-						Dd=atoi(stemp);
-						sprintf(stemp,"%.4s",&CURRENT_DATE10[6]);
-						Dy=atoi(stemp);
+						DE->setDate(WDate::currentDate());
+*/
 					}
-					wDate=Wt::WDate(Dy,Dm,Dd);
-					DE->setDate(wDate);	
 					if(!member->editable)
 					{
 						ADVMEMBERSETEDITABLE(member,FALSE,FALSE);
@@ -1154,10 +1143,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 						}
 						ADVMEMBERSETEDITABLE(member,member->user_editable,TRUE);
 					}
-/*
-					LE->keyPressed().connect(std::bind([=] (const Wt::WKeyEvent& e) { formattedstring_callback(member,e); }, std::placeholders::_1));
-					LE->keyWentUp().connect(std::bind([=] (const Wt::WKeyEvent& e) { formattedstring_callback(member,e); }, std::placeholders::_1));
-*/
 					LE->enterPressed().connect(boost::bind(&activatefunction,member));
 					wFormW->blurred().connect(boost::bind(&losingfocusfunction,member));
 					wFormW->focussed().connect(boost::bind(&gainingfocusfunction,member));
@@ -2244,14 +2229,8 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 							rname=stralloc("resources/OpenRDA/help.png");
 							break;
 						case 12: /* Search */
-							if(!RDAstrstr(rsx->screen,"SEARCH BROWSE")) 
-							{
-								pB->addStyleClass("SearchButton");
-								rname=stralloc("resources/OpenRDA/search.png");
-							} else {
-								pB->addStyleClass("SearchButton Color");
-								rname=stralloc("resources/OpenRDA/search_color.png");
-							}
+							pB->addStyleClass("SearchButton");
+							rname=stralloc("resources/OpenRDA/search.png");
 							break;
 						case 13: /* Edit */
 							pB->addStyleClass("Edit");
@@ -2262,14 +2241,8 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 							rname=stralloc("resources/OpenRDA/exit.png");
 							break;
 						case 15: /* definelist */
-							if(!RDAstrstr(rsx->screen,"DEFINE LIST")) 
-							{
-								pB->addStyleClass("DefineList");
-								rname=stralloc("resources/OpenRDA/definelist.png");
-							} else {
-								pB->addStyleClass("DefineList Color");
-								rname=stralloc("resources/OpenRDA/definelist_color.png");
-							}
+							pB->addStyleClass("DefineList");
+							rname=stralloc("resources/OpenRDA/definelist.png");
 							break;
 						case 16: /* add-create */
 							pB->addStyleClass("Add");

@@ -21,6 +21,7 @@ using namespace Wt;
 using namespace Wt::Auth;
 
 #define USING_WT
+extern char UseHTTPS;
 extern APPlib *CMAIN_ARGS,*OpenRDA_Cookies;
 extern Wt::WContainerWidget *QN2IT_PARENT;
 extern short QN2IT_PARENT_TYPE,MODULE_GROUP;

@@ -2533,7 +2533,7 @@ int xcrttab(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,WWid
 {
 	Wt::WTabWidget *Tab=NULL;
 	Wt::WText *myText=NULL;
-	Wt::WContainerWidget *TabD=NULL;
+	Wt::WContainerWidget *TabD=NULL,*SWindow=NULL;
 	Wt::WWidget *line_widget=NULL,*hold_widget=NULL;
 	char *mssc=NULL;
 
@@ -2820,19 +2820,30 @@ int xcrttab(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,WWid
 				}
 			} else if(wdgt->type==12)
 			{
-				rowsx=crtscrollwindow((Wt::WWidget *)TabD,scn,rsrc,widgetcount,&line_widget);
+				SWindow = new Wt::WContainerWidget(TabD);
+				mssc=ModuleScreenStyleClass(rsrc);
+				memset(GUIstemp,0,1024);
+				sprintf(GUIstemp,"OpenRDA %s LineContainer",mssc);
+				if(mssc!=NULL) Rfree(mssc);
+				SWindow->addStyleClass(GUIstemp);
+				spc=Wt::WLength(0,Wt::WLength::Pixel);
+				SWindow->setPadding(spc,All);
+				SWindow->setOverflow(WContainerWidget::OverflowVisible,Vertical);	
+				SWindow->setOverflow(WContainerWidget::OverflowVisible,Horizontal);	
+				rowsx=crtscrollwindow((Wt::WWidget *)SWindow,scn,rsrc,widgetcount,&line_widget);
+#ifdef __NEED_WDIALOG_LAYOUT__
+				if(rsrc->primary==NULL)
+				{
+					TabD->addWidget(SWindow);
+				} else {
+					vb->addWidget((Wt::WWidget *)SWindow,(rowsx>0 ? rowsx-1:0),Wt::AlignLeft | Wt::AlignJustify);
+				}
+#else
+				TabD->addWidget(SWindow);
+#endif /* __NEED_WDIALOG_LAYOUT__ */
 				if(rowsx>0)
 				{
-#ifdef __NEED_WDIALOG_LAYOUT__
-					if(rsrc->primary==NULL)
-					{
-						TabD->addWidget(line_widget);
-					} else {
-						vb->addWidget((Wt::WWidget *)line_widget,(rowsx>0 ? rowsx-1:0),Wt::AlignLeft | Wt::AlignJustify);
-					}
-#else
-					TabD->addWidget(line_widget);
-#endif /* __NEED_WDIALOG_LAYOUT__ */
+					SWindow->addWidget(line_widget);
 					hold_widget=line_widget;
 					if(frame_style!=(-1))
 					{
@@ -4072,6 +4083,11 @@ void crtwdgts(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsc,char *label)
 				rowz=crtbox((Wt::WWidget *)CW,scn,rsc,&widgetcount,&line_widget);
 				if(rowz>0)
 				{
+/* 
+	Wt::AlignLeft | Wt::AlignJustify should be invalid assignments, e.g. both horizontal, | for 1 horizontal and 1 vertical 
+	Change the structure so the main windows use layouts again. 
+	Most likely, Wt::AlignJust is result of Wt::AlignLeft | Wt::AlignJustify 
+*/
 #ifdef __NEED_WDIALOG_LAYOUT__
 				if(rsc->primary==NULL)
 				{

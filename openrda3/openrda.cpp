@@ -24,6 +24,7 @@
 /*CPP_OPART qn2it1 */
 /*CPP_OPART cyclemenu */
 /*CPP_OPART finmgtdash */
+/*CPP_OPART finscatter */
 /*CPP_OPART venpmtdash */
 /*CPP_OPART prsnnldash */
 /*CPP_OPART bnkrecdash */

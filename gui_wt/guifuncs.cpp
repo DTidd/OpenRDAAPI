@@ -26,6 +26,7 @@
 #include <SingleThreadedApplication.hpp>
 
 APPlib *CMAIN_ARGS=NULL,*OpenRDA_Cookies=NULL;
+char UseHTTPS=FALSE;
 char Skip_OpenRDA_Cookies=FALSE;
 int RDA_argc=0;
 char **RDA_argv;
@@ -375,12 +376,12 @@ int WT_RDA_SetEnv(char *name,char *value,int line,char *file)
 	hname=new string(temp);
 	p=new string("/");
 
-/*  wait for https, can't use this until after authentication 
-
-	myAPP->setCookie(*n1,*v1,3600,*hname,*p,TRUE);
-*/
-
-	myAPP->setCookie(*n1,*v1,3600,*hname,*p,FALSE);
+	if(UseHTTPS) 
+	{ 
+		myAPP->setCookie(*n1,*v1,3600,*hname,*p,TRUE);
+	} else {
+		myAPP->setCookie(*n1,*v1,3600,*hname,*p,FALSE);
+	}
 	n1->~string();
 	hname->~string();
 	v1->~string();
@@ -426,14 +427,13 @@ int WT_RDA_PutEnv(char *namevalue,int line,char *file)
 	for(x=temp;*x;++x) if(*x=='/' || *x==':') x=0;
 	hname=new string(temp);
 	p=new string("/");
-/*
-// can't use this until after authentication 
 
-	myAPP->setCookie(*n1,*v1,3600,*hname,*p,TRUE);
-
-*/
-
-	myAPP->setCookie(*n1,*v1,3600,*hname,*p,FALSE);
+	if(UseHTTPS) 
+	{ 
+		myAPP->setCookie(*n1,*v1,3600,*hname,*p,TRUE);
+	} else {
+		myAPP->setCookie(*n1,*v1,3600,*hname,*p,FALSE);
+	}
 	n1->~string();
 	v1->~string();
 	hname->~string();
@@ -1084,12 +1084,16 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 int main(int argc,char *argv[])
 {
 	int x=0;
+	char *temp=NULL;
 
 	RDAMAINWIDGET=NULL;
 	Skip_OpenRDA_Cookies=FALSE;
 
 	RDA_argc=argc;
 	RDA_argv=argv;
+	UseHTTPS=FALSE;
+	temp=getenv("HTTPS");
+	if(!isEMPTY(temp)) UseHTTPS=TRUE;
 
 	Session::configureAuth();
 
@@ -1219,11 +1223,11 @@ void xINITGUI(int argc,char *argv[],char *d,int line,char *file)
 }
 void xEXITGUI(int line,char *file)
 {
-	std::string s1("http:/");
+	std::string s1("http:/"),s2("https:/");
 	Wt::WString *c=NULL;
 	int x=0;
 	
-
+	fprintf(RDA_STDERR,"UseHTTPS [%s] ",(UseHTTPS==TRUE ? "True":"False"));TRACE;
 #ifdef USE_CONFIRM_CLOSE_MESSAGE
 	c=new WString("");
 	RDAMAINWIDGET->setConfirmCloseMessage(*c);
@@ -1263,8 +1267,14 @@ void xEXITGUI(int line,char *file)
 #ifdef WT_FASTCGI
 	if(!RDAstrcmp(PROGRAM_NAME,"openrda.lnx") || !RDAstrcmp(PROGRAM_NAME,"openrda.exe"))
 	{
-		s1+RDAMAINWIDGET->environment().hostName();
-		RDAMAINWIDGET->redirect(s1);
+		if(UseHTTPS) 
+		{ 
+			s2+RDAMAINWIDGET->environment().hostName();
+			RDAMAINWIDGET->redirect(s2);
+		} else {
+			s1+RDAMAINWIDGET->environment().hostName();
+			RDAMAINWIDGET->redirect(s2);
+		}
 	} else {
 		RDAMAINWIDGET->doJavaScript(closeWindowCmd);
 	}
@@ -1985,7 +1995,6 @@ short xupdatemember(RDArmem *member,int line,char *file)
 	Wt::WDateEdit *DE=NULL;
 	Wt::WText *wText=NULL;
 	Wt::WStandardItem *wSI=NULL;
-	Wt::WDate wDate;
 	Wt::WProgressBar *pBar=NULL;
 	Wt::WAbstractToggleButton *aTB=NULL;
 	char *temp_str=NULL,*temp=NULL;
@@ -2176,17 +2185,10 @@ short xupdatemember(RDArmem *member,int line,char *file)
 							Dd=atoi(stemp);
 							sprintf(stemp,"%.4s",&member->value.string_value[6]);
 							Dy=atoi(stemp);
+							DE->setDate(WDate(Dy,Dm,Dd));	
 						} else {
-							sprintf(stemp,"%.2s",&CURRENT_DATE10[0]);
-							Dm=atoi(stemp);
-							sprintf(stemp,"%.2s",&CURRENT_DATE10[3]);
-							Dd=atoi(stemp);
-							sprintf(stemp,"%.4s",&CURRENT_DATE10[6]);
-							Dy=atoi(stemp);
+							DE->setDate(WDate::currentDate());
 						}
-						wDate=Wt::WDate(Dy,Dm,Dd);
-						DE->setDate(wDate);	
-						
 					}
 				}
 				break;
@@ -5660,6 +5662,10 @@ void xreadmember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 			if(!isEMPTY(value))
 			{
+				if(member->field_type==ZIPCODE && !isEMPTY(value))
+				{
+					if(value[RDAstrlen(value)-1]='-') value[RDAstrlen(value)-1]=0;
+				}
 				l=RDAstrlen(value);
 				QUICKALLOC(member->value.string_value,member->dlen,l+1);
 				memcpy(member->value.string_value,(char *)value,l+1);
@@ -5748,12 +5754,15 @@ void xreadmember(RDArmem *member,int line,char *file)
 			} else {
 				DE=(Wt::WDateEdit *)member->w;
 				QD=DE->date();
-				text=QD.toString();
+				text=QD.toString("MM/dd/yyyy");
 				s1=text.toUTF8();
-				value=stralloc(s1.c_str());
-				l=RDAstrlen(value);
-				QUICKALLOC(member->value.string_value,member->dlen,l+1);
-				memcpy(member->value.string_value,(char *)value,l+1);
+				if(!s1.empty())
+				{
+					value=stralloc(s1.c_str());
+					l=RDAstrlen(value);
+					QUICKALLOC(member->value.string_value,member->dlen,l+1);
+					memcpy(member->value.string_value,(char *)value,l+1);
+				}
 			}
 			break;
 		case TIMES:
