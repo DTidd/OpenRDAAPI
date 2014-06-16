@@ -3245,6 +3245,28 @@ short xGLOBALSubData(char **tmp,char *modulename,int line,char *file)
 		sprintf(*tmp,"%s",stemp);
 		return(0);
 	}
+	if(!RDAstrcmp(modulename,"OPENRDA 4.0 SETUP"))
+	{
+		memset(stemp,0,101);
+		sprintf(stemp,"%d",TRUE);
+		if(RDAstrlen(*tmp)<(RDAstrlen(stemp)))
+		{
+			*tmp=Rrealloc(*tmp,RDAstrlen(stemp)+1);
+		}
+		sprintf(*tmp,"%s",stemp);
+		return(0);
+	}
+	if(!RDAstrcmp(modulename,"OPENRDA SETUP"))
+	{
+		memset(stemp,0,101);
+		sprintf(stemp,"%d",FALSE);
+		if(RDAstrlen(*tmp)<(RDAstrlen(stemp)))
+		{
+			*tmp=Rrealloc(*tmp,RDAstrlen(stemp)+1);
+		}
+		sprintf(*tmp,"%s",stemp);
+		return(0);
+	}
 	if(!RDAstrcmp(modulename,"FINMGT SETUP"))
 	{
 		memset(stemp,0,101);

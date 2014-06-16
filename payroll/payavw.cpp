@@ -1714,7 +1714,6 @@ void quitselect(RDArsrc *mainrsrc)
 	}
 	if(reportname!=NULL) Rfree(reportname);
 	ShutdownSubsystems();
-	exit(0);
 }
 static void changemonth(RDArsrc *mainrsrc)
 {

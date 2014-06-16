@@ -3428,7 +3428,7 @@ void selectpay(RDArsrc *mainrsrc)
 					if(TIMECARD_TYPE!=0)
 					{
 						ZERNRD(paytcsum);
-						if(TIMECARD_TYPE!=3)
+						if(TIMECARD_TYPE<3)
 						{
 						FIELDCOPY(prsnnl,"SOCIAL SECURITY NUMBER",paytcsum,"SOCIAL SECURITY NUMBER");
 						} else {
@@ -3911,7 +3911,6 @@ void quitselect(RDArsrc *mainrsrc)
 	if(audit_reportname!=NULL) Rfree(audit_reportname);
 	if(PAYROLL_SETUP!=NULL) free_payroll(PAYROLL_SETUP);
 	ShutdownSubsystems();
-	exit(0);
 }
 static void savepaymstr_do(RDArsrc *mainrsrc)
 {
@@ -4580,7 +4579,6 @@ static void print_list(RDArsrc *parent,void (*printfunc)(...))
 	addbtnrsrc(prsrc,"LOAD DEVICE NAME",TRUE,LoadDeviceWindow,SelectFuncDevice);
 	addstdrsrc(prsrc,"DEVICE",VARIABLETEXT,0,defaultprinter,TRUE);
 	addstdrsrc(prsrc,"NORMAL PRINT",BOOLNS,1,&normal_print,TRUE);
-	if(defaultprinter!=NULL) Rfree(defaultprinter);
 	addrfkwrsrc(prsrc,"PRINT",TRUE,printfunc,parent);
 	addrfkwrsrc(prsrc,"QUIT",TRUE,quit_print,NULL);
 	addbtnrsrc(prsrc,"HELP",TRUE,screenhelp,NULL);

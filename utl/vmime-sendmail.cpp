@@ -314,11 +314,8 @@ int sendattach(SENDMAIL_VARIABLES *mvars)
 		cerr << "No Email Recipients Specified..."  <<endl ;	
 		ostringstream errmsg;
 		std::string errstring;
-#ifdef WIN32
-		errmsg << "ok.exe ERRORDIALOG \"ERROR SENDING EMAIL\" \"No Email Recipients Specified..." << endl << endl << endl << endl
-#else
-		errmsg << "ok.lnx ERRORDIALOG \"ERROR SENDING EMAIL\" \"No Email Recipients Specified..." << endl << endl << endl << endl
-#endif
+
+		errmsg << "ERRORDIALOG \"ERROR SENDING EMAIL\" \"No Email Recipients Specified..." << endl << endl << endl << endl
 		<< (mvars->from_name==NULL ? "" : "From Name: ") << (mvars->from_name==NULL ? "" : mvars->from_name) << (mvars->from_name==NULL ? "" : "\n" )
 		<< (mvars->from_addr==NULL ? "" : "From Address: ") << (mvars->from_addr==NULL ? "" : mvars->from_addr) << (mvars->from_addr==NULL ? "" : "\n" )
 		<< (mvars->tolist==NULL ? "" : "TO: ") << (mvars->tolist==NULL ? "" : mvars->tolist) << (mvars->tolist==NULL ? "" : "\n" )
@@ -367,8 +364,9 @@ int sendattach(SENDMAIL_VARIABLES *mvars)
 		<< (mvars->fdata[9]==NULL ? "" : "File Data 9: ") << (mvars->fdata[9]==NULL ? "" : "TRUE") << (mvars->fdata[9]==NULL ? "" : "\n" )
 		<< (mvars->body==NULL ? "" : "Body: ") << (mvars->body==NULL ? "" : mvars->body) << (mvars->body==NULL ? "" : "\n" )
 		<< "\"" << endl;
-		errstring=errmsg.str();
-		//std::cerr << errstring;
+		//errstring=errmsg.str();
+		std::cerr << errstring;
+/*
 #ifdef WIN32
 		if(!mvars->ignerr) {
 			//system("ok.exe ERRORDIALOG \"ERROR SENDING EMAIL\" \"No Email Recipients Specified...\"");
@@ -380,6 +378,7 @@ int sendattach(SENDMAIL_VARIABLES *mvars)
 			system(errstring.c_str());
 		}
 #endif
+*/
 		return (1); 
 	}
 
@@ -747,9 +746,9 @@ int sendattach(SENDMAIL_VARIABLES *mvars)
 		}
 		if(pipe==NULL) {
 			cerr <<std::endl <<"ERROR SENDING EMAIL: MSMTP Failed.  Ensure MSMTP Is Installed..." <<std::endl;
-			if(!mvars->ignerr) {
-				system("ok.lnx ERRORDIALOG \"ERROR SENDING EMAIL\" \"MSMTP Failed.  Ensure MSMTP Is Installed...\"");
-			}
+			//if(!mvars->ignerr) {
+			//	system("ok.lnx ERRORDIALOG \"ERROR SENDING EMAIL\" \"MSMTP Failed.  Ensure MSMTP Is Installed...\"");
+			//}
 		}else{
 			fwrite(dataToSend.c_str(),(strlen(dataToSend.c_str())),1,pipe);
 		}
@@ -783,11 +782,8 @@ int sendattach(SENDMAIL_VARIABLES *mvars)
 		std::cerr << "vmime::exception: " << e.what() << std::endl;
 		ostringstream verrmsg;
 		std::string verrstring;
-#ifdef WIN32
-		verrmsg << "ok.exe ERRORDIALOG \"ERROR SENDING EMAIL\" \"vmime::exception: " << e.what() << endl << endl << endl << endl
-#else
-		verrmsg << "ok.lnx ERRORDIALOG \"ERROR SENDING EMAIL\" \"vmime::exception: " << e.what() << endl << endl << endl << endl
-#endif
+
+		verrmsg << "ERRORDIALOG \"ERROR SENDING EMAIL\" \"vmime::exception: " << e.what() << endl << endl << endl << endl
 		<< (mvars->from_name==NULL ? "" : "From Name: ") << (mvars->from_name==NULL ? "" : mvars->from_name) << (mvars->from_name==NULL ? "" : "\n" )
 		<< (mvars->from_addr==NULL ? "" : "From Address: ") << (mvars->from_addr==NULL ? "" : mvars->from_addr) << (mvars->from_addr==NULL ? "" : "\n" )
 		<< (mvars->tolist==NULL ? "" : "TO: ") << (mvars->tolist==NULL ? "" : mvars->tolist) << (mvars->tolist==NULL ? "" : "\n" )
@@ -836,8 +832,9 @@ int sendattach(SENDMAIL_VARIABLES *mvars)
 		<< (mvars->fdata[9]==NULL ? "" : "File Data 9: ") << (mvars->fdata[9]==NULL ? "" : "TRUE") << (mvars->fdata[9]==NULL ? "" : "\n" )
 		<< (mvars->body==NULL ? "" : "Body: ") << (mvars->body==NULL ? "" : mvars->body) << (mvars->body==NULL ? "" : "\n" )
 		<< "\"" << endl;
-		verrstring=verrmsg.str();
-		//std::cerr << errstring;
+		//verrstring=verrmsg.str();
+		std::cerr << verrmsg.str();
+/*
 #ifdef WIN32
 		if(!mvars->ignerr) {
 			//system("ok.exe ERRORDIALOG \"ERROR SENDING EMAIL\" \"No Email Recipients Specified...\"");
@@ -849,6 +846,7 @@ int sendattach(SENDMAIL_VARIABLES *mvars)
 			system(verrstring.c_str());
 		}
 #endif
+*/
 		return(1);
 		throw;
 	}
@@ -858,11 +856,8 @@ int sendattach(SENDMAIL_VARIABLES *mvars)
 		std::cerr << "std::exception: " << e.what() << std::endl;
 		ostringstream serrmsg;
 		std::string serrstring;
-#ifdef WIN32
-		serrmsg << "ok.exe ERRORDIALOG \"ERROR SENDING EMAIL\" \"std::exception: " << e.what() << endl << endl << endl << endl
-#else
-		serrmsg << "ok.lnx ERRORDIALOG \"ERROR SENDING EMAIL\" \"std::exception: " << e.what() << endl << endl << endl << endl
-#endif
+
+		serrmsg << "ERRORDIALOG \"ERROR SENDING EMAIL\" \"std::exception: " << e.what() << endl << endl << endl << endl
 		<< (mvars->from_name==NULL ? "" : "From Name: ") << (mvars->from_name==NULL ? "" : mvars->from_name) << (mvars->from_name==NULL ? "" : "\n" )
 		<< (mvars->from_addr==NULL ? "" : "From Address: ") << (mvars->from_addr==NULL ? "" : mvars->from_addr) << (mvars->from_addr==NULL ? "" : "\n" )
 		<< (mvars->tolist==NULL ? "" : "TO: ") << (mvars->tolist==NULL ? "" : mvars->tolist) << (mvars->tolist==NULL ? "" : "\n" )
@@ -911,8 +906,9 @@ int sendattach(SENDMAIL_VARIABLES *mvars)
 		<< (mvars->fdata[9]==NULL ? "" : "File Data 9: ") << (mvars->fdata[9]==NULL ? "" : "TRUE") << (mvars->fdata[9]==NULL ? "" : "\n" )
 		<< (mvars->body==NULL ? "" : "Body: ") << (mvars->body==NULL ? "" : mvars->body) << (mvars->body==NULL ? "" : "\n" )
 		<< "\"" << endl;
-		serrstring=serrmsg.str();
-		//std::cerr << errstring;
+		//serrstring=serrmsg.str();
+		std::cerr << serrmsg.str();
+/*
 #ifdef WIN32
 		if(!mvars->ignerr) {
 			//system("ok.exe ERRORDIALOG \"ERROR SENDING EMAIL\" \"No Email Recipients Specified...\"");
@@ -924,6 +920,7 @@ int sendattach(SENDMAIL_VARIABLES *mvars)
 			system(serrstring.c_str());
 		}
 #endif
+*/
 		return(1);
 		throw;
 	}
@@ -948,6 +945,7 @@ int main(int argc, char* argv[])
 	char stemp[512];
 	char *rdadiag=NULL;
 	char *temp1=NULL;
+	char *tempstr=NULL;
 	MAIL_VARS *mvars = new MAIL_VARS;
 
 	//mvars->cclist = new char[((strlen(argv[1]))+1)];
@@ -963,6 +961,12 @@ int main(int argc, char* argv[])
 		mvars->rdadiag=0;
 	}
 		
+	tempstr=getenv("RDA_DATA_DIR");
+	if(tempstr!=NULL)
+	{
+		chdir(tempstr);
+		tempstr==NULL;
+	}
 
 	mvars->from_name=NULL;
 	mvars->from_addr=NULL;

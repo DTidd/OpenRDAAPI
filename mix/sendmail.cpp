@@ -174,7 +174,7 @@ short xRunVMimeSendmail(MAIL_VARS *email,int line,char *file)
 		if(email->fname[x]!=NULL)
 		{
 			tempstr.assign("VMIME_FNAME");
-			tempstr.append(x);
+			tempstr.append(std::to_string(x));
 			tempstr.append("=");
 			tempstr.append(email->fname[x]);
 			addAPPlib(newenv,tempstr.c_str());
@@ -183,7 +183,7 @@ short xRunVMimeSendmail(MAIL_VARS *email,int line,char *file)
 		if(email->dname[x]!=NULL)
 		{
 			tempstr.assign("VMIME_DNAME");
-			tempstr.append(x);
+			tempstr.append(std::to_string(x));
 			tempstr.append("=");
 			tempstr.append(email->dname[x]);
 			addAPPlib(newenv,tempstr.c_str());
@@ -192,7 +192,7 @@ short xRunVMimeSendmail(MAIL_VARS *email,int line,char *file)
 		if(email->mtype[x]!=NULL)
 		{
 			tempstr.assign("VMIME_MTYPE");
-			tempstr.append(x);
+			tempstr.append(std::to_string(x));
 			tempstr.append("=");
 			tempstr.append(email->mtype[x]);
 			addAPPlib(newenv,tempstr.c_str());
@@ -201,7 +201,7 @@ short xRunVMimeSendmail(MAIL_VARS *email,int line,char *file)
 		if(email->fdata[x]!=NULL)
 		{
 			tempstr.assign("VMIME_FDATA");
-			tempstr.append(x);
+			tempstr.append(std::to_string(x));
 			tempstr.append("=");
 			tempstr.append(email->fdata[x]);
 			addAPPlib(newenv,tempstr.c_str());

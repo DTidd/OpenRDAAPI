@@ -1876,7 +1876,6 @@ static void quitbpaymstr(MakeBrowseList *blist)
 	if(PAYROLL_SETUP!=NULL) free_payroll(PAYROLL_SETUP);
 	if(audit_reportname!=NULL) Rfree(audit_reportname);
 	ShutdownSubsystems();
-	exit(0);
 }
 static void okbpaymstr(MakeBrowseList *b,void *targetkey)
 {

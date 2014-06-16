@@ -849,15 +849,6 @@ void xSET_MTNMASTER(RDArsrc *mtnrsrc,MaintainMaster *MTNMASTER,void (*SubFunc)(.
 {
 	readallwidgets(mtnrsrc);
 	IncVirRsrcstoFile(mtnrsrc);
-/* Don't need to call this because this function only called from non RDAScrolledList resources.
-	ReadRDAScrolledLists(mtnrsrc);
-	if(!MTNMASTER->file_type)
-	{
-		rsrc2filerecord(MTNMASTER->passkey->fileno,mtnrsrc);
-	} else {
-		rsrc2singlefilerecord(MTNMASTER->passkey->fileno,mtnrsrc);
-	}
-*/
 	GET_SUPPORTING(mtnrsrc,MTNMASTER,SubFunc,args,TRUE,FALSE);
 	MSTADVupdateSCRNvirtuals(mtnrsrc,SubFunc,args,MTNMASTER);
 }

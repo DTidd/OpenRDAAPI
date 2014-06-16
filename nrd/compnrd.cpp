@@ -3,6 +3,7 @@
 short xCOMPARENRDfield(NRDfield *fld,NRDfield *field,int line,char *file)
 {
 	short empty1=FALSE,empty2=FALSE;
+
 #ifdef USE_RDA_DIAGNOSTICS
 	if(diagnrd)
 	{
@@ -166,10 +167,12 @@ short xCOMPARENRDfield(NRDfield *fld,NRDfield *field,int line,char *file)
 				case DOLLARS:
 				case DOLLARS_NOCENTS:
 				case SDECIMALV:
-					if(*field->data.float_value==*fld->data.float_value)
+					if((*field->data.float_value)==(*fld->data.float_value))
 					{
-							return(FALSE);
-					} else return(TRUE);
+						return(FALSE);
+					} else {
+						return(TRUE);
+					}
 				case SHORTV:
 				case SSHORTV:
 					if(*field->data.float_value==*fld->data.short_value)

@@ -1486,7 +1486,6 @@ static void quit_record(RDArsrc *mtnrsrc,mtnstruct *mtn)
 	if(perhlth!=(-1)) CLSNRD(perhlth);
 	if(perret!=(-1)) CLSNRD(perret);
 	ShutdownSubsystems();
-	exit(0);
 }
 static void getrecord(RDArsrc *mtnrsrc,mtnstruct *mtn)
 {

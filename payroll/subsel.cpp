@@ -3275,7 +3275,6 @@ void quitselect(RDArsrc *mainrsrc)
 	if(audit_reportname!=NULL) Rfree(audit_reportname);
 	if(PAYROLL_SETUP!=NULL) free_payroll(PAYROLL_SETUP);
 	ShutdownSubsystems();
-	exit(0);
 }
 static void savepaymstr(RDArsrc *mainrsrc)
 {

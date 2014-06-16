@@ -1438,11 +1438,13 @@ Wt::WContainerWidget *BSScatterWidget(short dtype2use,char *fd2use)
 	chart->setLegendEnabled(TRUE);
 	chart->setType(Wt::Chart::ChartType::CategoryChart);
   	chart->axis(XAxis).setScale(CategoryScale); // set scale of X axis to DateScale
-	chart->setPlotAreaPadding(50,Left);
+	
+	chart->axis(YAxis).setLabelFormat("");
+	chart->setPlotAreaPadding(100,Left);
 	chart->setPlotAreaPadding(20,Top | Bottom);
 	for(x=1;x<model->columnCount();++x) 
 	{
-		WDataSeries s(x,Wt::Chart::SeriesType::LineSeries);
+		WDataSeries s(x,Wt::Chart::SeriesType::BarSeries);
 		s.setShadow(WShadow(3,3,WColor(0,0,0,127),3));
 		chart->addSeries(s);
 	}

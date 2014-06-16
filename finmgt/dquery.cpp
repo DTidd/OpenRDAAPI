@@ -130,11 +130,9 @@ int dQueryCustomTableFunction(Wt::WWidget *parent,Wt::WWidget **pop)
 {
 	Wt::WTable *myTable=NULL;
 	Wt::WContainerWidget *VB=NULL;
-/*
 	Wt::WContainerWidget *VB1=NULL;
 	Wt::WScrollArea *SA=NULL;
 	Wt::WVBoxLayout *vb1=NULL;
-*/
 	Wt::WHBoxLayout *hb=NULL;
 	Wt::WLayout *daL=NULL;
 	Wt::WTableColumn *TC=NULL;
@@ -152,74 +150,15 @@ int dQueryCustomTableFunction(Wt::WWidget *parent,Wt::WWidget **pop)
 	{
 		prterr("DIAG dQueryCustomTableFunction.");
 	}
-	TRACE;
-	VB=new Wt::WContainerWidget();
-	*pop=(Wt::WWidget *)VB;
-	hb=new Wt::WHBoxLayout();
-	hb->setSpacing(0);
-	VB->setLayout(hb);
-	daL=(Wt::WLayout *)hb;
-	daL->setContentsMargins(0,0,0,0);
-	spc=Wt::WLength(0,Wt::WLength::Pixel);
-	VB->setPadding(spc,All);
-	mssc=ModuleScreenStyleClass(MAINRSRC);
-	memset(GUIstemp,0,1024);
-	sprintf(GUIstemp,"OpenRDA %s TableContainer",mssc);
-	if(mssc!=NULL) Rfree(mssc);
-	VB->addStyleClass(GUIstemp);
-#ifdef USE_RDA_DIAGNOSTICS
-/*
-	if(diagcss)
-	{
-		if(cssNames!=NULL)
-		{
-			fprintf(cssNames,"\"%s\",\"%s\"\r\n","",VB->styleClass.toUTF8().c_str());
-		}
-	}
-*/
-#endif /* USE_RDA_DIAGNOSTICS */
-/*
-	SA=new Wt::WScrollArea((Wt::WContainerWidget *)VB);
-	hb->addWidget(SA);
-	VB1=new Wt::WContainerWidget();
-	SA->setWidget((Wt::WWidget *)VB1);	
-	hb->setStretchFactor(SA,800);
-	vb1=new Wt::WVBoxLayout();
-	VB1->setLayout(vb1);
-	SA->setHorizontalScrollBarPolicy(Wt::WScrollArea::ScrollBarAsNeeded);
-	SA->setVerticalScrollBarPolicy(Wt::WScrollArea::ScrollBarAlwaysOn);
-	sw=Wt::WLength(400,Wt::WLength::Pixel);
-	SA->setMinimumSize(sw,Wt::WLength::Auto);
-*/
 	MAINRSRC->has_large_table=TRUE;
 	myTable=new Wt::WTable();
+	*pop=(Wt::WWidget *)myTable;
 	myTable->addStyleClass("polished");
 	mssc=ModuleScreenStyleClass(MAINRSRC);
 	memset(GUIstemp,0,1024);
 	sprintf(GUIstemp,"OpenRDA %s Table",mssc);
 	if(mssc!=NULL) Rfree(mssc);
 	myTable->addStyleClass(GUIstemp);
-#ifdef USE_RDA_DIAGNOSTICS
-/*
-	if(diagcss)
-	{
-		if(cssNames!=NULL)
-		{
-			fprintf(cssNames,"\"%s\",\"%s\"\r\n","",myTable->styleClass.toUTF8().c_str());
-		}
-	}
-*/
-#endif /* USE_RDA_DIAGNOSTICS */
-/*
-	vb1->addWidget(myTable);
-	vb1->setStretchFactor(myTable,750);
-	vb1->setSpacing(0);
-	daL=(Wt::WLayout *)vb1;
-	daL->setContentsMargins(0,0,0,0);
-	spc=Wt::WLength(0,Wt::WLength::Pixel);
-	VB1->setPadding(spc,All);
-*/
-	hb->addWidget(myTable);
 /* Determine Rows & Columns */
 	myTable->setHeaderCount(1,Horizontal);
 	section=0;
@@ -296,22 +235,21 @@ int dQueryCustomTableFunction(Wt::WWidget *parent,Wt::WWidget **pop)
 	myText=new Wt::WText("Source");
 	TE->addWidget(myText);
 	++section;
-	TRACE;
 	section=0;
-	for(crow=2;crow<(NumberRows+2);++crow)
+	for(crow=1;crow<(NumberRows+1);++crow)
 	{
 		section=0;
-		TE=myTable->elementAt(crow-1,section);
+		TE=myTable->elementAt(crow,section);
 		memset(DQUERYstemp,0,101);
 		sprintf(DQUERYstemp,"%08d:AFFECT DATE",crow);
 		r=FINDRSC(MAINRSRC,DQUERYstemp);
 		if(r>(-1))
 		{
 			mem=MAINRSRC->rscs+r;
-			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,10,0,(Wt::WTable *)myTable,crow-1,section,0,0);
+			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,10,0,(Wt::WTable *)myTable,crow,section,0,0);
 		}
 		++section;
-		TE=myTable->elementAt(crow-1,section);
+		TE=myTable->elementAt(crow,section);
 
 		memset(DQUERYstemp,0,101);
 		sprintf(DQUERYstemp,"%08d:CONTROL",crow);
@@ -319,10 +257,10 @@ int dQueryCustomTableFunction(Wt::WWidget *parent,Wt::WWidget **pop)
 		if(r>(-1))
 		{
 			mem=MAINRSRC->rscs+r;
-			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,15,0,(Wt::WTable *)myTable,crow-1,section,0,0);
+			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,15,0,(Wt::WTable *)myTable,crow,section,0,0);
 		}
 		++section;
-		TE=myTable->elementAt(crow-1,section);
+		TE=myTable->elementAt(crow,section);
 
 		memset(DQUERYstemp,0,101);
 		sprintf(DQUERYstemp,"%08d:DEBIT AMOUNT",crow);
@@ -330,10 +268,10 @@ int dQueryCustomTableFunction(Wt::WWidget *parent,Wt::WWidget **pop)
 		if(r>(-1))
 		{
 			mem=MAINRSRC->rscs+r;
-			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,20,0,(Wt::WTable *)myTable,crow-1,section,0,0);
+			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,20,0,(Wt::WTable *)myTable,crow,section,0,0);
 		}
 		++section;
-		TE=myTable->elementAt(crow-1,section);
+		TE=myTable->elementAt(crow,section);
 
 		memset(DQUERYstemp,0,101);
 		sprintf(DQUERYstemp,"%08d:CREDIT AMOUNT",crow);
@@ -341,10 +279,10 @@ int dQueryCustomTableFunction(Wt::WWidget *parent,Wt::WWidget **pop)
 		if(r>(-1))
 		{
 			mem=MAINRSRC->rscs+r;
-			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,20,0,(Wt::WTable *)myTable,crow-1,section,0,0);
+			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,20,0,(Wt::WTable *)myTable,crow,section,0,0);
 		}
 		++section;
-		TE=myTable->elementAt(crow-1,section);
+		TE=myTable->elementAt(crow,section);
 
 		memset(DQUERYstemp,0,101);
 		sprintf(DQUERYstemp,"%08d:REFERENCE",crow);
@@ -352,10 +290,10 @@ int dQueryCustomTableFunction(Wt::WWidget *parent,Wt::WWidget **pop)
 		if(r>(-1))
 		{
 			mem=MAINRSRC->rscs+r;
-			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,15,0,(Wt::WTable *)myTable,crow-1,section,0,0);
+			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,15,0,(Wt::WTable *)myTable,crow,section,0,0);
 		}
 		++section;
-		TE=myTable->elementAt(crow-1,section);
+		TE=myTable->elementAt(crow,section);
 
 		memset(DQUERYstemp,0,101);
 		sprintf(DQUERYstemp,"%08d:DESCRIPTION",crow);
@@ -363,10 +301,10 @@ int dQueryCustomTableFunction(Wt::WWidget *parent,Wt::WWidget **pop)
 		if(r>(-1))
 		{
 			mem=MAINRSRC->rscs+r;
-			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,40,0,(Wt::WTable *)myTable,crow-1,section,0,0);
+			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,40,0,(Wt::WTable *)myTable,crow,section,0,0);
 		}
 		++section;
-		TE=myTable->elementAt(crow-1,section);
+		TE=myTable->elementAt(crow,section);
 
 		memset(DQUERYstemp,0,101);
 		sprintf(DQUERYstemp,"%08d:IDENTIFICATION",crow);
@@ -374,10 +312,10 @@ int dQueryCustomTableFunction(Wt::WWidget *parent,Wt::WWidget **pop)
 		if(r>(-1))
 		{
 			mem=MAINRSRC->rscs+r;
-			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,15,0,(Wt::WTable *)myTable,crow-1,section,0,0);
+			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,15,0,(Wt::WTable *)myTable,crow,section,0,0);
 		}
 		++section; 
-		TE=myTable->elementAt(crow-1,section);
+		TE=myTable->elementAt(crow,section);
 
 		memset(DQUERYstemp,0,101);
 		sprintf(DQUERYstemp,"%08d:BANK IDENTIFICATION",crow);
@@ -385,10 +323,10 @@ int dQueryCustomTableFunction(Wt::WWidget *parent,Wt::WWidget **pop)
 		if(r>(-1))
 		{
 			mem=MAINRSRC->rscs+r;
-			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,15,0,(Wt::WTable *)myTable,crow-1,section,0,0);
+			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,15,0,(Wt::WTable *)myTable,crow,section,0,0);
 		}
 		++section;
-		TE=myTable->elementAt(crow-1,section);
+		TE=myTable->elementAt(crow,section);
 
 		memset(DQUERYstemp,0,101);
 		sprintf(DQUERYstemp,"%08d:GRANT YEAR",crow);
@@ -396,10 +334,10 @@ int dQueryCustomTableFunction(Wt::WWidget *parent,Wt::WWidget **pop)
 		if(r>(-1))
 		{
 			mem=MAINRSRC->rscs+r;
-			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,10,0,(Wt::WTable *)myTable,crow-1,section,0,0);
+			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,10,0,(Wt::WTable *)myTable,crow,section,0,0);
 		}
 		++section;
-		TE=myTable->elementAt(crow-1,section);
+		TE=myTable->elementAt(crow,section);
 
 
 		memset(DQUERYstemp,0,101);
@@ -408,10 +346,10 @@ int dQueryCustomTableFunction(Wt::WWidget *parent,Wt::WWidget **pop)
 		if(r>(-1))
 		{
 			mem=MAINRSRC->rscs+r;
-			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,10,0,(Wt::WTable *)myTable,crow-1,section,0,0);
+			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,10,0,(Wt::WTable *)myTable,crow,section,0,0);
 		}
 		++section;
-		TE=myTable->elementAt(crow-1,section);
+		TE=myTable->elementAt(crow,section);
 
 		memset(DQUERYstemp,0,101);
 		sprintf(DQUERYstemp,"%08d:DISTRIBUTED",crow);
@@ -419,10 +357,10 @@ int dQueryCustomTableFunction(Wt::WWidget *parent,Wt::WWidget **pop)
 		if(r>(-1))
 		{
 			mem=MAINRSRC->rscs+r;
-			makefield((Wt::WWidget *)TE,mem,"Distributed",NULL,NULL,0,0,0,(Wt::WTable *)myTable,crow-1,section,0,0);
+			makefield((Wt::WWidget *)TE,mem,"Distributed",NULL,NULL,0,0,0,(Wt::WTable *)myTable,crow,section,0,0);
 		}
 		++section;
-		TE=myTable->elementAt(crow-1,section);
+		TE=myTable->elementAt(crow,section);
 
 		memset(DQUERYstemp,0,101);
 		sprintf(DQUERYstemp,"%08d:CALENDAR YEAR",crow);
@@ -430,10 +368,10 @@ int dQueryCustomTableFunction(Wt::WWidget *parent,Wt::WWidget **pop)
 		if(r>(-1))
 		{
 			mem=MAINRSRC->rscs+r;
-			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,13,0,(Wt::WTable *)myTable,crow-1,section,0,0);
+			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,13,0,(Wt::WTable *)myTable,crow,section,0,0);
 		}
 		++section;
-		TE=myTable->elementAt(crow-1,section);
+		TE=myTable->elementAt(crow,section);
 
 		memset(DQUERYstemp,0,101);
 		sprintf(DQUERYstemp,"%08d:SOURCE USER",crow);
@@ -441,10 +379,10 @@ int dQueryCustomTableFunction(Wt::WWidget *parent,Wt::WWidget **pop)
 		if(r>(-1))
 		{
 			mem=MAINRSRC->rscs+r;
-			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,15,0,(Wt::WTable *)myTable,crow-1,section,0,0);
+			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,15,0,(Wt::WTable *)myTable,crow,section,0,0);
 		}
 		++section;
-		TE=myTable->elementAt(crow-1,section);
+		TE=myTable->elementAt(crow,section);
 
 
 		memset(DQUERYstemp,0,101);
@@ -453,10 +391,10 @@ int dQueryCustomTableFunction(Wt::WWidget *parent,Wt::WWidget **pop)
 		if(r>(-1))
 		{
 			mem=MAINRSRC->rscs+r;
-			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,8,0,(Wt::WTable *)myTable,crow-1,section,0,0);
+			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,8,0,(Wt::WTable *)myTable,crow,section,0,0);
 		}
 		++section;
-		TE=myTable->elementAt(crow-1,section);
+		TE=myTable->elementAt(crow,section);
 
 
 		memset(DQUERYstemp,0,101);
@@ -465,10 +403,10 @@ int dQueryCustomTableFunction(Wt::WWidget *parent,Wt::WWidget **pop)
 		if(r>(-1))
 		{
 			mem=MAINRSRC->rscs+r;
-			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,4,0,(Wt::WTable *)myTable,crow-1,section,0,0);
+			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,4,0,(Wt::WTable *)myTable,crow,section,0,0);
 		}
 		++section;
-		TE=myTable->elementAt(crow-1,section);
+		TE=myTable->elementAt(crow,section);
 
 		memset(DQUERYstemp,0,101);
 		sprintf(DQUERYstemp,"%08d:SOURCE DESCRIPTION",crow);
@@ -476,10 +414,10 @@ int dQueryCustomTableFunction(Wt::WWidget *parent,Wt::WWidget **pop)
 		if(r>(-1))
 		{
 			mem=MAINRSRC->rscs+r;
-			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,25,0,(Wt::WTable *)myTable,crow-1,section,0,0);
+			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,25,0,(Wt::WTable *)myTable,crow,section,0,0);
 		}
 		++section;
-		TE=myTable->elementAt(crow-1,section);
+		TE=myTable->elementAt(crow,section);
 
 		memset(DQUERYstemp,0,101);
 		sprintf(DQUERYstemp,"%08d:SOURCE",crow);
@@ -487,7 +425,7 @@ int dQueryCustomTableFunction(Wt::WWidget *parent,Wt::WWidget **pop)
 		if(r>(-1))
 		{
 			mem=MAINRSRC->rscs+r;
-			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,2,0,(Wt::WTable *)myTable,crow-1,section,0,0);
+			makefield((Wt::WWidget *)TE,mem,DQUERYstemp,NULL,NULL,0,2,0,(Wt::WTable *)myTable,crow,section,0,0);
 		}
 		++section;
 	}
@@ -1435,6 +1373,7 @@ void GatherData()
 							FINDFLDGETINT(venvch,"CLEAR FISCAL YEAR",&fy);
 							FINDFLDGETCHAR(venvch,"VOID CHECK",&voidchk);
 							FINDFLDGETCHAR(venvch,"ELECTRONIC TRANSFER",&d);
+							FINDFLDGETSTRING(venvch,"DESCRIPTION",&desc);
 							if(voidchk && !strncmp(desc,"VOID VOUCHER TRANSACTION",24))
 							{
 								FINDFLDGETSTRING(venvch,"VOID CHECK DATE",&adate);
@@ -5423,7 +5362,6 @@ static void quit_record(RDArsrc *parent)
 {
 	quit_record_free(parent);
 	ShutdownSubsystems();
-	exit(0);
 }
 void setyear(RDArsrc *parent)
 {
@@ -5949,7 +5887,6 @@ int main(int argc,char **argv)
 		RDAAPPMAINLOOP();
 		return;
 	}
-	diaggui=TRUE;TRACE;
 	PayrollActivity=FALSE;
 	libx=Rmalloc(RDAstrlen(CURRENTDIRECTORY)+RDAstrlen("FINMGT")+11);
 #ifndef WIN32
@@ -6369,7 +6306,7 @@ int main(int argc,char **argv)
 	FINDRSCSETFUNC(MAINRSRC,"AFFECT DATE",changeAFFECTdate,NULL);
 	addstdrsrc(MAINRSRC,"TOTAL DEBITS",DOLLARS,20,NULL,FALSE);
 	addstdrsrc(MAINRSRC,"TOTAL CREDITS",DOLLARS,20,NULL,FALSE);
-	addstdrsrc(MAINRSRC,"GRANT YEAR",LONGV,4,&GrantYear,TRUE);
+	addstdrsrc(MAINRSRC,"GRANT YEAR",SLONGV,5,&GrantYear,TRUE);
 	addstdrsrc(MAINRSRC,"SECONDS DIFFERENTIAL",LONGV,4,&SECONDS_DIFFERENTIAL,TRUE);
 	addstdrsrc(MAINRSRC,"BALANCE",DOLLARS,20,NULL,FALSE);
 	addstdrsrc(MAINRSRC,"CURRENT PAGE",LONGV,8,&CurrentPage,TRUE);

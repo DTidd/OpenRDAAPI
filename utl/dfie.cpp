@@ -1119,9 +1119,9 @@ void makeRangeScreen(IEfile *IMPDEF)
 	{
 		if(XPERT_SETUP->software_type<2)
 		{
-			ADVaddwdgt(SCREEN,12,"","","","",350,791,0,NULL,NULL,NULL,NULL);
+			ADVaddwdgt(SCREEN,12,"","","","",450,990,0,NULL,NULL,NULL,NULL);
 		} else {
-			ADVaddwdgt(SCREEN,12,"","","","",300,650,0,NULL,NULL,NULL,NULL);
+			ADVaddwdgt(SCREEN,12,"","","","",400,800,0,NULL,NULL,NULL,NULL);
 		}
 	}
 

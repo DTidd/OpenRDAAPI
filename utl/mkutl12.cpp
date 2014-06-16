@@ -13,18 +13,19 @@ void DOS_COPY_WINDOW()
 	char *temp1=NULL,*temp2=NULL;
 	char *temp3=NULL,*temp4=NULL;
 
-	scrn=RDAscrnNEW("UTILITIES","DOS COPY WINDOW");
+	scrn=RDAscrnNEW("UTILITIES","COPY FILE WINDOW");
 	if(scrn!=NULL)
 	{
-		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,1,"","","","",0,0,0,"((GENERIC_SETUP_VARIABLE(\"[UTILITIES][DISPLAY DOSCOPY MEDIA OPTIONS]\")))",NULL,NULL,NULL);
 		ADVaddwdgt(scrn,5,"","Device Spec:","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,0,"DEVICE SPECIFICATION","Device Specification","","",0,20,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
-		ADVaddwdgt(scrn,5,"","From Filename:","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,5,"","Filename:","","",0,0,0,"!((GENERIC_SETUP_VARIABLE(\"[UTILITIES][DISPLAY DOSCOPY MEDIA OPTIONS]\")))",NULL,NULL,NULL);
+		ADVaddwdgt(scrn,5,"","From Filename:","","",0,0,0,"((GENERIC_SETUP_VARIABLE(\"[UTILITIES][DISPLAY DOSCOPY MEDIA OPTIONS]\")))",NULL,NULL,NULL);
 		ADVaddwdgt(scrn,0,"FROM FILE NAME","From Filename","","",0,40,0,NULL,NULL,NULL,NULL);
-		ADVaddwdgt(scrn,5,"","To Filename:","","",0,0,0,NULL,NULL,NULL,NULL);
-		ADVaddwdgt(scrn,0,"TO FILE NAME","To Filename","","",0,40,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,5,"","To Filename:","","",0,0,0,"((GENERIC_SETUP_VARIABLE(\"[UTILITIES][DISPLAY DOSCOPY MEDIA OPTIONS]\")))",NULL,NULL,NULL);
+		ADVaddwdgt(scrn,0,"TO FILE NAME","To Filename","","",0,40,0,"((GENERIC_SETUP_VARIABLE(\"[UTILITIES][DISPLAY DOSCOPY MEDIA OPTIONS]\")))",NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,3,"","","","",0,0,0,NULL,NULL,NULL,NULL);
@@ -38,11 +39,11 @@ void DOS_COPY_WINDOW()
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,3,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
-		ADVaddwdgt(scrn,6,"DOWNLOAD","Download","","",0,0,45,NULL,NULL,"([WORKSTATION VALIDATED]=TRUE)",NULL);
-		ADVaddwdgt(scrn,6,"COPY FILE","Copy File","","",0,0,49,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,6,"DOWNLOAD","Download","","",0,0,45,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,6,"COPY FILE","Copy File","","",0,0,49,"((GENERIC_SETUP_VARIABLE(\"[UTILITIES][DISPLAY DOSCOPY MEDIA OPTIONS]\")))",NULL,NULL,NULL);
 		ADVaddwdgt(scrn,6,"ZIP FILE","Zip File","","",0,0,28,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,6,"URL","URL (Internet)","","",0,0,46,NULL,NULL,NULL,NULL);
-		ADVaddwdgt(scrn,6,"FORMAT MEDIA","Format Media","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,6,"FORMAT MEDIA","Format Media","","",0,0,0,"((GENERIC_SETUP_VARIABLE(\"[UTILITIES][DISPLAY DOSCOPY MEDIA OPTIONS]\")))",NULL,NULL,NULL);
 		ADVaddwdgt(scrn,6,"QUIT","Cancel","","",0,0,14,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,6,"HELP","Help","","",0,0,11,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);

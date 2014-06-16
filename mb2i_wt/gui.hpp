@@ -759,5 +759,9 @@ void GUI_OpenURL(char *);
 char *RDA_EncodeWhiteSpace(char *);
 #define memberrequired(a)	xmemberrequired(a,__LINE__,__FILE__)
 void xmemberrequired(RDArmem *,int,char *);
+#define ReadRDAScrolledLists(a) xReadRDAScrolledLists(a,__LINE__,__FILE__)
+void xReadRDAScrolledLists(RDArsrc *,int,char *);
+short SCRNFILENUMBER(RDArsrc *,char *,char *,short);
+void membersetcursor(RDArmem *);
 
 #endif /* GUI_HPP */

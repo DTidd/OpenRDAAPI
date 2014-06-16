@@ -3133,8 +3133,8 @@ static void new_screen(RDArsrc *mainrsrc)
 	addstdrsrc(edit_rsrc,"WIDGET LABEL",VARIABLETEXT,0,NULL,TRUE);
 	addstdrsrc(edit_rsrc,"WIDGET PIXMAP",VARIABLETEXT,0,NULL,TRUE);
 	addsctrsrc(edit_rsrc,"XHTML LABEL",0,NULL,TRUE);
-	addstdrsrc(edit_rsrc,"NUMBER ROWS",SHORTV,3,0,TRUE);
-	addstdrsrc(edit_rsrc,"NUMBER COLUMNS",SHORTV,3,0,TRUE);
+	addstdrsrc(edit_rsrc,"NUMBER ROWS",SHORTV,4,0,TRUE);
+	addstdrsrc(edit_rsrc,"NUMBER COLUMNS",SHORTV,4,0,TRUE);
 	addlstrsrc(edit_rsrc,"RESOURCE TYPES",0,TRUE,changersctype,rsrclist->numlibs,&rsrclist->libs,NULL);
 	addlstrsrc(edit_rsrc,"BOOTSTRAP",0,TRUE,NULL,BootStrap->numlibs,&BootStrap->libs,NULL);
 	addlstrsrc(edit_rsrc,"VERTICAL ALIGNMENT",0,TRUE,NULL,VerAlign->numlibs,&VerAlign->libs,NULL);

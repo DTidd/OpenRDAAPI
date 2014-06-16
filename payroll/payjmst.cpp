@@ -3227,7 +3227,6 @@ static void quit_record(RDArsrc *mtnrsrc,mtnstruct *mtn)
 			mbl_posmstr=NULL;
 		}
 		ShutdownSubsystems();
-		exit(0);
 	}
 	if(mtnrsrc!=NULL)
 	{
@@ -3774,7 +3773,6 @@ void doexit(MakeBrowseList *blist)
 			mbl_posmstr=NULL;
 		}
 		ShutdownSubsystems();
-		exit(0);
 	}
 	if(mbl_payjmst!=NULL) mbl_payjmst=NULL;
 }

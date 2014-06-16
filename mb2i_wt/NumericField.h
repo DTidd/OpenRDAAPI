@@ -61,30 +61,47 @@ public:
   /* Get whether this is a currency input. */
   bool currency() const { return currency_; }
 
-  /* Set the value of this input to the given unsigned integer. */
+  /* Set the value of this input to the given unsigned integer.
+   *
+   * If this is a currency input, the value should be in cents. */
   void setValue(unsigned value);
 
   /* Set the value of this input to the given signed integer.
+   *
+   * If this is a currency input, the value should be in cents.
+   *
    * Throws a NumericConversionError if a negative value is supplied and this NumericField does
    * not allow negative values. */
   void setValue(int value);
 
   /* Set the value of this input to the given double.
+   *
+   * If this is a currency input, the value should be in cents.
+   *
    * Throws a NumericConversionError if a negative value is supplied and this NumericField does
    * not allow negative values. */
   void setValue(double value);
 
   /* Get the value of this input as an unsigned integer.
+   *
+   * If this is a currency input, the value returned is in cents.
+   *
    * Throws a NumericConversionError if the value is negative, or
    * if the value was not in the right format. */
   unsigned unsignedValue() const;
 
   /* Get the value of this input as a signed integer.
+   *
+   * If this is a currency input, the value returned is in cents.
+   *
    * Throws a NumericConversionError if the value was not
    * in the right format. */
   int intValue() const;
 
   /* Get the value of this input as a double.
+   *
+   * If this is a currency input, the value returned is in cents.
+   *
    * Throws a NumericConversionError if the value was not
    * in the right format. */
   double doubleValue() const;

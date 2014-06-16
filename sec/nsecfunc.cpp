@@ -257,6 +257,7 @@ short xPROCsecurity(char *module,char *process,int line,char *file)
 	char deleteflag=FALSE,exec_func=FALSE;
 	SECmodule *m;
 
+
 #ifdef USE_RDA_DIAGNOSTICS
 	if(diagsec || diagsec_field)
 	{
@@ -384,6 +385,7 @@ short xPROCsecurity(char *module,char *process,int line,char *file)
 		prterr("DIAG PROCsecurity Denied Access to Process [%s] at line [%d] program [%s].",process,line,file);
 	}
 #endif /* ifdef USE_RDA_DIAGNOSTICS */
+
 	return(FALSE);
 }
 /*---------------------------------------------------------------------------

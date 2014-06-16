@@ -332,6 +332,7 @@ function NumericField(edit, config) {
   }
 
   this.keyPressed = function(o, event) {
+    if (edit.readOnly) return;
     event = jQuery.event.fix(event);
     event.preventDefault();
     handleChar(event.charCode || event.keyCode);
@@ -402,6 +403,7 @@ function NumericField(edit, config) {
   }
 
   this.keyWentDown = function(o, event) {
+    if (edit.readOnly) return;
     event = jQuery.event.fix(event);
     var selection = getSelection();
     if (event.keyCode === BACKSPACE_KEYCODE || event.keyCode === DELETE_KEYCODE) {

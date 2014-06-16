@@ -65,7 +65,7 @@ short xExecuteProgram(char *name,APPlib *args,APPlib *envp,short style,APPlib *r
 		return(-1);
 	}
 	applibx=APPlibNEW();
-	if((RDA_NOGUI && UI_OpenWindow==NULL) || (!RDA_NOGUI && UI_OpenWindow!=NULL))
+	if(!isEMPTY(DOCUMENTROOT))
 	{
 		if(style==TRUE)
 		{
@@ -133,6 +133,7 @@ short xExecuteProgram(char *name,APPlib *args,APPlib *envp,short style,APPlib *r
 				RDA_PutEnv(envp->libs[x]);
 			}
 		}
+		fprintf(RDA_STDERR,"windowData [%s] ",windowData);TRACE;
 		UI_OpenWindow(windowData);
 		if(progname!=NULL) Rfree(progname);
 		if(applibx!=NULL) freeapplib(applibx);
@@ -228,7 +229,7 @@ short xExecute2Program(char *name,APPlib *args,APPlib *envp,char add_ext,char qu
 		return(-1);
 	}
 	applibx=APPlibNEW();
-	if((RDA_NOGUI && UI_OpenWindowWait==NULL) || (!RDA_NOGUI && UI_OpenWindowWait!=NULL))
+	if(!isEMPTY(DOCUMENTROOT))
 	{
 		if(add_ext==FALSE)
 		{
@@ -256,6 +257,7 @@ short xExecute2Program(char *name,APPlib *args,APPlib *envp,char add_ext,char qu
 #endif
 		}
 	}
+	fprintf(RDA_STDERR,"progname [%s] ",progname);TRACE;
 	addAPPlib(applibx,progname);
 	if(UI_OpenWindowWait!=NULL && !RDA_NOGUI)
 	{
@@ -297,6 +299,7 @@ short xExecute2Program(char *name,APPlib *args,APPlib *envp,char add_ext,char qu
 			RDA_PutEnv(envp->libs[x]);
 		}
 		}
+		fprintf(RDA_STDERR,"windowData [%s] ",windowData);TRACE;
 		UI_OpenWindowWait(windowData);
 		if(progname!=NULL) Rfree(progname);
 		if(applibx!=NULL) freeapplib(applibx);

@@ -26,16 +26,17 @@ void SetModuleGroup(char *m)
 	{
 		MODULE_GROUP=1;
 	} else if(!RDAstrcmp(m,"VENPMT") || !RDAstrcmp(m,"PURORD") ||
-		!RDAstrcmp(m,"INVCTL"))
+		!RDAstrcmp(m,"INVCTL") || !RDAstrcmp(m,"CATALOGUE"))
 	{
 		MODULE_GROUP=2;
 	} else if(!RDAstrcmp(m,"PRSNNL") || !RDAstrcmp(m,"PAYROLL") ||
 		!RDAstrcmp(m,"LVEMGT") || !RDAstrcmp(m,"SUBMGT") || 
 		!RDAstrcmp(m,"EMPABS") || !RDAstrcmp(m,"POSTRK") ||
-		!RDAstrcmp(m,"APPMGT") || !RDAstrcmp(m,"OPENSS"))
+		!RDAstrcmp(m,"APPMGT") || !RDAstrcmp(m,"OPENSS") ||
+		!RDAstrcmp(m,"BFTMGT"))
 	{
 		MODULE_GROUP=3;
-	} else if(!RDAstrcmp(m,"PROPERTY") || !RDAstrcmp(m,"RLSTMGT"))
+	} else if(!RDAstrcmp(m,"DMVREG") || !RDAstrcmp(m,"PROPERTY") || !RDAstrcmp(m,"RLSTMGT"))
 	{
 		MODULE_GROUP=4;
 	} else if(!RDAstrcmp(m,"OCCTAX") || !RDAstrcmp(m,"BLDPRMT") ||
@@ -2204,25 +2205,10 @@ void quit_dos_copy(RDArsrc *parent,RDADosCopy *DosCopyStruct)
 }
 void do_dos_download(RDArsrc *parent,RDADosCopy *DosCopyStruct)
 {
-	APPlib *args=NULL;
-	char *work_ip=NULL,*work_documents=NULL,*work_login=NULL,*work_passwd=NULL;
-
-	work_ip=WorkStationIPAddr();
-	work_login=UsersWorkstationLogin();
-	work_passwd=UsersWorkstationPassword();
-	work_documents=UsersWorkstationDocuments();
 	readallwidgets(parent);
-	FINDRSCGETSTRING(parent,"DEVICE SPECIFICATION",&DosCopyStruct->device_spec);
+	readwidget(parent,"FROM FILE NAME");
 	FINDRSCGETSTRING(parent,"FROM FILE NAME",&DosCopyStruct->from_filename);
-	args=APPlibNEW();
-	addAPPlib(args,"\"\"");
-	addAPPlib(args,DosCopyStruct->from_filename);
-	addAPPlib(args,work_ip);
-	addAPPlib(args,work_documents);
-	addAPPlib(args,work_login);
-	addAPPlib(args,work_passwd);
-	ADVExecute2Program("sftpfile",args,NULL);
-	if(args!=NULL) freeapplib(args);
+	DisplayFile(DosCopyStruct->from_filename);
 }
 void do_dos_copy(RDArsrc *parent,RDADosCopy *DosCopyStruct)
 {
@@ -2251,8 +2237,9 @@ void do_dos_format(RDArsrc *parent,RDADosCopy *DosCopyStruct)
 void do_zip_file(RDArsrc *parent,RDADosCopy *DosCopyStruct)
 {
 	int x=0;
-	char *ffile=NULL,*zfile=NULL,*temp=NULL,*temp1=NULL;
+	char *ffile=NULL,*zfile=NULL,*temp=NULL,*temp1=NULL,*temp2=NULL;
 	APPlib *args=NULL;
+	void (*myUI_OpenWindow)(char *)=NULL;
 	
 	readallwidgets(parent);
 	FINDRSCGETSTRING(parent,"FROM FILE NAME",&ffile);
@@ -2271,12 +2258,22 @@ void do_zip_file(RDArsrc *parent,RDADosCopy *DosCopyStruct)
 			break;
 		}
 	}
-	zfile=Rmalloc(RDAstrlen(temp)+5);
+	zfile=Rmalloc(RDAstrlen(temp)+9);
 	sprintf(zfile,"%s.zip",temp);
 	args=APPlibNEW();
-	addAPPlib(args,zfile);
-	addAPPlib(args,ffile);
+	temp2=Rmalloc(RDAstrlen(CURRENTDIRECTORY)+RDAstrlen(zfile)+3);
+	sprintf(temp2,"%s/%s",CURRENTDIRECTORY,zfile);
+	addAPPlib(args,temp2);
+	sprintf(temp2,"%s/%s",CURRENTDIRECTORY,ffile);
+	addAPPlib(args,temp2);
+	if(temp2!=NULL) Rfree(temp2);
+	myUI_OpenWindow=UI_OpenWindow;
+	UI_OpenWindow=NULL;
+	RDA_NOGUI=TRUE;
 	ExecuteProgram("zip",args);
+	RDA_NOGUI=FALSE;
+	UI_OpenWindow=myUI_OpenWindow;
+	myUI_OpenWindow=NULL;
 	if(args!=NULL) freeapplib(args);
 	FINDRSCSETSTRING(parent,"FROM FILE NAME",zfile);
 	FINDRSCSETSTRING(parent,"TO FILE NAME",zfile);
@@ -2426,7 +2423,7 @@ int run_dos_copy(RDArsrc *parent,char *procname,char *device_spec_override,char 
 	DosCopyStruct->quitfunc=quitfunc;
 	DosCopyStruct->quitfuncargs=quitfuncargs;
 	DosCopyStruct->parentrsrc=parent;
-	DosCopyStruct->doscopyrsrc=RDArsrcNEW("UTILITIES","DOS COPY WINDOW");
+	DosCopyStruct->doscopyrsrc=RDArsrcNEW("UTILITIES","COPY FILE WINDOW");
 	addstdrsrc(DosCopyStruct->doscopyrsrc,"PROCESS",VARIABLETEXT,0,procname,FALSE);
 	if(errorlist->numlibs<1)
 	{
@@ -2456,8 +2453,8 @@ int run_dos_copy(RDArsrc *parent,char *procname,char *device_spec_override,char 
 	addbtnrsrc(DosCopyStruct->doscopyrsrc,"PRINT RESOURCES",TRUE,printrsrcs,NULL);
 	if(ADVmakescrn(DosCopyStruct->doscopyrsrc,modal))
 	{
-		ERRORDIALOG("MAKESCRN FAILED","The Make Screen function failed for the custom screen DOS COPY WINDOW. Check to see the screen is available. If it is, call your installer.",NULL,TRUE);
-		prterr("Error can't make screen DOS COPY WINDOW.");
+		ERRORDIALOG("MAKESCRN FAILED","The Make Screen function failed for the custom screen COPY FILE WINDOW. Check to see the screen is available. If it is, call your installer.",NULL,TRUE);
+		prterr("Error can't make screen COPY FILE WINDOW.");
 		if(quitfunc!=NULL)
 		{
 			quit_dos_copy(DosCopyStruct->doscopyrsrc,DosCopyStruct);

@@ -1697,6 +1697,47 @@ static void SCN_SECURITY_TOKENS_MAINTAIN_SCREEN()
 	if(temp3!=NULL) Rfree(temp3);
 	if(temp4!=NULL) Rfree(temp4);
 }
+static void DEF_SECURITY_TOKENS_DEFINE_LIST()
+{
+	RDAdefault *def=NULL;
+	char *defdir=NULL;
+	char *temp1=NULL;
+
+	def=RDAdefaultNEW("SECURITY","SECURITY TOKENS DEFINE LIST");
+	if(def!=NULL)
+	{
+		def->input_focus=stralloc("DEFAULTS");
+		addDefaultFieldINT(def,"KEY LIST",TRUE,13,0);
+		addDefaultFieldSHORT(def,"TOKEN POSITION",TRUE,7,1);
+		addDefaultFieldSHORT(def,"TOKEN LENGTH",TRUE,7,25);
+		addDefaultFieldSHORT(def,"DELETEFLAG POSITION",TRUE,7,0);
+		addDefaultFieldSHORT(def,"DELETEFLAG LENGTH",TRUE,7,0);
+		addDefaultFieldSHORT(def,"USER IDENTIFICATION POSITION",TRUE,7,2);
+		addDefaultFieldSHORT(def,"USER IDENTIFICATION LENGTH",TRUE,7,15);
+
+		defdir=Rmalloc(RDAstrlen(CURRENTDIRECTORY)+RDAstrlen(module)+12);
+#ifndef WIN32
+		sprintf(defdir,"%s/rda/%s.DEF",CURRENTDIRECTORY,module);
+#endif
+#ifdef WIN32
+		sprintf(defdir,"%s\\rda\\%s.DEF",CURRENTDIRECTORY,module);
+#endif
+		if(writedefaultbin(defdir,def))
+		{
+			if(temp1!=NULL) Rfree(temp1);
+			temp1=Rmalloc(27+8+100+1);
+			sprintf(temp1,"SCREEN DEFAULT WRITE ERROR: Module [SECURITY] Screen [SECURITY TOKENS DEFINE LIST], Can Not Save Screen Defaults!");
+			prterr(temp1);
+			if(errorlist!=NULL)
+			{
+				addERRlist(&errorlist,temp1);
+			}
+			if(temp1!=NULL) Rfree(temp1);
+		}
+		if(defdir!=NULL) Rfree(defdir);
+		if(def!=NULL) FreeRDAdefault(def);
+	}
+}
 void MTNTOKENS()
 {
 	MTN_MTN_TOKENS();
@@ -1705,4 +1746,5 @@ void MTNTOKENS()
 	SCN_SECURITY_TOKENS_DEFINE_LIST();
 	SCN_SECURITY_TOKENS_SEARCH_BROWSE();
 	SCN_SECURITY_TOKENS_MAINTAIN_SCREEN();
+	DEF_SECURITY_TOKENS_DEFINE_LIST();
 }

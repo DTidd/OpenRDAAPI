@@ -175,9 +175,6 @@ void loadgrouper(RDArsrc *r,char *fieldname)
 	addrfkwrsrc(ldvalrsrc,"QUIT",TRUE,quitldval,load);
 	addbtnrsrc(ldvalrsrc,"HELP",TRUE,screenhelp,NULL);
 	addbtnrsrc(ldvalrsrc,"PRINT RESOURCES",TRUE,screenhelp,NULL);
-/*
-	APPmakescrn(ldvalrsrc,TRUE,quitldval,load,FALSE);
-*/
 	if(ADVmakescrn(ldvalrsrc,TRUE))
 	{
 		e=Rmalloc(130+RDAstrlen(ldvalrsrc->module)+RDAstrlen(ldvalrsrc->screen));
@@ -253,6 +250,7 @@ void loadglobals(APPlib *a)
 	addAPPlibNoDuplicates(a,"[ORGANIZATION ZIP]");
 	addAPPlibNoDuplicates(a,"[ORGANIZATION PHONE]");
 	addAPPlibNoDuplicates(a,"[ORGANIZATION FAX]");
+	addAPPlibNoDuplicates(a,"[OPENRDA 4.0 SETUP]");
 	addAPPlibNoDuplicates(a,"[OPENRDA SETUP]");
 	addAPPlibNoDuplicates(a,"[VERSION DATE]");
 	addAPPlibNoDuplicates(a,"[PROGRAM NAME]");

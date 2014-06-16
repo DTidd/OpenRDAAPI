@@ -1995,7 +1995,6 @@ static void quitbpaymstr(MakeBrowseList *blist)
 	if(PAYROLL_SETUP!=NULL) free_payroll(PAYROLL_SETUP);
 	if(audit_reportname!=NULL) Rfree(audit_reportname);
 	ShutdownSubsystems();
-	exit(0);
 }
 static void okbpaymstr(MakeBrowseList *b,void *targetkey)
 {
@@ -3026,7 +3025,6 @@ static void print_list(RDArsrc *parent,void (*printfunc)(...))
 	addbtnrsrc(prsrc,"LOAD DEVICE NAME",TRUE,LoadDeviceWindow,SelectFuncDevice);
 	addstdrsrc(prsrc,"DEVICE",VARIABLETEXT,0,defaultprinter,TRUE);
 	addstdrsrc(prsrc,"NORMAL PRINT",BOOLNS,1,&normal_print,TRUE);
-	if(defaultprinter!=NULL) Rfree(defaultprinter);
 	addrfkwrsrc(prsrc,"PRINT",TRUE,printfunc,parent);
 	addrfkwrsrc(prsrc,"QUIT",TRUE,quit_print,NULL);
 	addbtnrsrc(prsrc,"HELP",TRUE,screenhelp,NULL);

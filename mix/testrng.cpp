@@ -152,6 +152,7 @@ void setrangeto2fromcb(RDArmem *member)
 			break;
 	}
 	updatersrc(member->parent,temp);
+	FINDRSCSETINPUTFOCUS((RDArsrc *)member->parent,temp);
 	if(temp!=NULL) Rfree(temp);
 }
 void xReadRangeScreen(short fileno,RangeScreen *rs,short type,
@@ -1008,8 +1009,14 @@ char *xgetfilerangedesc(short fileno,RangeScreen *rs,int line,char *file)
 }
 void setrangesensitivecb(RDArmem *member)
 {
+	char *temp=NULL;
+
 	readmember(member);
 	setrangesensitive(member);
+	temp=Rmalloc(10+RDAstrlen(member->rscrname));
+	sprintf(temp,"FROM%s",&member->rscrname[8]);
+	FINDRSCSETINPUTFOCUS((RDArsrc *)member->parent,temp);
+	if(temp!=NULL) Rfree(temp);
 }
 void SetRangersrcsensitive(RDArsrc *parent)
 {

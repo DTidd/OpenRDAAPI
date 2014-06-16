@@ -335,7 +335,7 @@ char *WT_RDA_GetEnv(char *name,int line,char *file)
 
 		if(v1!=NULL)
 		{
-			if(!v1->empty())
+			if(!v1->empty() && v1->compare("deleted"))
 			{
 				temp=v1->c_str();
 			}
@@ -671,6 +671,9 @@ public:
 	AlreadyInitialized=TRUE;
 /* NEED THE ITEMS ABOVE SUBSTANTIATED IN ORDER TO READ USERS TABLES FOR AUTHENTICATION */
 	RDAMAINWIDGET=this;
+	Wt::WLocale locale;
+	locale.setGroupSeparator(",");
+	RDAMAINWIDGET->setLocale(locale);
 #ifdef _USE_GOOGLE_ANALYTICS_ 
 	RDAMAINWIDGET->require("http://www.google-analytics.com/ga.js");
 
@@ -1227,7 +1230,7 @@ void xEXITGUI(int line,char *file)
 	Wt::WString *c=NULL;
 	int x=0;
 	
-	fprintf(RDA_STDERR,"UseHTTPS [%s] ",(UseHTTPS==TRUE ? "True":"False"));TRACE;
+
 #ifdef USE_CONFIRM_CLOSE_MESSAGE
 	c=new WString("");
 	RDAMAINWIDGET->setConfirmCloseMessage(*c);
@@ -1273,7 +1276,7 @@ void xEXITGUI(int line,char *file)
 			RDAMAINWIDGET->redirect(s2);
 		} else {
 			s1+RDAMAINWIDGET->environment().hostName();
-			RDAMAINWIDGET->redirect(s2);
+			RDAMAINWIDGET->redirect(s1);
 		}
 	} else {
 		RDAMAINWIDGET->doJavaScript(closeWindowCmd);
@@ -1960,7 +1963,9 @@ void xmemberrequired(RDArmem *member,int line,char *file)
 	Wt::WWidget *WW=NULL;
 	char b=FALSE;
 	RDArsrc *rs=(RDArsrc *)member->parent;
-	Wt::WValidator *V=(Wt::WValidator *)member->validobject;
+	Wt::WValidator *V=NULL;
+	Wt::WLineEdit *LE=(Wt::WLineEdit *)member->w;
+	Wt::WRegExpValidator *REv=NULL;
 
 	if(diaggui)
 	{
@@ -1970,11 +1975,43 @@ void xmemberrequired(RDArmem *member,int line,char *file)
 	{
 		b=rs->EvalFunc(member->required_expression,rs,rs->EvalFuncArgs);
 		WW=(Wt::WWidget *)member->w;
-		if(b==TRUE)
+		if(member->field_type==LONGV || member->field_type==SLONGV ||
+			member->field_type==SHORTV || 
+			member->field_type==SSHORTV || 
+			member->field_type==DOUBLEV || 
+			member->field_type==SDOUBLEV || 
+			member->field_type==DECIMALV || 
+			member->field_type==SDECIMALV || 
+			member->field_type==DOLLARS ||
+			member->field_type==DOLLARS_NOCENTS)
 		{
-			V->setMandatory(TRUE);
+			if(b==TRUE && member->validobject==NULL)
+			{
+				REv = new Wt::WRegExpValidator(".*[1-9].*");
+				REv->setMandatory(TRUE);
+				member->validobject=(Wt::WValidator *)REv;
+				if(member->validobject!=NULL) 
+				{
+					LE->setValidator(member->validobject);
+					LE->validate();
+				}
+			} else if(b==FALSE && member->validobject!=NULL)
+			{
+				V=(Wt::WValidator *)member->validobject;
+				V=NULL;
+				member->validobject=NULL;	
+			}
 		} else {
-			V->setMandatory(FALSE);
+			if(member->validobject!=NULL)
+			{
+				V=(Wt::WValidator *)member->validobject;
+				if(b==TRUE)
+				{
+					V->setMandatory(TRUE);
+				} else {
+					V->setMandatory(FALSE);
+				}
+			}
 		}
 	}
 }
@@ -2242,7 +2279,6 @@ short xupdatemember(RDArmem *member,int line,char *file)
 				NF=(NumericField *)member->w;
 				NF->setValue((double)*member->value.float_value/100);
 				LE=(Wt::WLineEdit *)member->w;
-				if(member->validobject!=NULL) LE->validate();
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -2258,9 +2294,8 @@ short xupdatemember(RDArmem *member,int line,char *file)
 				break;
 			case DOLLARS:
 				NF=(NumericField *)member->w;
-				NF->setValue((double)*member->value.float_value/100);
+				NF->setValue((double)*member->value.float_value);
 				LE=(Wt::WLineEdit *)member->w;
-				if(member->validobject!=NULL) LE->validate();
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -2278,7 +2313,6 @@ short xupdatemember(RDArmem *member,int line,char *file)
 				NF=(NumericField *)member->w;
 				NF->setValue((double)*member->value.float_value);
 				LE=(Wt::WLineEdit *)member->w;
-				if(member->validobject!=NULL) LE->validate();
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -2301,7 +2335,6 @@ short xupdatemember(RDArmem *member,int line,char *file)
 				NF=(NumericField *)member->w;
 				NF->setValue((double)*member->value.float_value);
 				LE=(Wt::WLineEdit *)member->w;
-				if(member->validobject!=NULL) LE->validate();
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -2319,7 +2352,6 @@ short xupdatemember(RDArmem *member,int line,char *file)
 				NF=(NumericField *)member->w;
 				NF->setValue(*member->value.float_value);
 				LE=(Wt::WLineEdit *)member->w;
-				if(member->validobject!=NULL) LE->validate();
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -2342,7 +2374,6 @@ short xupdatemember(RDArmem *member,int line,char *file)
 				NF=(NumericField *)member->w;
 				NF->setValue((double)*member->value.float_value);
 				LE=(Wt::WLineEdit *)member->w;
-				if(member->validobject!=NULL) LE->validate();
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -2357,6 +2388,13 @@ short xupdatemember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 				break;
 			case SHORTV:
+				memset(stemp,0,101);
+				sprintf(stemp,"%d",*member->value.short_value);
+				if(RDAstrlen(stemp)>member->cols)
+				{
+					prterr("Error Resource [%s] exceeds the maximum cols displayed on the screen of [%d] with a value of [%s]. This will automatically be set to 0.",member->rscrname,member->cols,stemp);
+					*member->value.short_value=0;
+				}
 				if(*member->value.short_value<0)
 				{
 					prterr("Error Resource [%s] is negative [%d] and by definition cannot be for a SHORTV.  This will automatically be set to 0.",member->rscrname,*member->value.short_value);
@@ -2366,7 +2404,6 @@ short xupdatemember(RDArmem *member,int line,char *file)
 				iv=*member->value.short_value;
 				NF->setValue((int)iv);
 				LE=(Wt::WLineEdit *)member->w;
-				if(member->validobject!=NULL) LE->validate();
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -2385,7 +2422,6 @@ short xupdatemember(RDArmem *member,int line,char *file)
 				iv=*member->value.short_value;
 				NF->setValue((int)iv);
 				LE=(Wt::WLineEdit *)member->w;
-				if(member->validobject!=NULL) LE->validate();
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -2409,7 +2445,6 @@ short xupdatemember(RDArmem *member,int line,char *file)
 				iv=*member->value.integer_value;
 				NF->setValue((int)iv);
 				LE=(Wt::WLineEdit *)member->w;
-				if(member->validobject!=NULL) LE->validate();
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -2451,7 +2486,6 @@ short xupdatemember(RDArmem *member,int line,char *file)
 				iv=*member->value.integer_value;
 				NF->setValue((int)iv);
 				LE=(Wt::WLineEdit *)member->w;
-				if(member->validobject!=NULL) LE->validate();
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -5650,7 +5684,12 @@ void xreadmember(RDArmem *member,int line,char *file)
 		case ZIPCODE:
 		case OPTIONALFIELDS:
 			LE=(Wt::WLineEdit *)member->w;
-			text=LE->text();
+			if(member->rtype==3 && (member->field_type==VARIABLETEXT || member->field_type==PLAINTEXT))
+			{
+				text=LE->text();
+			} else {
+				text=LE->displayText();
+			}
 			s1=text.toUTF8();
 			value=stralloc(s1.c_str());
 			if(!isEMPTY(value)) unpad(value);
@@ -5664,7 +5703,13 @@ void xreadmember(RDArmem *member,int line,char *file)
 			{
 				if(member->field_type==ZIPCODE && !isEMPTY(value))
 				{
-					if(value[RDAstrlen(value)-1]='-') value[RDAstrlen(value)-1]=0;
+					if(value[RDAstrlen(value)-1]=='-') value[RDAstrlen(value)-1]=0;
+				} else if(member->field_type==PHONE)
+				{
+					if(!strncmp(value,"   -   -    ",RDAstrlen(value))) memset(value,0,RDAstrlen(value));
+				} else if(member->field_type==SOCSECNUM)
+				{
+					if(!strncmp(value,"   -  -    ",RDAstrlen(value))) memset(value,0,RDAstrlen(value));
 				}
 				l=RDAstrlen(value);
 				QUICKALLOC(member->value.string_value,member->dlen,l+1);
@@ -5724,7 +5769,7 @@ void xreadmember(RDArmem *member,int line,char *file)
 			if(member->rtype==0)
 			{
 				LE=(Wt::WLineEdit *)member->w;
-				text=LE->text();
+				text=LE->displayText();
 				s1=text.toUTF8();
 				value=stralloc(s1.c_str());
 #ifdef USE_RDA_DIAGNOSTICS
@@ -5735,6 +5780,7 @@ void xreadmember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 				if(!isEMPTY(value))
 				{
+					if(!strncmp(value,"  /  /    ",RDAstrlen(value))) memset(value,0,RDAstrlen(value));
 					l=RDAstrlen(value);
 					QUICKALLOC(member->value.string_value,member->dlen,l+1);
 					memcpy(member->value.string_value,(char *)value,l+1);
@@ -5769,7 +5815,7 @@ void xreadmember(RDArmem *member,int line,char *file)
 			if(member->rtype==0)
 			{
 				LE=(Wt::WLineEdit *)member->w;
-				text=LE->text();
+				text=LE->displayText();
 				s1=text.toUTF8();
 				value=stralloc(s1.c_str());
 #ifdef USE_RDA_DIAGNOSTICS
@@ -5780,6 +5826,7 @@ void xreadmember(RDArmem *member,int line,char *file)
 #endif /* USE_RDA_DIAGNOSTICS */
 				if(!isEMPTY(value))
 				{
+					if(!strncmp(value,"  :  :  ",RDAstrlen(value))) memset(value,0,RDAstrlen(value));
 					l=RDAstrlen(value);
 					QUICKALLOC(member->value.string_value,member->dlen,l+1);
 					memcpy(member->value.string_value,(char *)value,l+1);
@@ -5890,7 +5937,7 @@ void xreadmember(RDArmem *member,int line,char *file)
 			break;
 		case DOLLARS:
 			NF=(NumericField *)member->w;
-			*member->value.float_value=NF->doubleValue()*100;
+			*member->value.float_value=NF->doubleValue();
 #ifdef USE_RDA_DIAGNOSTICS
 			if(diaggui || diaggui_field)
 			{
@@ -7942,6 +7989,7 @@ int xFINDRSCGETCURSORPOSITION(RDArsrc *rsc,char *name,int line,char *file)
 							TE=(Wt::WTextEdit *)member->w;
 							i=TE->cursorPosition();
 						}
+						if(i==(-1)) i=0;
 						return(i);
 					} else {
 						prterr("Error Character Interface FINDRSCGETCURSORPOSITION function is unavailable.");
@@ -7955,6 +8003,7 @@ int xFINDRSCGETCURSORPOSITION(RDArsrc *rsc,char *name,int line,char *file)
 							LE=(Wt::WLineEdit *)member->w;
 							return(LE->cursorPosition());
 						}
+						if(i==(-1)) i=0;
 						return(0);
 					} else {
 						prterr("Error Character Interface FINDRSCGETCURSORPOSITION function is unavailable.");
@@ -7986,7 +8035,9 @@ int xFINDRSCGETCURSORPOSITION(RDArsrc *rsc,char *name,int line,char *file)
 					if(!USER_INTERFACE) 
 					{
 						LE=(Wt::WLineEdit *)member->w;
-						return(LE->cursorPosition());
+						i=LE->cursorPosition();
+						if(i==(-1)) i=0;
+						return(i);
 					} else {
 						prterr("Error Character Interface FINDRSCGETCURSORPOSITION function is unavailable.");
 						return(-1);
@@ -8011,6 +8062,7 @@ short xFINDRSCSETCURSOR(RDArsrc *rsc,char *name,int position,
 	short x;
 	RDArmem *member;
 	int p=0,i=0,tp=0,lp=0;
+	std::stringstream ss1;
 
 #ifdef USE_RDA_DIAGNOSTICS
 	if(diaggui || diaggui_field)
@@ -8022,11 +8074,17 @@ short xFINDRSCSETCURSOR(RDArsrc *rsc,char *name,int position,
 	{
 		if(!RDAstrcmp(member->rscrname,name))
 		{
+			Wt::WWidget *WW=(Wt::WWidget *)member->w;
 			if(!USER_INTERFACE)
 			{
 				switch(member->field_type)
 				{
 					case SCROLLEDTEXT:
+						if(!USER_INTERFACE) 
+						{
+							ss1 << WW->jsRef() << ".selectionStart = " << position << ";" << WW->jsRef() << ".selectionEnd = " << position << ";";
+							WW->doJavaScript(ss1.str());
+						}
 						break;
 					case VARIABLETEXT:
 					case PLAINTEXT:
@@ -8053,8 +8111,8 @@ short xFINDRSCSETCURSOR(RDArsrc *rsc,char *name,int position,
 					case SLONGV:
 						if(!USER_INTERFACE) 
 						{
-						} else {
-							prterr("Error Character Interface FINDRSCGETCURSORPOSITION function is unavailable.");
+							ss1 << WW->jsRef() << ".selectionStart = " << position << ";" << WW->jsRef() << ".selectionEnd = " << position << ";";
+							WW->doJavaScript(ss1.str());
 						}
 						break;
 					case CHARACTERS:
@@ -8507,6 +8565,7 @@ short xFINDRSCSETINPUTFOCUS(RDArsrc *rsc,char *name,int line,char *file)
 					{
 						wFormW=(Wt::WFormWidget *)member->w;
 						wFormW->setFocus();
+						membersetcursor(member);
 					}
 				}
 #ifdef USE_RDA_DIAGNOSTICS
@@ -9253,11 +9312,20 @@ char *DetermineMimeType(char *filename)
 void DisplayFile(char *filename)
 {
 	Wt::WFileResource *mf=NULL;
-	char *f2=NULL,*extn=NULL;
+	char *f2=NULL,*extn=NULL,*msg=NULL;
 
+	if(isEMPTY(filename)) return;
 	mf=new Wt::WFileResource(RDAMAINWIDGET);
 	f2=Rmalloc(RDAstrlen(CURRENTDIRECTORY)+RDAstrlen(filename)+4);
 	sprintf(f2,"%s/%s",CURRENTDIRECTORY,filename);
+	if(access(f2,02))
+	{
+		msg=Rmalloc(128+RDAstrlen(f2));
+		sprintf(msg,"The File [%s] doesn't exist or has permissions preventing access.",(f2!=NULL ? f2:""));	
+		ERRORDIALOG("File Access Denied",msg,NULL,FALSE);
+		if(msg!=NULL) Rfree(msg);
+		return;
+	}
 	extn=DetermineMimeType(filename);
 	mf->setMimeType(extn);
 	mf->setFileName(f2);
@@ -9291,7 +9359,7 @@ static char *strippathfromfile(char *filename)
 void DisplayRelativeFile(char *filename)
 {
 	Wt::WFileResource *mf=NULL;
-	char *f2=NULL,*extn=NULL;
+	char *f2=NULL,*extn=NULL,*msg=NULL;
 	char *name=NULL;
 
 	if(isEMPTY(filename)) return;
@@ -9301,6 +9369,14 @@ void DisplayRelativeFile(char *filename)
 	mf->setFileName(filename);
 	mf->setDispositionType(Wt::WResource::DispositionType::Attachment);
 	name=strippathfromfile(filename);	
+	if(access(filename,02))
+	{
+		msg=Rmalloc(128+RDAstrlen(filename));
+		sprintf(msg,"The File [%s] doesn't exist or has permissions preventing access.",(filename!=NULL ? filename:""));	
+		ERRORDIALOG("File Access Denied",msg,NULL,FALSE);
+		if(msg!=NULL) Rfree(msg);
+		return;
+	}
 	mf->suggestFileName(name);
 	if(name!=NULL) Rfree(name);
 	std::string url(mf->url());
@@ -9334,4 +9410,288 @@ char *xUTF8famt(double a,int len,int line,char *file)
 		}
 	}	
 	return(r);
+}
+short SCRNFILENUMBER(RDArsrc *r,char *modx,char *filx,short occurrence)
+{
+	short fileno=(-1),count=0;
+	int x;
+	DFincvir *i;
+
+#ifdef USE_RDA_DIAGNOSTICS
+	if(diagvirtual)
+	{
+		prterr("DIAG SCRNFILENUMBER Looking up file number for Module [%s] File [%s] occurrence [%d] used on Screen [%s] [%s].",modx,filx,occurrence,r->module,r->screen);
+	}
+#endif /* USE_RDA_DIAGNOSTICS */
+	for(x=0,i=r->incvir;x<r->numvir;++x,++i)
+	{
+		if(!RDAstrcmp(i->module,modx) && !RDAstrcmp(i->file,filx)) 
+		{
+			++count;
+			if(count==occurrence) break;
+		}
+	}
+	if(x<r->numvir)
+	{
+		fileno=i->fileno;
+	}
+#ifdef USE_RDA_DIAGNOSTICS
+	if(diagvirtual)
+	{
+		prterr("DIAG SCRNFILENUMBER returning Fileno [%d] for File [%s][%s].",fileno,(fileno!=(-1)?MODULENAME(fileno):""),(fileno!=(-1)?FILENAME(fileno):""));
+	}
+#endif /* USE_RDA_DIAGNOSTICS */
+	return(fileno);
+}
+void xReadRDAScrolledLists(RDArsrc *r,int line,char *file)
+{
+	int selected=0,y=0,lf=0,x=0;
+	char *temp=NULL;
+	RDArmem *mem=NULL;
+	char *value=NULL;
+	RDAScrolledList *list=NULL;
+	short fileno=(-1);
+
+#ifdef USE_RDA_DIAGNOSTICS
+	if(diaglist)
+	{
+		prterr("DIAG ReadRDAScrolledLists Setting Scrolled List [%s] [%s]'s at line [%d] program [%s].",r->module,r->screen,line,file);
+	}
+#endif /* USE_RDA_DIAGNOSTICS */
+	if(r!=NULL)
+	{
+		if(r->lists!=NULL)
+		{
+			for(x=0,list=r->lists;x<r->numlists;++x,++list)
+			{
+				FINDRSCGETINT(r,list->name,&selected);
+				switch(list->contype)
+				{
+					default:
+					case 0: /* Connect Normal Field */
+					case 1: /* Connect Special Field */
+					case 3: /* Connect Report Generator */
+						if(!list->contype)
+						{
+							temp=Rmalloc(RDAstrlen(list->confil)+RDAstrlen(list->confld)+5);
+							sprintf(temp,"[%s][%s]",
+								list->confil,list->confld);
+						} else {
+							temp=stralloc(list->conmod);
+						}
+						y=FINDRSC(r,temp);
+						if(temp!=NULL) Rfree(temp);
+						if(y>(-1))
+						{
+							mem=r->rscs+y;
+							value=list->dlist->libs[selected];
+							fileno=SCRNFILENUMBER(r,list->conmod,
+								list->confil,1);
+							switch(mem->field_type)
+							{
+								case SCROLLEDTEXT:
+								case VARIABLETEXT:
+								case DATES:
+								case SOCSECNUM:
+								case TIMES:
+								case PLAINTEXT:
+								case PHONE:
+								case CUSTOMTYPE:
+								case ZIPCODE:
+								case EXPENDITURE:
+								case REVENUE:
+								case BALANCESHEET:
+								case BEGINNINGBALANCE:
+								case OPTIONALFIELDS:
+									if(!isEMPTY(list->unformat_formula))
+									{
+										value=PP_EVALUATEstr(list->unformat_formula,list->SubFunc,list->args);
+									}
+									if(value!=NULL) lf=RDAstrlen(value);
+										else lf=0;
+									if(value!=NULL && lf>0)
+									{
+										QUICKALLOC(mem->value.string_value,mem->dlen,lf+1);
+										memcpy(mem->value.string_value,value,lf+1);
+									} else if(mem->dlen>0)
+									{
+										memset(mem->value.string_value,0,mem->dlen);
+									} else {
+										mem->value.string_value=NULL;
+										mem->dlen=0;
+									}
+									if(mem->dlen>mem->field_length && mem->field_length>0) mem->value.string_value[mem->field_length]=0;
+									if(!isEMPTY(list->unformat_formula))
+									{
+										if(value!=NULL) Rfree(value);
+									}
+									if(fileno!=(-1))
+									{
+										if(!list->contype)
+										{
+											FINDFLDSETSTRING(fileno,list->confld,mem->value.string_value);
+										}
+									}
+									break;
+								case BOOLNS:
+								case CHARACTERS:
+									if(!isEMPTY(list->unformat_formula))
+									{
+										*mem->value.string_value=PP_EVALUATEbol(list->unformat_formula,list->SubFunc,list->args);
+									} else *mem->value.string_value=(char)selected;
+									if(fileno!=(-1))
+									{
+										if(!list->contype)
+										{
+											FINDFLDSETCHAR(fileno,list->confld,*mem->value.string_value);
+										}
+									}
+									break;
+								case DOLLARS:
+								case DOLLARS_NOCENTS:
+								case DECIMALV:
+								case SDECIMALV:
+								case DOUBLEV:
+								case SDOUBLEV:
+									if(!isEMPTY(list->unformat_formula))
+									{
+										*mem->value.float_value=PP_EVALUATEdbl(list->unformat_formula,list->SubFunc,list->args);
+									} else *mem->value.float_value=(double)selected;
+									if(fileno!=(-1))
+									{
+										if(!list->contype)
+										{
+											FINDFLDSETDOUBLE(fileno,list->confld,*mem->value.float_value);
+										}
+									}
+									break;
+								case SHORTV:
+								case SSHORTV:
+									if(!isEMPTY(list->unformat_formula))
+									{
+										*mem->value.short_value=PP_EVALUATEsht(list->unformat_formula,list->SubFunc,list->args);
+									} else *mem->value.short_value=(short)selected;
+									if(fileno!=(-1))
+									{
+										if(!list->contype)
+										{
+											FINDFLDSETSHORT(fileno,list->confld,*mem->value.short_value);
+										}
+									}
+									break;
+								case SCROLLEDLIST:
+								case LONGV:
+								case SLONGV:
+									if(!isEMPTY(list->unformat_formula))
+									{
+										*mem->value.integer_value=PP_EVALUATEint(list->unformat_formula,list->SubFunc,list->args);
+									} else *mem->value.integer_value=selected;
+									if(fileno!=(-1))
+									{	
+										if(!list->contype)
+										{
+											FINDFLDSETINT(fileno,list->confld,*mem->value.integer_value);
+										}
+									}
+									break;
+								default:
+									prterr("Error Field Type [%d] is invalid for Resource [%s].",mem->rscrname);
+									break;
+							}
+#ifdef IF_WE_NEED_TOO
+							ExecuteRDArmemFunction(mem);
+#endif /* IF_WE_NEED_TO */
+						}
+						break;
+					case 2: /* Connect Virtual Field */
+						y=FINDRSC(r,list->conmod);
+						if(y>(-1))
+						{
+							mem=r->rscs+y;
+							value=list->dlist->libs[selected];
+							switch(mem->field_type)
+							{
+								case SCROLLEDTEXT:
+								case VARIABLETEXT:
+								case DATES:
+								case SOCSECNUM:
+								case TIMES:
+								case PLAINTEXT:
+								case PHONE:
+								case CUSTOMTYPE:
+								case ZIPCODE:
+								case EXPENDITURE:
+								case REVENUE:
+								case BALANCESHEET:
+								case BEGINNINGBALANCE:
+								case OPTIONALFIELDS:
+									if(!isEMPTY(list->unformat_formula))
+									{
+										value=PP_EVALUATEstr(list->unformat_formula,list->SubFunc,list->args);
+									}
+									if(value!=NULL) lf=RDAstrlen(value);
+										else lf=0;
+									if(value!=NULL && lf>0)
+									{
+										QUICKALLOC(mem->value.string_value,mem->dlen,lf+1);
+										memcpy(mem->value.string_value,value,lf+1);
+									} else if(mem->dlen>0)
+									{
+										memset(mem->value.string_value,0,mem->dlen);
+									} else {
+										mem->value.string_value=NULL;
+										mem->dlen=0;
+									}
+									if(mem->dlen>mem->field_length && mem->field_length>0) mem->value.string_value[mem->field_length]=0;
+									if(!isEMPTY(list->unformat_formula))
+									{
+										if(value!=NULL) Rfree(value);
+									}
+									break;
+								case BOOLNS:
+								case CHARACTERS:
+									if(!isEMPTY(list->unformat_formula))
+									{
+										*mem->value.string_value=PP_EVALUATEbol(list->unformat_formula,list->SubFunc,list->args);
+									} else *mem->value.string_value=(char)selected;
+									break;
+								case DOLLARS:
+								case DOLLARS_NOCENTS:
+								case DECIMALV:
+								case SDECIMALV:
+								case DOUBLEV:
+								case SDOUBLEV:
+									if(!isEMPTY(list->unformat_formula))
+									{
+										*mem->value.float_value=PP_EVALUATEdbl(list->unformat_formula,list->SubFunc,list->args);
+									} else *mem->value.float_value=(double)selected;
+									break;
+								case SHORTV:
+								case SSHORTV:
+									if(!isEMPTY(list->unformat_formula))
+									{
+										*mem->value.short_value=PP_EVALUATEsht(list->unformat_formula,list->SubFunc,list->args);
+									} else *mem->value.short_value=(short)selected;
+									break;
+								case SCROLLEDLIST:
+								case LONGV:
+								case SLONGV:
+									if(!isEMPTY(list->unformat_formula))
+									{
+										*mem->value.integer_value=PP_EVALUATEint(list->unformat_formula,list->SubFunc,list->args);
+									} else *mem->value.integer_value=selected;
+									break;
+								default:
+									prterr("Error Field Type [%d] is invalid for Resource [%s].",mem->rscrname);
+									break;
+							}
+#ifdef IF_WE_NEED_TOO
+							ExecuteRDArmemFunction(mem);
+#endif /* IF_WE_NEED_TOO */
+						}
+						break;
+				}
+			}
+		}
+	}
 }

@@ -146,61 +146,12 @@ void makeSearchBrowseScreen(MaintainMaster *MTN,RDAsearch *s)
 	}
 	SORTAPPlib(bol_fields);
 	SORTAPPlib(reg_fields);
-	if(bol_fields->numlibs>0)
-	{
-		addwdgt(SCREEN,20,NULL,"Select",NULL,NULL,0,0,0,NULL,NULL,NULL);
-		if(bol_fields->numlibs>8)
-		{
-			addwdgt(SCREEN,12,NULL,NULL,NULL,NULL,350,791,0,NULL,NULL,NULL);
-		}
-		addwdgt(SCREEN,1,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,3,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		for(x=0;x<bol_fields->numlibs;++x)
-		{
-			field=FLDNRD(fileno,bol_fields->libs[x]);
-			if(field!=NULL)
-			{
-				rscreename=ReturnScreenName((s!=NULL ? s->filename:MTN->mainfile),field);
-				rscrlabel=ReturnScreenLabel(field->name);
-				if(!isEMPTY(rscreename))
-				{
-					addwdgt(SCREEN,1,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-					temp=Rmalloc(RDAstrlen(rscreename)+14);
-					temp1=Rmalloc(RDAstrlen(rscrlabel)+20);
-					sprintf(temp,"SELECT %s FALSE",rscreename);
-					sprintf(temp1,"Select when %s False",rscrlabel);
-					addwdgt(SCREEN,9,temp,temp1,NULL,NULL,0,0,0,NULL,NULL,NULL);
-					sprintf(temp,"SELECT %s TRUE",rscreename);
-					sprintf(temp1,"Select when %s True",rscrlabel);
-					addwdgt(SCREEN,9,temp,temp1,NULL,NULL,0,0,0,NULL,NULL,NULL);
-					if(temp!=NULL) Rfree(temp);
-					if(temp1!=NULL) Rfree(temp1);
-					addwdgt(SCREEN,2,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-				}
-				if(rscreename!=NULL) Rfree(rscreename);
-				if(rscrlabel!=NULL) Rfree(rscrlabel);
-			}
-		}
-		if(XPERT_SETUP->software_type==2)
-		{
-			addwdgt(SCREEN,4,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-			addwdgt(SCREEN,5,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-			addwdgt(SCREEN,2,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		}
-		addwdgt(SCREEN,4,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,2,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		if(bol_fields->numlibs>8)
-		{
-			addwdgt(SCREEN,13,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		}
-		addwdgt(SCREEN,21,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-	}
 	if(reg_fields->numlibs>0)
 	{
 		addwdgt(SCREEN,20,NULL,"Range",NULL,NULL,0,0,0,NULL,NULL,NULL);
 		if(reg_fields->numlibs>8)
 		{
-			addwdgt(SCREEN,12,NULL,NULL,NULL,NULL,350,791,0,NULL,NULL,NULL);
+			addwdgt(SCREEN,12,NULL,NULL,NULL,NULL,450,990,0,NULL,NULL,NULL);
 		}
 		if(XPERT_SETUP->software_type<2)
 		{
@@ -351,6 +302,55 @@ void makeSearchBrowseScreen(MaintainMaster *MTN,RDAsearch *s)
 		}
 		addwdgt(SCREEN,21,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
 	}
+	if(bol_fields->numlibs>0)
+	{
+		addwdgt(SCREEN,20,NULL,"Select",NULL,NULL,0,0,0,NULL,NULL,NULL);
+		if(bol_fields->numlibs>8)
+		{
+			addwdgt(SCREEN,12,NULL,NULL,NULL,NULL,450,990,0,NULL,NULL,NULL);
+		}
+		addwdgt(SCREEN,1,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
+		addwdgt(SCREEN,3,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
+		for(x=0;x<bol_fields->numlibs;++x)
+		{
+			field=FLDNRD(fileno,bol_fields->libs[x]);
+			if(field!=NULL)
+			{
+				rscreename=ReturnScreenName((s!=NULL ? s->filename:MTN->mainfile),field);
+				rscrlabel=ReturnScreenLabel(field->name);
+				if(!isEMPTY(rscreename))
+				{
+					addwdgt(SCREEN,1,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
+					temp=Rmalloc(RDAstrlen(rscreename)+14);
+					temp1=Rmalloc(RDAstrlen(rscrlabel)+20);
+					sprintf(temp,"SELECT %s FALSE",rscreename);
+					sprintf(temp1,"Select when %s False",rscrlabel);
+					addwdgt(SCREEN,9,temp,temp1,NULL,NULL,0,0,0,NULL,NULL,NULL);
+					sprintf(temp,"SELECT %s TRUE",rscreename);
+					sprintf(temp1,"Select when %s True",rscrlabel);
+					addwdgt(SCREEN,9,temp,temp1,NULL,NULL,0,0,0,NULL,NULL,NULL);
+					if(temp!=NULL) Rfree(temp);
+					if(temp1!=NULL) Rfree(temp1);
+					addwdgt(SCREEN,2,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
+				}
+				if(rscreename!=NULL) Rfree(rscreename);
+				if(rscrlabel!=NULL) Rfree(rscrlabel);
+			}
+		}
+		if(XPERT_SETUP->software_type==2)
+		{
+			addwdgt(SCREEN,4,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
+			addwdgt(SCREEN,5,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
+			addwdgt(SCREEN,2,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
+		}
+		addwdgt(SCREEN,4,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
+		addwdgt(SCREEN,2,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
+		if(bol_fields->numlibs>8)
+		{
+			addwdgt(SCREEN,13,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
+		}
+		addwdgt(SCREEN,21,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
+	}
 	addwdgt(SCREEN,2,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
 	if(bol_fields!=NULL) freeapplib(bol_fields);
 	if(reg_fields!=NULL) freeapplib(reg_fields);
@@ -424,32 +424,8 @@ void makeBrowseScreen(MaintainMaster *MTN,RDAsearch *s)
 		SCREEN=RDAscrnNEW(MTN->module,MTN->browse_screen);
 	}
 	if(SCREEN==NULL) return;
-	temp1=Rmalloc(50+1);
-	sprintf(temp1,"%s",
-		"[EXTENSIONS SETUP]=TRUE");
-	temp2=Rmalloc(3+1);
-	sprintf(temp2,"%s",
-		"");
-	temp3=Rmalloc(3+1);
-	sprintf(temp3,"%s",
-		"");
-	temp4=Rmalloc(3+1);
-	sprintf(temp4,"%s",
-		"");
-	ADVaddwdgt(SCREEN,1,"","","","",0,0,0,temp1,temp2,temp3,temp4);
-	if(temp1!=NULL) Rfree(temp1);
-	if(temp2!=NULL) Rfree(temp2);
-	if(temp3!=NULL) Rfree(temp3);
-	if(temp4!=NULL) Rfree(temp4);
-	ADVaddwdgt(SCREEN,3,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 	ADVaddwdgt(SCREEN,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 	ADVaddwdgt(SCREEN,6,"DEFINE LIST","Define List","","",0,0,15,NULL,NULL,NULL,NULL);
-	ADVaddwdgt(SCREEN,6,"SEARCH BUTTON","Search","","",0,0,12,NULL,NULL,NULL,NULL);
-	ADVaddwdgt(SCREEN,6,"PRINT BROWSE","Print Browse","","",0,0,7,NULL,NULL,NULL,NULL);
-	ADVaddwdgt(SCREEN,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
-	ADVaddwdgt(SCREEN,4,"","","","",0,0,0,NULL,NULL,NULL,NULL);
-	ADVaddwdgt(SCREEN,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
-	ADVaddwdgt(SCREEN,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 	ADVaddwdgt(SCREEN,6,"TOP","Top","","",0,0,41,NULL,NULL,NULL,NULL);
 	ADVaddwdgt(SCREEN,6,"BOTTOM","Bottom","","",0,0,42,NULL,NULL,NULL,NULL);
 	ADVaddwdgt(SCREEN,6,"SEARCH ALL","Search All","","",0,0,0,NULL,NULL,NULL,NULL);
@@ -458,6 +434,8 @@ void makeBrowseScreen(MaintainMaster *MTN,RDAsearch *s)
 	ADVaddwdgt(SCREEN,0,"BROWSE LIST LPM","Lexical Pattern Match:","","",0,20,0,NULL,NULL,NULL,NULL);
 	ADVaddwdgt(SCREEN,5,"","Search Field:","","",0,0,0,NULL,NULL,NULL,NULL);
 	ADVaddwdgt(SCREEN,0,"SEARCH FIELD","Search Field","","",0,30,0,NULL,NULL,NULL,NULL);
+	ADVaddwdgt(SCREEN,6,"SEARCH BUTTON","Search","","",0,0,12,NULL,NULL,NULL,NULL);
+	ADVaddwdgt(SCREEN,6,"PRINT BROWSE","Print Browse","","",0,0,7,NULL,NULL,NULL,NULL);
 	ADVaddwdgt(SCREEN,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 	ADVaddwdgt(SCREEN,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 	ADVaddwdgt(SCREEN,7,"BROWSE LIST","Browse List","","",10,0,0,NULL,NULL,NULL,NULL);
@@ -495,11 +473,7 @@ void makeBrowseScreen(MaintainMaster *MTN,RDAsearch *s)
 	addwdgt(SCREEN,1,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
 	addwdgt(SCREEN,3,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
 	addwdgt(SCREEN,1,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-	if(s==NULL)
-	{
-		addwdgt(SCREEN,6,"ADD","Add",NULL,NULL,0,0,16,NULL,NULL,NULL);
-	}
-	addwdgt(SCREEN,6,"SELECT","Select",NULL,NULL,0,0,36,NULL,NULL,NULL);
+	addwdgt(SCREEN,6,"SELECT","Select",NULL,NULL,0,0,68,NULL,NULL,NULL);
 	if(s==NULL)
 	{
 		if((MTN->buttons!=NULL) && MTN->numbuttons==1)
@@ -573,7 +547,7 @@ void makeDefineListScreen(MaintainMaster *MTN,RDAsearch *s)
 	addwdgt(SCREEN,2,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
 	if(nofields>8)
 	{
-		addwdgt(SCREEN,12,NULL,NULL,NULL,NULL,300,200,0,NULL,NULL,NULL);
+		addwdgt(SCREEN,12,NULL,NULL,NULL,NULL,300,500,0,NULL,NULL,NULL);
 	}
 	addwdgt(SCREEN,1,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
 	addwdgt(SCREEN,3,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
@@ -731,6 +705,21 @@ void makeMaintainScreen(MaintainMaster *MTN)
 		return;
 	}
 	SCREEN=RDAscrnNEW(MTN->module,MTN->maintain_screen);
+	if(MTN->buttons!=NULL && MTN->numbuttons>1)
+	{
+		if((MTN->buttons!=NULL) && MTN->numbuttons>1)
+		{
+			addwdgt(SCREEN,1,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
+			addwdgt(SCREEN,26,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
+			for(x=0,button=MTN->buttons;x<MTN->numbuttons;++x,++button)
+			{
+				temp1=ReturnScreenLabel((button->listname!=NULL ? button->listname:button->buttonname));
+				addwdgt(SCREEN,6,button->buttonname,temp1,NULL,NULL,0,0,0,NULL,NULL,NULL);
+				if(temp1!=NULL) Rfree(temp1);
+			}
+			addwdgt(SCREEN,27,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
+		}
+	}
 
 	field=FLDNRD(fileno,"DELETEFLAG");
 	if(field!=NULL)
@@ -796,14 +785,14 @@ void makeMaintainScreen(MaintainMaster *MTN)
 					{
 						if(field->type!=CUSTOMTYPE)
 						{
-							addwdgt(SCREEN,0,temp,temp1,NULL,NULL,0,field->len,0,NULL,NULL,NULL);
+							ADV2addwdgt(SCREEN,0,temp,temp1,NULL,NULL,0,field->len,0,NULL,NULL,NULL,NULL,"TRUE",0,0,0);
 						} else {
 							custom_type=GuessCustomFieldType(MTN->module,field->name);
-							addwdgt(SCREEN,15,temp,temp1,NULL,NULL,0,field->len,custom_type,NULL,NULL,NULL);
+							ADV2addwdgt(SCREEN,15,temp,temp1,NULL,NULL,0,field->len,custom_type,NULL,NULL,NULL,NULL,"TRUE",0,0,0);
 						}
 					} else if((y+1<key->numparts))
 					{
-						addwdgt(SCREEN,0,temp,temp1,NULL,NULL,0,field->len,0,NULL,NULL,NULL);
+						ADV2addwdgt(SCREEN,0,temp,temp1,NULL,NULL,0,field->len,0,NULL,NULL,NULL,NULL,"TRUE",0,0,0);
 						addwdgt(SCREEN,2,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
 						addwdgt(SCREEN,1,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
 						total_len=0;
@@ -849,7 +838,7 @@ void makeMaintainScreen(MaintainMaster *MTN)
 	fields=FLDPOINTER(fileno);
 	if(noflds>12)
 	{
-		ADVaddwdgt(SCREEN,12,"","","","",300,650,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(SCREEN,12,"","","","",300,990,0,NULL,NULL,NULL,NULL);
 	}
 
 	four_ways=APPlibNEW();
@@ -1371,75 +1360,20 @@ void makeMaintainScreen(MaintainMaster *MTN)
 	}
 
 	if(fileno!=(-1)) CLSNRD(fileno);
-	if(MTN->buttons!=NULL && MTN->numbuttons>1)
-	{
-		addwdgt(SCREEN,1,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,3,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,1,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,6,"BROWSE","Browse",NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,6,"RESET DEFAULTS","Reset",NULL,NULL,0,0,18,NULL,NULL,NULL);
-		addwdgt(SCREEN,6,"DEFAULTS","Save Defaults",NULL,NULL,0,0,17,NULL,NULL,NULL);
-		addwdgt(SCREEN,2,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,4,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,2,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
 
-
-		if((MTN->buttons!=NULL) && MTN->numbuttons>1)
-		{
-			addwdgt(SCREEN,1,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-			addwdgt(SCREEN,3,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-			addwdgt(SCREEN,1,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-			for(x=0,button=MTN->buttons;x<MTN->numbuttons;++x,++button)
-			{
-				temp1=ReturnScreenLabel((button->listname!=NULL ? button->listname:button->buttonname));
-				addwdgt(SCREEN,6,button->buttonname,temp1,NULL,NULL,0,0,0,NULL,NULL,NULL);
-				if(temp1!=NULL) Rfree(temp1);
-			}
-			addwdgt(SCREEN,2,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-			addwdgt(SCREEN,4,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-			addwdgt(SCREEN,2,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		}
-
-
-
-		addwdgt(SCREEN,1,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,3,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,1,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,6,"SAVE","Save",NULL,NULL,0,0,54,NULL,NULL,NULL);
-		addwdgt(SCREEN,6,"SAVE NO UPDATE","Fast Save",NULL,NULL,0,0,23,NULL,NULL,NULL);
-		addwdgt(SCREEN,6,"QUIT","Cancel",NULL,NULL,0,0,14,NULL,NULL,NULL);
-		addwdgt(SCREEN,6,"HELP","Help",NULL,NULL,0,0,11,NULL,NULL,NULL);
-		addwdgt(SCREEN,2,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,4,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,2,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-	} else {
-		addwdgt(SCREEN,1,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,3,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,1,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,6,"BROWSE","Browse",NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,6,"RESET DEFAULTS","Reset",NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,6,"DEFAULTS","Save Defaults",NULL,NULL,0,0,0,NULL,NULL,NULL);
-		if((MTN->buttons!=NULL) && MTN->numbuttons==1)
-		{
-			button=MTN->buttons;
-			temp1=ReturnScreenLabel((button->listname!=NULL ? button->listname:button->buttonname));
-			addwdgt(SCREEN,6,button->buttonname,temp1,NULL,NULL,0,0,0,NULL,NULL,NULL);
-			if(temp1!=NULL) Rfree(temp1);
-		}
-		addwdgt(SCREEN,2,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,4,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,2,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,1,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,3,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,1,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,6,"SAVE","Save",NULL,NULL,0,0,23,NULL,NULL,NULL);
-		addwdgt(SCREEN,6,"SAVE NO UPDATE","Fast Save",NULL,NULL,0,0,24,NULL,NULL,NULL);
-		addwdgt(SCREEN,6,"QUIT","Cancel",NULL,NULL,0,0,14,NULL,NULL,NULL);
-		addwdgt(SCREEN,6,"HELP","Help",NULL,NULL,0,0,11,NULL,NULL,NULL);
-		addwdgt(SCREEN,2,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,4,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-		addwdgt(SCREEN,2,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
-	}
+	addwdgt(SCREEN,1,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
+	addwdgt(SCREEN,3,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
+	addwdgt(SCREEN,1,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
+	addwdgt(SCREEN,6,"BROWSE","Browse",NULL,NULL,0,0,67,NULL,NULL,NULL);
+	addwdgt(SCREEN,6,"SAVE","Save",NULL,NULL,0,0,54,NULL,NULL,NULL);
+	addwdgt(SCREEN,6,"SAVE NO UPDATE","Fast Save",NULL,NULL,0,0,23,NULL,NULL,NULL);
+	addwdgt(SCREEN,6,"QUIT","Cancel",NULL,NULL,0,0,14,NULL,NULL,NULL);
+	addwdgt(SCREEN,6,"HELP","Help",NULL,NULL,0,0,11,NULL,NULL,NULL);
+	addwdgt(SCREEN,6,"RESET DEFAULTS","Reset",NULL,NULL,0,0,18,NULL,NULL,NULL);
+	addwdgt(SCREEN,6,"DEFAULTS","Save Defaults",NULL,NULL,0,0,17,NULL,NULL,NULL);
+	addwdgt(SCREEN,2,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
+	addwdgt(SCREEN,4,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
+	addwdgt(SCREEN,2,NULL,NULL,NULL,NULL,0,0,0,NULL,NULL,NULL);
 
 	lib=Rmalloc(RDAstrlen(MTN->module)+RDAstrlen(CURRENTDIRECTORY)+11);
 #ifndef WIN32

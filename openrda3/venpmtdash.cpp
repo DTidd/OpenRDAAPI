@@ -9,7 +9,6 @@
 #include <olh.hpp>
 #include <mix.hpp>
 
-Wt::WContainerWidget *UnProcessedVoucherStatus(void);
 int VoucherStatusValuetoVisual=0;
 short VoucherStatusShowTable=FALSE;
 Wt::WContainerWidget *UnProcessedVoucherStatusDashBoard=NULL;
@@ -255,6 +254,7 @@ Wt::WContainerWidget *UnProcessedVoucherStatus()
 	xchart->setDisplayLabels(Wt::Chart::LabelOption::Outside | Wt::Chart::LabelOption::TextLabel | Wt::Chart::LabelOption::TextPercentage);
 	xchart->setPerspectiveEnabled(true,0.2);
 	xchart->setExplode(0,0.3);
+	xchart->setAvoidLabelRendering(2.99);
 	xchart->resize(960,360);
 	xchart->setMargin(2,Wt::Side::Top | Wt::Side::Bottom);
 	xchart->setMargin(Wt::WLength::Auto,Wt::Side::Left | Wt::Side::Right);

@@ -870,6 +870,10 @@ short xEQLNRD(short fileno,short keyno,int line,char *file)
 			prterr("Error Unknown Database Engine [%d] for Module [%s] File [%s] at line [%d] program [%s].",NRDbuf[fileno].db_engine,NRDbuf[fileno].modname,NRDbuf[fileno].name,line,file);
 			return(-1);
 	}
+	if(diagnrd)
+	{
+		SEENRDRECORD(fileno);TRACE;
+	}
 }
 void xsetrdakeys(short fileno,short keyno,int line,char *file)
 {

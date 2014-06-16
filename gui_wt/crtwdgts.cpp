@@ -430,6 +430,8 @@ int xcrttablecontainer(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widge
 	}
 #endif /* USE_RDA_DIAGNOSTICS */
 	VB=new Wt::WContainerWidget((Wt::WContainerWidget *)parent);
+	VB->setOverflow(WContainerWidget::OverflowVisible,Vertical);	
+	VB->setOverflow(WContainerWidget::OverflowVisible,Horizontal);	
 	mssc=ModuleScreenStyleClass(rsrc);
 	memset(GUIstemp,0,1024);
 	sprintf(GUIstemp,"OpenRDA %s TableContainer",mssc);
@@ -456,6 +458,8 @@ int xcrttablecontainer(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widge
 	SA=new Wt::WScrollArea((Wt::WContainerWidget *)VB);
 	vb->addWidget(SA);
 	VB1=new Wt::WContainerWidget();
+	VB1->setOverflow(WContainerWidget::OverflowVisible,Vertical);	
+	VB1->setOverflow(WContainerWidget::OverflowVisible,Horizontal);	
 	SA->setWidget((Wt::WWidget *)VB1);
 	vb->setStretchFactor(SA,800);
 	vb1=new Wt::WVBoxLayout();
@@ -588,7 +592,7 @@ int xcrttablecontainer(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widge
 						member->vertical=wdgt->vertical;
 						member->horizontal=wdgt->horizontal;
 						makefield((Wt::WWidget *)TE,member,wdgt->label,wdgt->XHTML_Label,wdgt->pixmap,wdgt->rows,wdgt->cols,wdgt->rtype,myTable,row,col,row_span,col_span);
-						if(!RDAstrcmp(member->rscrname,"BROWSE LIST")) hold=(Wt::WWidget *)member->w->parent();
+						if(!RDAstrcmp(member->rscrname,"BROWSE LIST") || (member->field_type==SCROLLEDLIST && member->rows>1)) hold=(Wt::WWidget *)member->w->parent();
 							else hold=member->w;
 						if(wdgt->type==7 && wdgt->rows<2) last=FALSE;
 						else if(wdgt->type==8 && wdgt->rows==1) last=FALSE;
@@ -641,7 +645,7 @@ int xcrttablecontainer(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widge
 						member->vertical=wdgt->vertical;
 						member->horizontal=wdgt->horizontal;
 						makefield((Wt::WWidget *)TE,member,wdgt->label,wdgt->XHTML_Label,wdgt->pixmap,wdgt->rows,wdgt->cols,wdgt->rtype,myTable,row,col,row_span,col_span);
-						if(!RDAstrcmp(member->rscrname,"BROWSE LIST")) hold=(Wt::WWidget *)member->w->parent();
+						if(!RDAstrcmp(member->rscrname,"BROWSE LIST") || (member->field_type==SCROLLEDLIST && member->rows>1)) hold=(Wt::WWidget *)member->w->parent();
 							else if((member->field_type==0 || member->field_type==1) && member->rtype>4) hold=(Wt::WWidget *)member->w->parent();
 							else hold=member->w;
 						TE->addWidget(hold);
@@ -1158,6 +1162,8 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 		if(!USER_INTERFACE)
 		{
 			myLine = new Wt::WContainerWidget((Wt::WContainerWidget *)parent);
+			myLine->setOverflow(WContainerWidget::OverflowVisible,Vertical);	
+			myLine->setOverflow(WContainerWidget::OverflowVisible,Horizontal);	
 			mssc=ModuleScreenStyleClass(rsrc);
 			memset(GUIstemp,0,1024);
 			sprintf(GUIstemp,"OpenRDA %s LineContainer",mssc);
@@ -1214,10 +1220,10 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 							member->vertical=wdgt->vertical;
 							member->horizontal=wdgt->horizontal;
 							makefield((Wt::WWidget *)*line,member,wdgt->label,wdgt->XHTML_Label,wdgt->pixmap,wdgt->rows,wdgt->cols,wdgt->rtype,NULL,0,0,0,0);
-							if(!RDAstrcmp(member->rscrname,"BROWSE LIST")) hold=(Wt::WWidget *)member->w->parent();
+							if(!RDAstrcmp(member->rscrname,"BROWSE LIST") || (member->field_type==SCROLLEDLIST && member->rows>1)) hold=(Wt::WWidget *)member->w->parent();
 								else hold=member->w;
 							lBox->addWidget((Wt::WWidget *)hold);
-							if(!RDAstrcmp(member->rscrname,"BROWSE LIST")) lBox->setStretchFactor(hold,200);
+							if(!RDAstrcmp(member->rscrname,"BROWSE LIST") || (member->field_type==SCROLLEDLIST && member->rows>1)) lBox->setStretchFactor(hold,200);
 							else if(wdgt->type==8) lBox->setStretchFactor(hold,500);
 							else if((wdgt->type==7 && wdgt->rows>1))
 							{
@@ -1270,7 +1276,7 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 							member->vertical=wdgt->vertical;
 							member->horizontal=wdgt->horizontal;
 							makefield((Wt::WWidget *)*line,member,wdgt->label,wdgt->XHTML_Label,wdgt->pixmap,wdgt->rows,wdgt->cols,wdgt->rtype,NULL,0,0,0,0);
-							if(!RDAstrcmp(member->rscrname,"BROWSE LIST")) hold=(Wt::WWidget *)member->w->parent();
+							if(!RDAstrcmp(member->rscrname,"BROWSE LIST") || (member->field_type==SCROLLEDLIST && member->rows>1)) hold=(Wt::WWidget *)member->w->parent();
 								else if((member->field_type==0 || member->field_type==1) && member->rtype>4) hold=(Wt::WWidget *)member->w->parent();
 								else hold=member->w;
 /*
@@ -2100,7 +2106,7 @@ int xcrtbox(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt::
 							member->vertical=wdgt->vertical;
 							member->horizontal=wdgt->horizontal;
 							makefield((Wt::WWidget *)hBox,member,wdgt->label,wdgt->XHTML_Label,wdgt->pixmap,wdgt->rows,wdgt->cols,wdgt->rtype,NULL,0,0,0,0);
-							if(!RDAstrcmp(member->rscrname,"BROWSE LIST")) hold=(Wt::WWidget *)member->w->parent();
+							if(!RDAstrcmp(member->rscrname,"BROWSE LIST") || (member->field_type==SCROLLEDLIST && member->rows>1)) hold=(Wt::WWidget *)member->w->parent();
 								else hold=member->w;
 							myGrid->addWidget((Wt::WWidget *)hold,row,col,0);
 							++col;
@@ -2139,7 +2145,7 @@ int xcrtbox(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt::
 							member->vertical=wdgt->vertical;
 							member->horizontal=wdgt->horizontal;
 							makefield((Wt::WWidget *)hBox,member,wdgt->label,wdgt->XHTML_Label,wdgt->pixmap,wdgt->rows,wdgt->cols,wdgt->rtype,NULL,0,0,0,0);
-							if(!RDAstrcmp(member->rscrname,"BROWSE LIST")) hold=(Wt::WWidget *)member->w->parent();
+							if(!RDAstrcmp(member->rscrname,"BROWSE LIST") || (member->field_type==SCROLLEDLIST && member->rows>1)) hold=(Wt::WWidget *)member->w->parent();
 								else if((member->field_type==0 || member->field_type==1) && member->rtype>4) hold=(Wt::WWidget *)member->w->parent();
 								else hold=member->w;
 							myGrid->addWidget((Wt::WWidget *)hold,row,col,0);
@@ -2174,7 +2180,7 @@ int xcrtbox(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,Wt::
 							member->vertical=wdgt->vertical;
 							member->horizontal=wdgt->horizontal;
 							makefield((Wt::WWidget *)hBox,member,wdgt->label,wdgt->XHTML_Label,wdgt->pixmap,wdgt->rows,wdgt->cols,wdgt->rtype,NULL,0,0,0,0);
-							if(!RDAstrcmp(member->rscrname,"BROWSE LIST")) hold=(Wt::WWidget *)member->w->parent();
+							if(!RDAstrcmp(member->rscrname,"BROWSE LIST") || (member->field_type==SCROLLEDLIST && member->rows>1)) hold=(Wt::WWidget *)member->w->parent();
 								else hold=member->w;
 /*
 							if(wdgt->type==9)
@@ -2601,18 +2607,13 @@ int xcrttab(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,WWid
 			{
 				rows=0;
 				TabD=new Wt::WContainerWidget();
+				TabD->setOverflow(WContainerWidget::OverflowVisible,Vertical);	
+				TabD->setOverflow(WContainerWidget::OverflowVisible,Horizontal);	
 				mssc=ModuleScreenStyleClass(rsrc);
 				memset(GUIstemp,0,1024);
 				sprintf(GUIstemp,"OpenRDA %s TabBar TabContainer",mssc);
 				if(mssc!=NULL) Rfree(mssc);
 				TabD->addStyleClass(GUIstemp);
-#ifdef __NEED_WDIALOG_LAYOUT__
-				if(rsrc->primary!=NULL)
-				{
-					TabD->setOverflow(WContainerWidget::OverflowVisible,Vertical);	
-					TabD->setOverflow(WContainerWidget::OverflowVisible,Horizontal);	
-				}
-#endif /* __NEED_WDIALOG_LAYOUT__ */
 				spc=Wt::WLength(0,Wt::WLength::Pixel);
 				TabD->setPadding(spc,All);
 				c = new Wt::WString(wdgt->label);
@@ -2655,7 +2656,7 @@ int xcrttab(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,WWid
 					{
 						Tab->setCurrentIndex(which);
 					}
-					return(rowsr);
+					return(rowsr+2);
 				} else {
 					++count;
 				}
@@ -2831,6 +2832,18 @@ int xcrttab(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,WWid
 				SWindow->setOverflow(WContainerWidget::OverflowVisible,Vertical);	
 				SWindow->setOverflow(WContainerWidget::OverflowVisible,Horizontal);	
 				rowsx=crtscrollwindow((Wt::WWidget *)SWindow,scn,rsrc,widgetcount,&line_widget);
+				if(rowsx>0)
+				{
+			
+					SWindow->addWidget(line_widget);
+					hold_widget=SWindow;
+					if(frame_style!=(-1))
+					{
+						FrameWidget((Wt::WWidget *)SWindow,frame_style);
+						frame_style=(-1);
+					}
+					rows+=rowsx;
+				}
 #ifdef __NEED_WDIALOG_LAYOUT__
 				if(rsrc->primary==NULL)
 				{
@@ -2840,18 +2853,7 @@ int xcrttab(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,WWid
 				}
 #else
 				TabD->addWidget(SWindow);
-#endif /* __NEED_WDIALOG_LAYOUT__ */
-				if(rowsx>0)
-				{
-					SWindow->addWidget(line_widget);
-					hold_widget=line_widget;
-					if(frame_style!=(-1))
-					{
-						FrameWidget((Wt::WWidget *)line_widget,frame_style);
-						frame_style=(-1);
-					}
-					rows+=rowsx;
-				}
+#endif 
 			} else if(wdgt->type==28)
 			{
 				rowsx=crttablecontainer((Wt::WWidget *)TabD,scn,rsrc,widgetcount,&line_widget,wdgt->rtype);
@@ -2952,6 +2954,8 @@ int xcrtpanel(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 	*panel=(WWidget *)myPanel;
 
 	Vb=new Wt::WContainerWidget();
+	Vb->setOverflow(WContainerWidget::OverflowVisible,Vertical);	
+	Vb->setOverflow(WContainerWidget::OverflowVisible,Horizontal);	
 	mssc=ModuleScreenStyleClass(rsrc);
 	memset(GUIstemp,0,1024);
 	sprintf(GUIstemp,"OpenRDA %s Panel InternalContainer",mssc);
@@ -3195,7 +3199,7 @@ int xcrtscrollwindow(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 {
 	Wt::WWidget *line_widget=NULL,*hold_widget=NULL;
 	RDAwdgt *wdgt=NULL;
-	int line_count=0,w=0,h=0;
+	int line_count=0,w=0,h=0,Rsize=0;
 	Wt::WScrollArea *SA=NULL;
 	int frame_style=(-1);
 	Wt::WVBoxLayout *vb=NULL;
@@ -3219,24 +3223,28 @@ int xcrtscrollwindow(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 	}
 #endif /* USE_RDA_DIAGNOSTICS */
 	VB=new Wt::WContainerWidget((Wt::WContainerWidget *)parent);
-	mssc=ModuleScreenStyleClass(rsrc);
-	memset(GUIstemp,0,1024);
-	sprintf(GUIstemp,"OpenRDA %s ScrolledWindow ExternalContainer",mssc);
-	if(mssc!=NULL) Rfree(mssc);
-	VB->addStyleClass(GUIstemp);
+	VB->setOverflow(WContainerWidget::OverflowVisible,Vertical);	
+	VB->setOverflow(WContainerWidget::OverflowVisible,Horizontal);	
 	wdgt=scn->wdgts+(*widgetcount);
 	if(wdgt->cols!=0 && wdgt->rows!=0)
 	{
 		L=Wt::WLength(wdgt->cols);
 		H=Wt::WLength(wdgt->rows);
+		Rsize=wdgt->rows/44;
 		if(rsrc->primary!=NULL)
 		{
+			VB->setMinimumSize(L,H);
 			VB->setMaximumSize(L,H);
 		} else {
 			VB->setMaximumSize(Wt::WLength::Auto,H);
+			VB->setMinimumSize(L,H);
 		}
-		VB->setMinimumSize(L,H);
 	}
+	mssc=ModuleScreenStyleClass(rsrc);
+	memset(GUIstemp,0,1024);
+	sprintf(GUIstemp,"OpenRDA %s ScrolledWindow ExternalContainer",mssc);
+	if(mssc!=NULL) Rfree(mssc);
+	VB->addStyleClass(GUIstemp);
 	vb1=new Wt::WHBoxLayout();
 	VB->setLayout(vb1);
 	*swindow=(Wt::WWidget *)VB;
@@ -3254,6 +3262,8 @@ int xcrtscrollwindow(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 	SA->setHorizontalScrollBarPolicy(Wt::WScrollArea::ScrollBarAsNeeded);
 	SA->setVerticalScrollBarPolicy(Wt::WScrollArea::ScrollBarAlwaysOn);
 	Vb=new Wt::WContainerWidget();
+	Vb->setOverflow(WContainerWidget::OverflowVisible,Vertical);	
+	Vb->setOverflow(WContainerWidget::OverflowVisible,Horizontal);	
 	mssc=ModuleScreenStyleClass(rsrc);
 	memset(GUIstemp,0,1024);
 	sprintf(GUIstemp,"OpenRDA %s ScrolledWindow InternalContainer",mssc);
@@ -3265,6 +3275,8 @@ int xcrtscrollwindow(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 	Vb->setLayout(vb);
 	daL=(Wt::WLayout *)vb;
 	daL->setContentsMargins(0,0,0,0);
+
+
 
 	while((*widgetcount+1)<scn->numwdgts)
 	{
@@ -3471,7 +3483,7 @@ int xcrtscrollwindow(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 				}
 			} else if(wdgt->type==13) /* END SCROLLED WINDOW */
 			{
-				return(rows);
+				return(Rsize);
 			} else if(wdgt->type==32)
 			{
 				rowsx=crtpanel((Wt::WWidget *)Vb,scn,rsrc,widgetcount,&line_widget);
@@ -3554,6 +3566,8 @@ static void MakeScreenHeader(Wt::WContainerWidget *parent,char *label,RDArsrc *r
 	mssc=ModuleScreenStyleClass(rsc);
 	DefineHeaderCSS(mssc);
 	c=new Wt::WContainerWidget();
+	c->setOverflow(WContainerWidget::OverflowVisible,Vertical);	
+	c->setOverflow(WContainerWidget::OverflowVisible,Horizontal);	
 	c->addStyleClass(GUIstemp);
 #ifdef __NEED_WDIALOG_LAYOUT__
 	if(rsc->primary==NULL)
@@ -3589,7 +3603,7 @@ static void MakeScreenHeader(Wt::WContainerWidget *parent,char *label,RDArsrc *r
 			}
 		}
 #endif /* USE_RDA_DIAGNOSTICS */
-		h->addWidget(t,0,Wt::AlignLeft);
+		h->addWidget(t,0,Wt::AlignLeft | Wt::AlignJustify);
 		x=FINDRSC(rsc,"CLOSE WINDOW");
 		if(x>(-1))
 		{
@@ -3605,8 +3619,6 @@ static void MakeScreenHeader(Wt::WContainerWidget *parent,char *label,RDArsrc *r
 			pB->setIcon(*WK);
 		}
 	} else {
-		c->setOverflow(WContainerWidget::OverflowVisible,Vertical);
-		c->setOverflow(WContainerWidget::OverflowVisible,Horizontal);
 		vb->addWidget((Wt::WWidget *)c,0,Wt::AlignLeft | Wt::AlignJustify);
 		h=new Wt::WHBoxLayout();
 		h->setSpacing(0);
@@ -3618,7 +3630,7 @@ static void MakeScreenHeader(Wt::WContainerWidget *parent,char *label,RDArsrc *r
 		t =(Wt::WWidget *) new Wt::WText(label);
 		DefineHeaderCSS(mssc);
 		t->addStyleClass(GUIstemp);
-		h->addWidget(t,0,Wt::AlignLeft);
+		h->addWidget(t,0,Wt::AlignLeft | Wt::AlignJustify);
 		x=FINDRSC(rsc,"CLOSE WINDOW");
 		if(x>(-1))
 		{
@@ -3676,7 +3688,7 @@ static void MakeScreenHeader(Wt::WContainerWidget *parent,char *label,RDArsrc *r
 		}
 	}
 #endif /* USE_RDA_DIAGNOSTICS */
-	h->addWidget(t,0,Wt::AlignLeft);
+	h->addWidget(t,0,Wt::AlignLeft | Wt::AlignJustify);
 	x=FINDRSC(rsc,"CLOSE WINDOW");
 	if(x>(-1))
 	{
@@ -3703,7 +3715,7 @@ void crtwdgts(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsc,char *label)
 	Wt::WContainerWidget *CW=NULL;
 	Wt::WImage *myImage=NULL;
 	Wt::WLink *WK=NULL;
-	int line_count=0,h=0;
+	int line_count=0,h=0,total_rowz=0;
 	int widgetcount=0,rowz=0;
 	RDAwdgt *wdgt=NULL;
 	char *tmpstr=NULL,*dashes=NULL,eat_end_table=FALSE,*rname=NULL;
@@ -3742,10 +3754,10 @@ void crtwdgts(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsc,char *label)
 		spc=Wt::WLength(0,Wt::WLength::Pixel);
 		CW->setPadding(spc,All);
 #ifdef __NEED_WDIALOG_LAYOUT__
+		CW->setOverflow(Wt::WContainerWidget::OverflowVisible,Vertical);
+		CW->setOverflow(Wt::WContainerWidget::OverflowVisible,Horizontal);
 		if(rsc->primary!=NULL)
 		{
-			CW->setOverflow(Wt::WContainerWidget::OverflowVisible,Vertical);
-			CW->setOverflow(Wt::WContainerWidget::OverflowVisible,Horizontal);
 			vb=new Wt::WVBoxLayout();
 			vb->setSpacing(0);
 			daL=(Wt::WLayout *)vb;
@@ -3834,6 +3846,7 @@ void crtwdgts(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsc,char *label)
 				if(numperline(scn,widgetcount))
 				{
 					rowz=crtline((Wt::WWidget *)CW,scn,rsc,&widgetcount,&line_widget);
+					total_rowz+=rowz;
 					if(rowz>0)
 					{
 					++line_count;
@@ -3962,6 +3975,7 @@ void crtwdgts(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsc,char *label)
 						frame_style=(-1);
 					}
 					rowz=1;
+					total_rowz+=rowz;
 					if(dashes!=NULL) Rfree(dashes);
 					temp_xstr->~WString();
 					if(tmpstr!=NULL) Rfree(tmpstr);
@@ -3977,6 +3991,7 @@ void crtwdgts(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsc,char *label)
 			} else if(wdgt->type==26) /* Tool Bar */
 			{
 				rowz=crttoolbarcontainer((Wt::WWidget *)CW,scn,rsc,&widgetcount,&line_widget);
+				total_rowz+=rowz;
 				if(last_wdgttype==(-1))
 				{
 #ifdef __NEED_WDIALOG_LAYOUT__
@@ -4002,6 +4017,7 @@ void crtwdgts(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsc,char *label)
 			{
 				eat_end_table=TRUE;
 				rowz=CustomTableFunction((Wt::WWidget *)CW,&line_widget);
+				total_rowz+=rowz;
 				if(rowz>0)
 				{
 #ifdef __NEED_WDIALOG_LAYOUT__
@@ -4028,6 +4044,7 @@ void crtwdgts(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsc,char *label)
 			} else if(wdgt->type==28) /* Table Container */
 			{
 				rowz=crttablecontainer((Wt::WWidget *)CW,scn,rsc,&widgetcount,&line_widget,wdgt->rtype);
+				total_rowz+=rowz;
 				if(rowz>0)
 				{
 #ifdef __NEED_WDIALOG_LAYOUT__
@@ -4055,6 +4072,7 @@ void crtwdgts(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsc,char *label)
 			} else if(wdgt->type==23) /* NEW TAB BAR */
 			{
 				rowz=crttab((Wt::WWidget *)CW,scn,rsc,&widgetcount,&line_widget);
+				total_rowz+=rowz;
 				if(rowz>0)
 				{
 #ifdef __NEED_WDIALOG_LAYOUT__
@@ -4081,13 +4099,9 @@ void crtwdgts(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsc,char *label)
 			} else if(wdgt->type==3) /* NEW BOX */
 			{
 				rowz=crtbox((Wt::WWidget *)CW,scn,rsc,&widgetcount,&line_widget);
+				total_rowz+=rowz;
 				if(rowz>0)
 				{
-/* 
-	Wt::AlignLeft | Wt::AlignJustify should be invalid assignments, e.g. both horizontal, | for 1 horizontal and 1 vertical 
-	Change the structure so the main windows use layouts again. 
-	Most likely, Wt::AlignJust is result of Wt::AlignLeft | Wt::AlignJustify 
-*/
 #ifdef __NEED_WDIALOG_LAYOUT__
 				if(rsc->primary==NULL)
 				{
@@ -4109,6 +4123,7 @@ void crtwdgts(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsc,char *label)
 			} else if(wdgt->type==12) /* NEW SCROLLED WINDOW */
 			{
 				rowz=crtscrollwindow((Wt::WWidget *)CW,scn,rsc,&widgetcount,&line_widget);
+				total_rowz+=rowz;
 				if(rowz>0)
 				{
 #ifdef __NEED_WDIALOG_LAYOUT__
@@ -4116,8 +4131,11 @@ void crtwdgts(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsc,char *label)
 					{
 						CW->addWidget(line_widget);
 					} else {
+						vb->addWidget((Wt::WWidget *)line_widget,0,Wt::AlignLeft | Wt::AlignJustify);
+/*
 						vb->addWidget((Wt::WWidget *)line_widget,(rowz>0 ? rowz-1:0),Wt::AlignLeft | Wt::AlignJustify);
 						vb->setStretchFactor((Wt::WWidget *)line_widget,200);
+*/
 					}
 #else 
 					CW->addWidget(line_widget);
@@ -4132,6 +4150,7 @@ void crtwdgts(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsc,char *label)
 			} else if(wdgt->type==32) /* NEW PANEL */
 			{
 				rowz=crtpanel((Wt::WWidget *)CW,scn,rsc,&widgetcount,&line_widget);
+				total_rowz+=rowz;
 				if(rowz>0)
 				{
 #ifdef __NEED_WDIALOG_LAYOUT__

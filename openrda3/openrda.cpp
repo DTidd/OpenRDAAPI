@@ -26,6 +26,7 @@
 /*CPP_OPART finmgtdash */
 /*CPP_OPART finscatter */
 /*CPP_OPART venpmtdash */
+/*CPP_OPART payddsvdash */
 /*CPP_OPART prsnnldash */
 /*CPP_OPART bnkrecdash */
 /*CPP_OPART fixassdash */
@@ -1084,11 +1085,11 @@ void CreateStatusBar()
 			freeapplib(grpavl);
 		}
 #endif /* XXXX */
-		WK=new Wt::WLink("resources/OpenRDA/NavigationalTerminology.pdf");
+		WK=new Wt::WLink(Wt::WLink::Url,"resources/OpenRDA/NavigationalTerminology.pdf");
 		MItem=pop->addItem("Navigation Terminology");
 		MItem->setLink(*WK);
 		MItem->setLinkTarget(TargetNewWindow);
-		WK=new Wt::WLink("http://www.openrda.net/OpenRDALandingPage.php");
+		WK=new Wt::WLink(Wt::WLink::Url,"http://www.openrda.net/OpenRDALandingPage.php");
 		MItem=pop->addItem("OpenRDA News");
 		MItem->setLink(*WK);
 		MItem->setLinkTarget(TargetNewWindow);
@@ -1105,18 +1106,18 @@ void CreateStatusBar()
 		sprintf(redirect,"%s%s",redirect,temp1);
 		url=Rmalloc(256);
 		sprintf(url,"http://wiki.openrda.com/index.php?user=%s&passw=%s&redirect=%s",user,passw,(redirect!=NULL ? redirect:""));
-		WK=new Wt::WLink(url);
+		WK=new Wt::WLink(Wt::WLink::Url,url);
 		if(temp!=NULL) Rfree(temp);
 		if(temp1!=NULL) Rfree(temp1);
 		if(redirect!=NULL) Rfree(redirect);
 		MItem=pop->addItem("OpenRDA Answers / Documentation");
 		MItem->setLink(*WK);
 		MItem->setLinkTarget(TargetNewWindow);
-		WK=new Wt::WLink("http://openrda.net/rda-announcements");
+		WK=new Wt::WLink(Wt::WLink::Url,"http://openrda.net/rda-announcements");
 		MItem=pop->addItem("Product Announcements");
 		MItem->setLink(*WK);
 		MItem->setLinkTarget(TargetNewWindow);
-		WK=new Wt::WLink("http://openrda.net/videos");
+		WK=new Wt::WLink(Wt::WLink::Url,"http://openrda.net/videos");
 		MItem=pop->addItem("Videos");
 		MItem->setLink(*WK);
 		MItem->setLinkTarget(TargetNewWindow);
@@ -1134,11 +1135,11 @@ void CreateStatusBar()
 			pop->addItem("Upload a File")->triggered().connect(boost::bind(&upload_a_file,P));
 		}
 #endif
-		WK=new Wt::WLink("http://openrda.com");
+		WK=new Wt::WLink(Wt::WLink::Url,"http://openrda.com");
 		MItem=pop->addItem("Visit Our Web Site");
 		MItem->setLink(*WK);
 		MItem->setLinkTarget(TargetNewWindow);
-		WK=new Wt::WLink("http://openrda.com/blog");
+		WK=new Wt::WLink(Wt::WLink::Url,"http://openrda.com/blog");
 		MItem=pop->addItem("Visit Our Blogs");
 		MItem->setLink(*WK);
 		MItem->setLinkTarget(TargetNewWindow);
@@ -1193,7 +1194,7 @@ void CreateStatusBar()
 			P->setText(*c);
 			c->~WString();
 			temp=getopenselfserve();
-			WK=new Wt::WLink(temp);
+			WK=new Wt::WLink(Wt::WLink::Url,temp);
 			if(temp!=NULL) Rfree(temp);
 			P->setLink(*WK);
 			P->setLinkTarget(TargetNewWindow);

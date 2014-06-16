@@ -395,7 +395,6 @@ static void quit_record(RDArsrc *mainrsrc)
 	}
 	if(reportname!=NULL) Rfree(reportname);
 	ShutdownSubsystems();
-	exit(0);
 }
 static void doexit_position(MakeBrowseList *blist)
 {

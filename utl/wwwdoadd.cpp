@@ -724,7 +724,7 @@ static void xRUNWWWADD(char *module,char *poweradd,int level,
 }
 struct curl_httppost *PowerAdd2HttpPost(MaintainButton *button,PowerAdd *POWERADD)
 {
-	struct curl_httppost **tmp=NULL,**lastptr=NULL;
+	struct curl_httppost *tmp=NULL,*lastptr=NULL;
 	char *temp3=NULL,*temp2=NULL,*temp1=NULL,*temp=NULL;
 	int x=0,y=0,z=0,l=0;
 	ButtonField *btnfld=NULL;
@@ -795,19 +795,19 @@ struct curl_httppost *PowerAdd2HttpPost(MaintainButton *button,PowerAdd *POWERAD
 					}
 				}
 			}
-			curl_formadd(tmp,lastptr,CURLFORM_COPYNAME,btnfld->ename,CURLFORM_COPYCONTENTS,(temp3!=NULL ? temp3:""),CURLFORM_END);
+			curl_formadd(&tmp,&lastptr,CURLFORM_COPYNAME,btnfld->ename,CURLFORM_COPYCONTENTS,(temp3!=NULL ? temp3:""),CURLFORM_END);
 			if(temp1!=NULL) Rfree(temp1);
 			if(temp3!=NULL) Rfree(temp3);
 		}
 	}
-	return(*tmp);
+	return(tmp);
 }
 static void WWWPowerAddButtonFunction(RDArsrc *mainrsrc,MaintainButton *button)
 {
 	APPlib *envpx=NULL,*newargs=NULL;
 	struct curl_httppost *formpost=NULL;
 	int x;
-	char *value=NULL;
+	char *value=NULL,*temp=NULL,Lstemp[768];
 	PowerAdd *POWERADD=NULL;
 	CURL *RDAcurl=NULL;
 	CURLcode res=0;
@@ -928,32 +928,30 @@ static void WWWPowerAddButtonFunction(RDArsrc *mainrsrc,MaintainButton *button)
 					}
 					curl_easy_setopt(RDAcurl,CURLOPT_VERBOSE,FALSE);
 					formpost=PowerAdd2HttpPost(button,POWERADD);
-					prterr("formpost [%s]  formpost [%d]",formpost,formpost);
 					if(formpost!=NULL)
 					{
-						memset(stemp,0,101);
-						sprintf(stemp,"helpdesk-ticket.%d.txt",RGETPID());
-						fp=freopen(stemp,"w+b",stdout);	
+						temp=getenv("WT_DOC_ROOT");
+						memset(Lstemp,0,768);
+						sprintf(Lstemp,"%s/viewpdf.lnx --dont-view --dont-delete -ps2 -o %s/helpdesk-ticket.%d.pdf",temp,CURRENTDIRECTORY,RGETPID());
+						fp=popen(Lstemp,"w");	
 						if(fp==NULL) 
 						{
-							prterr("Error: freopen didn't redirect anything.....");
+							prterr("Error: popen for viewpdf failed.....");
 						}
+						curl_easy_setopt(RDAcurl,CURLOPT_WRITEDATA,(void*)fp);
 						curl_easy_setopt(RDAcurl,CURLOPT_HTTPPOST,formpost);
 						res=curl_easy_perform(RDAcurl);
 						if(CURLE_OK!=res)
 						{
 							prterr("Error:  Failed to HTTP Post Form.");
 						} else {
-							fclose(fp);
+							pclose(fp);
 							memset(stemp,0,101);
-							sprintf(stemp,"helpdesk-ticket.%d.txt",RGETPID());
-							newargs=APPlibNEW();
-							addAPPlib(newargs,"-ps2");
-							addAPPlib(newargs,"-i");
-							addAPPlib(newargs,stemp);
-							Execute2Program("viewpdf",newargs);
-							if(newargs!=NULL) freeapplib(newargs);
-							unlink(stemp);
+							sprintf(stemp,"helpdesk-ticket.%d.pdf",RGETPID());
+							DisplayFile(stemp);
+							memset(Lstemp,0,768);
+							sprintf(Lstemp,"%s/helpdesk-ticket.%d.pdf",CURRENTDIRECTORY,RGETPID());
+							unlink(Lstemp);
 						}
 						curl_easy_cleanup(RDAcurl);
 						curl_formfree(formpost);
@@ -1571,7 +1569,6 @@ short WWWInitializeSubsystems(int argc,char **argv,char *module,char *process)
 	Pay_Balance_of_Contract=FALSE;
 	Dump_Deferred_Pay_Balance=FALSE;
 #endif
-	RDA_NOGUI=TRUE;
 	INITGUI(argc,argv,CURRENTDIRECTORY);
 	SETCWD();
 	PP_translate_GUIFUNC=PP_translate_GUI;
@@ -1609,20 +1606,21 @@ int c_main(int argc,char **argv)
 int main(int argc,char **argv)
 #endif
 {
-	if(argc<3) std::exit;
-	RDA_NOGUI=TRUE;
+	if(argc<3) 
+	{
+		ShutdownSubsystems();
+		return;
+	}
 #ifdef LINUX 
 	umask(002);
 #endif
 #if defined(LINUX2_2) || defined(UBUNTU_OS) 
 	umask(002);
 #endif
-	RDA_NOGUI=TRUE;
 	if(WWWInitializeSubsystems(argc,argv,argv[1],argv[2]))
 	{
 		ShutdownSubsystems();
 		return;
 	}
-	RDA_NOGUI=TRUE;
 	RUNWWWADD(argv[1],argv[2],0,NULL,NULL,NULL);
 }

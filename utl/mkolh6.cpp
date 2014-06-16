@@ -167,7 +167,7 @@ void SCREEN_HELP()
 		ADVaddwdgt(scrn,6,"ANNOUNCEMENTS","Announcements","","",0,0,43,"","","","");
 		if(XPERT_SETUP->software_type<2) 
 		{
-		ADVaddwdgt(scrn,6,"VIDEOS","Videos","","",0,0,50,"","","","");
+			ADVaddwdgt(scrn,6,"VIDEOS","Videos","","",0,0,50,"","","","");
 		}
 		ADVaddwdgt(scrn,6,"USER PROFILE","User Profile","","",0,0,65,"","","","");
 		ADVaddwdgt(scrn,6,"SYSTEM PRINTER MANAGEMENT","System Printer Management","","",0,0,7,"","","","");
@@ -181,8 +181,13 @@ void SCREEN_HELP()
 		ADVaddwdgt(scrn,6,"WWW.RDASYS.COM","RDA's Web Site","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,14,"EDIT SCREEN NOTES","Add/Edit Notes","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,6,"PRINT RESOURCES","Print & Capture Resources","","",0,0,0,"([TOOLS SETUP]=TRUE)","","","");
+		ADVaddwdgt(scrn,2,"","","","",0,0,0,"","","","");
+		ADVaddwdgt(scrn,4,"","","","",0,0,0,"","","","");
+		ADVaddwdgt(scrn,2,"","","","",0,0,0,"","","","");
+		ADVaddwdgt(scrn,1,"","","","",0,0,0,"","","","");
+		ADVaddwdgt(scrn,3,"","","","",0,0,0,"","","","");
+		ADVaddwdgt(scrn,1,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,6,"QUIT","Cancel","","",0,0,14,"","","","");
-		ADVaddwdgt(scrn,6,"HELP","Help","","",0,0,11,"FALSE","","","");
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,4,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,"","","","");
@@ -299,8 +304,13 @@ void RESOURCE_HELP_SCREEN()
 		ADVaddwdgt(scrn,6,"FEEDBACK","Suggestions/Comments","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,6,"WWW.RDASYS.COM","RDA's Web Site","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,14,"EDIT RESOURCE NOTES","Edit Resource Notes","","",0,0,0,"","","","");
+		ADVaddwdgt(scrn,2,"","","","",0,0,0,"","","","");
+		ADVaddwdgt(scrn,4,"","","","",0,0,0,"","","","");
+		ADVaddwdgt(scrn,2,"","","","",0,0,0,"","","","");
+		ADVaddwdgt(scrn,1,"","","","",0,0,0,"","","","");
+		ADVaddwdgt(scrn,3,"","","","",0,0,0,"","","","");
+		ADVaddwdgt(scrn,1,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,6,"QUIT","Cancel","","",0,0,14,"","","","");
-		ADVaddwdgt(scrn,6,"HELP","Help","","",0,0,11,"FALSE","","","");
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,4,"","","","",0,0,0,"","","","");
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,"","","","");

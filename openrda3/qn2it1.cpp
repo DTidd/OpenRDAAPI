@@ -6,6 +6,9 @@
 #include <olh.hpp>
 #include <mix.hpp>
 
+extern Wt::WContainerWidget *UnProcessedVendorWithholding(void);
+extern Wt::WContainerWidget *UnProcessedAccumulatedWithholding(void);
+extern Wt::WContainerWidget *UnProcessedAccumulatedWithholdingbyVen(void);
 extern Wt::WContainerWidget *BalSumScatterWidget();
 extern Wt::WContainerWidget *UnPostedExpenditureActivity(void);
 extern Wt::WContainerWidget *UnPostedRevenueActivity(void);
@@ -1178,7 +1181,6 @@ void CreateDockRSRC(char *modname)
 	int psize=0;
 	short ef=0;
 	RDArmem *mem=NULL;
-	Wt::WLink *WK=NULL;
 	Wt::WContainerWidget *h=NULL,*v=NULL,*SC=NULL;
 	Wt::WVBoxLayout *vbox=NULL,*vb=NULL;
 	Wt::WHBoxLayout *hbox=NULL;
@@ -1321,12 +1323,13 @@ void CreateDockRSRC(char *modname)
 	SC->resize(300,Wt::WLength::Auto);
 	QN2IT_PARENT_TYPE=0;
 }
-void CreateCenterPanel()
+void CreateCenterPanel(char *modname)
 {
 	Wt::WTabWidget *tabW=NULL;
 	Wt::WMenuItem *tab=NULL;
 	Wt::WContainerWidget *w=NULL;
 	Wt::WHBoxLayout *hbox=NULL;
+	Wt::WText *myText=NULL;
 
 	ExpendActShowTable=FALSE;
 	ExpendActValuetoVisual=0;
@@ -1343,15 +1346,15 @@ void CreateCenterPanel()
 	OpenPObyVendorValuetoVisual=1;
 	OpenPObyVendorShowTable=FALSE;
 	if(MainWindowCenter->count()>0) MainWindowCenter->clear();
-	if(!RDAstrcmp(CURRENT_MODULE,"FINMGT"))
+	if(!RDAstrcmp(modname,"FINMGT"))
 	{
 		tabW=new Wt::WTabWidget(MainWindowCenter);
 		w=BalSumScatterWidget();
 		if(w!=NULL)
 		{
-			tabW->addTab(w,"G/L Scatter",Wt::WTabWidget::PreLoading);
+			tabW->addTab(w,"G/L Category",Wt::WTabWidget::PreLoading);
 		} else {
-			prterr("Error:  G/L Scatter didn't generate a container.");TRACE;
+			prterr("Error:  G/L Category didn't generate a container.");TRACE;
 		}
 		w=UnPostedExpenditureActivity();
 		tabW->addTab(w,"Exp Activity",Wt::WTabWidget::PreLoading);
@@ -1363,42 +1366,52 @@ void CreateCenterPanel()
 		tabW->addTab(w,"J/E",Wt::WTabWidget::PreLoading);
 		w=UnProcessedReceipt();
 		tabW->addTab(w,"Receipts",Wt::WTabWidget::PreLoading);
-	} else if(!RDAstrcmp(CURRENT_MODULE,"VENPMT"))
+	} else if(!RDAstrcmp(modname,"VENPMT"))
 	{
 		tabW=new Wt::WTabWidget(MainWindowCenter);
 		w=UnProcessedVoucherStatus();
 		tabW->addTab(w,"Vouchers",Wt::WTabWidget::PreLoading);
-	} else if(!RDAstrcmp(CURRENT_MODULE,"PURORD"))
+	} else if(!RDAstrcmp(modname,"PURORD"))
 	{
 		tabW=new Wt::WTabWidget(MainWindowCenter);
 		w=OpenPObyVendorDisplayDashBoard();
 		tabW->addTab(w,"Open PO's by Vendor",Wt::WTabWidget::PreLoading);
-	} else if(!RDAstrcmp(CURRENT_MODULE,"FIXASS"))
+	} else if(!RDAstrcmp(modname,"FIXASS"))
 	{
 		hbox=new Wt::WHBoxLayout();
 		MainWindowCenter->setLayout(hbox);
 		w=FixedAssetsByCategoryView();
 		hbox->addWidget(w,500);
-	} else if(!RDAstrcmp(CURRENT_MODULE,"BNKREC"))
+	} else if(!RDAstrcmp(modname,"BNKREC"))
 	{
 		tabW=new Wt::WTabWidget(MainWindowCenter);
 		w=BankBalanceByCashCodeView();
 		tabW->addTab(w,"by Cash Code",Wt::WTabWidget::PreLoading);
 		w=BankBalanceByIDView();
 		tabW->addTab(w,"by Bank ID",Wt::WTabWidget::PreLoading);
-	} else if(!RDAstrcmp(CURRENT_MODULE,"PRSNNL"))
+	} else if(!RDAstrcmp(modname,"PRSNNL"))
 	{
 		tabW=new Wt::WTabWidget(MainWindowCenter);
 		w=CurrentEmployeeLocation();
 		tabW->addTab(w,"by Location",Wt::WTabWidget::PreLoading);
 		w=CurrentEmployeeClass();
 		tabW->addTab(w,"by Class",Wt::WTabWidget::PreLoading);
-	} else if(!RDAstrcmp(CURRENT_MODULE,"HOME"))
+	} else if(!RDAstrcmp(modname,"HOME"))
 	{
 		hbox=new Wt::WHBoxLayout();
 		MainWindowCenter->setLayout(hbox);
-		w=CreateFeed("http://www.openrda.net/OpenRDALandingPage.php");
-		hbox->addWidget(w,500);
+		myText=new Wt::WText("<iframe src='http://www.openrda.com/blog' width=100% height=100%></iframe>");
+		myText->setTextFormat(Wt::TextFormat::XHTMLUnsafeText);
+		hbox->addWidget(myText,500);
+	} else if(!RDAstrcmp(modname,"VW"))
+	{
+		tabW=new Wt::WTabWidget(MainWindowCenter);
+		w=UnProcessedAccumulatedWithholdingbyVen();
+		tabW->addTab(w,"Accumulated W/H by Vendor",Wt::WTabWidget::PreLoading);
+		w=UnProcessedAccumulatedWithholding();
+		tabW->addTab(w,"Accumulated W/H by Type",Wt::WTabWidget::PreLoading);
+		w=UnProcessedVendorWithholding();
+		tabW->addTab(w,"by Voucher Status",Wt::WTabWidget::PreLoading);
 	}
 }
 void ChooseModule(char *modname)
@@ -1430,6 +1443,6 @@ void ChooseModule(char *modname)
 		CreateDockRSRC(modname);
 		if(!OPENRDA_STYLE) CreateStatusBar();
 			else CreateAccordionBar();
-		CreateCenterPanel();
+		CreateCenterPanel(modname);
 	}
 }

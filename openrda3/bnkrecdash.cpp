@@ -202,6 +202,7 @@ Wt::WContainerWidget *BankBalanceByIDView()
 	xchart->setModel(BankBalanceByIDsModel);
 	xchart->setLabelsColumn(0);
 	xchart->setDataColumn((BankBalanceByIDValuetoVisual+1));
+	xchart->setAvoidLabelRendering(2.99);
 	xchart->setDisplayLabels(Wt::Chart::LabelOption::Outside | Wt::Chart::LabelOption::TextLabel | Wt::Chart::LabelOption::TextPercentage);
 	xchart->setPerspectiveEnabled(true,0.2);
 	xchart->setExplode(0,0.3);
@@ -437,6 +438,7 @@ Wt::WContainerWidget *BankBalanceByCashCodeView()
 	xchart->setDataColumn((BankBalanceByCashCodeValuetoVisual+1));
 	xchart->setDisplayLabels(Wt::Chart::LabelOption::Outside | Wt::Chart::LabelOption::TextLabel | Wt::Chart::LabelOption::TextPercentage);
 	xchart->setPerspectiveEnabled(true,0.2);
+	xchart->setAvoidLabelRendering(2.99);
 	xchart->setExplode(0,0.3);
 	xchart->resize(960,360);
 	xchart->setMargin(2,Wt::Side::Top | Wt::Side::Bottom);

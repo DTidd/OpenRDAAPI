@@ -1027,6 +1027,10 @@ short EQLNRDKEYmyisam(short fileno,short keyno,void *target)
 			}
 		} else {
 			assignMyIsam_fields(NRDtmp);
+			if(diagmyisam)
+			{	
+				SEENRDRECORD(fileno);TRACE;
+			}
 		}
 	} else {
 		if(diagmyisam)
@@ -1084,6 +1088,10 @@ short GTENRDmyisam(short fileno,short keyno)
 		}
 	} else {
 		assignMyIsam_fields(NRDtmp);
+		if(diagmyisam)
+		{	
+			SEENRDRECORD(fileno);TRACE;
+		}
 	}
 	return(r);
 }
@@ -1114,6 +1122,10 @@ short PRVNRDmyisam(short fileno,short keyno)
 		}
 	} else {
 		assignMyIsam_fields(NRDtmp);
+		if(diagmyisam)
+		{	
+			SEENRDRECORD(fileno);TRACE;
+		}
 	}
 	return(r);
 }
@@ -1142,6 +1154,10 @@ short LSTNRDmyisam(short fileno,short keyno)
 		r=(-1);
 	} else {
 		assignMyIsam_fields(NRDtmp);
+		if(diagmyisam)
+		{	
+			SEENRDRECORD(fileno);TRACE;
+		}
 	}
 	return(r);
 }
@@ -1172,6 +1188,10 @@ short BEGNRDmyisam(short fileno)
 		rs=(-1);
 	} else {
 		assignMyIsam_fields(NRDtmp);
+		if(diagmyisam)
+		{	
+			SEENRDRECORD(fileno);TRACE;
+		}
 		rs=0;
 	}
 	return(r);
@@ -1206,6 +1226,10 @@ short SEQNRDmyisam(short fileno)
 		rs=(-1);
 	} else {
 		assignMyIsam_fields(NRDtmp);
+		if(diagmyisam)
+		{	
+			SEENRDRECORD(fileno);TRACE;
+		}
 		rs=0;
 	}
 	return(r);
@@ -1240,6 +1264,10 @@ short LTENRDmyisam(short fileno,short keyno)
 		}
 	} else {
 		assignMyIsam_fields(NRDtmp);
+		if(diagmyisam)
+		{	
+			SEENRDRECORD(fileno);TRACE;
+		}
 	}
 	return(r);
 }
@@ -1269,6 +1297,10 @@ short FRSNRDmyisam(short fileno,short keyno)
 		}
 	} else {
 		assignMyIsam_fields(NRDtmp);
+		if(diagmyisam)
+		{	
+			SEENRDRECORD(fileno);TRACE;
+		}
 	}
 	return(r);
 }
@@ -1299,6 +1331,10 @@ short NXTNRDmyisam(short fileno,short keyno)
 		}
 	} else {
 		assignMyIsam_fields(NRDtmp);
+		if(diagmyisam)
+		{	
+			SEENRDRECORD(fileno);TRACE;
+		}
 	}
 	return(r);
 }

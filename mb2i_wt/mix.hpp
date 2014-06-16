@@ -922,7 +922,6 @@ void xCLEAR_SCREEN_VIRTUAL(RDArsrc *,int,char *);
 #define COMPUTE_SCREEN_VIRTUAL(a,b,c,d)	xCOMPUTE_SCREEN_VIRTUAL(a,b,c,d,__LINE__,__FILE__)
 short xCOMPUTE_SCREEN_VIRTUAL(RDArsrc *,char *,void (*)(...),void *,
 	int,char *);
-short SCRNFILENUMBER(RDArsrc *,char *,char *,short);
 void SCRNvirtualSubData(char **,RDArsrc *);
 short ScrolledListSubData(char **,RDArsrc *);
 #define CreateRDAScrolledList(a,b,c,d)	xCreateRDAScrolledList(a,b,c,d,__LINE__,__FILE__)
@@ -977,8 +976,6 @@ void RDALoadValueCB(RDArsrc *,RDALoadValue *);
 void RDALoadOperatorCB(RDArsrc *,RDALoadValue *);
 void RDALoadGrouperCB(RDArsrc *,RDALoadValue *);
 void RDALoadControlCB(RDArsrc *,RDALoadValue *);
-#define ReadRDAScrolledLists(a) xReadRDAScrolledLists(a,__LINE__,__FILE__)
-void xReadRDAScrolledLists(RDArsrc *,int,char *);
 #define ReadRDAScrolledListsKeysOnly(a,b)	xReadRDAScrolledListsKeysOnly(a,b,__LINE__,__FILE__)
 void xReadRDAScrolledListsKeysOnly(RDArsrc *,short,int,char *);
 #define ReadRDAScrolledListsNoPassKeys(a,b)	xReadRDAScrolledListsNoPassKeys(a,b,__LINE__,__FILE__)

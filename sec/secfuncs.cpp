@@ -923,11 +923,13 @@ char *xUsers_Department(int line,char *file)
 	{
 	if(SEC_USERS_FILENO!=(-1))
 	{
+	prterr("USERLOGIN [%s]",USERLOGIN);
 		FINDFLDSETSTRING(SEC_USERS_FILENO,"USER IDENTIFICATION",USERLOGIN);
 		if(!EQLNRD(SEC_USERS_FILENO,1))
 		{
 			FINDFLDGETSTRING(SEC_USERS_FILENO,"DEPARTMENT",&department);
 		}
+	prterr("DEPARTMENT [%s]",department);
 	}
 	if(isEMPTY(department))
 	{

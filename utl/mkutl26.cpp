@@ -239,6 +239,9 @@ static void SCN_GENERIC_SETUP_VARIABLES()
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,9,"DOMENU STYLE BLOCKS TAB BAR ON DOCK WINDOW","Use [DOMENU STYLE] to block the TAB BAR on Dock Windows","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,9,"DISPLAY DOSCOPY MEDIA OPTIONS","Display Media Options on the Utility DOS COPY WINDOW.","","",0,0,0,NULL,NULL,NULL,NULL);
+		ADVaddwdgt(scrn,2,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,21,"","","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,20,"","Browsing","","",0,0,0,NULL,NULL,NULL,NULL);
 		ADVaddwdgt(scrn,1,"","","","",0,0,0,NULL,NULL,NULL,NULL);
@@ -2607,6 +2610,50 @@ static void LST_OPENRDA_STYLES()
 		if(list!=NULL) FreeRDAScrolledList(list);
 	}
 }
+static void GSV_DISPLAY_DOSCOPY_MEDIA_OPTIONS()
+{
+	RDAGenericSetup *gsv=NULL;
+	char *temp1=NULL,*libx=NULL;
+
+	libx=Rmalloc(RDAstrlen(CURRENTDIRECTORY)+RDAstrlen(module)+11);
+#ifndef WIN32
+	sprintf(libx,"%s/rda/%s.GSV",CURRENTDIRECTORY,module);
+#endif
+#ifdef WIN32
+	sprintf(libx,"%s\\rda\\%s.GSV",CURRENTDIRECTORY,module);
+#endif
+
+	gsv=RDAGenericSetupNew("UTILITIES","DISPLAY DOSCOPY MEDIA OPTIONS");
+	if(gsv!=NULL)
+	{
+		if(getRDAGenericSetupbin(libx,gsv))
+		{
+			gsv->type=10;
+			gsv->length=1;
+			gsv->desc=stralloc("Used to denote when to display the Report Generator DOSCOPY Media Options.");
+			gsv->label=stralloc("Display DOSCOPY Media Options");
+			gsv->value.string_value=Rmalloc(1);
+			*gsv->value.string_value=0;
+	
+			if(writeRDAGenericSetupbin(libx,gsv))
+			{
+				if(temp1!=NULL) Rfree(temp1);
+				if(libx!=NULL) Rfree(libx);
+				temp1=Rmalloc(29+9+110+1);
+				sprintf(temp1,"GENERIC SETUP VARIABLE WRITE ERROR: Module [UTILITIES] GSV [DISPLAY DOSCOPY MEDIA OPTIONS], Can Not Save Generic Setup Variable!");
+				prterr(temp1);
+				if(errorlist!=NULL)
+				{
+					addERRlist(&errorlist,temp1);
+				}
+				if(temp1!=NULL) Rfree(temp1);
+			}
+		}
+		if(temp1!=NULL) Rfree(temp1);
+	}
+	if(libx!=NULL) Rfree(libx);
+	if(gsv!=NULL) FreeRDAGenericSetup(gsv);
+}
 void UTLGSV()
 {
 	GSV_HTTP_PROXY();
@@ -2642,6 +2689,7 @@ void UTLGSV()
 	GSV_ORGANIZATION_LOGO();
 	GSV_CENTER_WINDOWS();
 	GSV_DEFAULT_DUPLEX_PRINTING();
+	GSV_DISPLAY_DOSCOPY_MEDIA_OPTIONS();
 	if(XPERT_SETUP->software_type<2)
 	{
 		GSV_DOMENU_STYLE_BLOCKS_TAB_BAR_ON_DOCK_WINDOW();

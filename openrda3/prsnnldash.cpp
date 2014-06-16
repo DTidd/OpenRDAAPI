@@ -10,6 +10,8 @@
 #include <mix.hpp>
 
 /* By Personnel Class */
+/* Use PieChart API to ignore options below a specific size, e.g. 3% */
+/* This will avoid displaying jumbled legend items */
 
 Wt::WContainerWidget *CurrentEmployeeClass(void);
 int EmployeeClassValuetoVisual=0;
@@ -212,6 +214,7 @@ Wt::WContainerWidget *CurrentEmployeeClass()
 	xchart=new Wt::Chart::WPieChart(CurrentEmployeeClassDashBoard);
 	xchart->setModel(EmployeeClasssCurrent);
 	xchart->setLabelsColumn(0);
+	xchart->setAvoidLabelRendering(2.99);
 	xchart->setDataColumn((EmployeeClassValuetoVisual+1));
 	xchart->setDisplayLabels(Wt::Chart::LabelOption::Outside | Wt::Chart::LabelOption::TextLabel | Wt::Chart::LabelOption::TextPercentage);
 	xchart->setPerspectiveEnabled(true,0.2);
@@ -463,6 +466,7 @@ Wt::WContainerWidget *CurrentEmployeeLocation()
 	xchart->setPerspectiveEnabled(true,0.2);
 	xchart->setExplode(0,0.3);
 	xchart->resize(960,360);
+	xchart->setAvoidLabelRendering(2.99);
 	xchart->setMargin(2,Wt::Side::Top | Wt::Side::Bottom);
 	xchart->setMargin(Wt::WLength::Auto,Wt::Side::Left | Wt::Side::Right);
 	TablePanel=new Wt::WPanel(CurrentEmployeeLocationDashBoard);

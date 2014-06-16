@@ -31,6 +31,7 @@ static short payjpms=(-1),paymstr=(-1),payddac=(-1),payppms=(-1);
 static short payjtrn=(-1),payjdpm=(-1),paydtrn=(-1),payjams=(-1);
 static short payddms=(-1),payjmst=(-1),paydpms=(-1),payjdac=(-1);
 static short paydedm=(-1),posacc=(-1),eyrnum=(-1),eaccnum=(-1),byrnum=(-1),baccnum=(-1);
+static char *defaultprinter=NULL;
 static int DO_AUDIT=FALSE;
 static MakeBrowseList *mbl_paymstr=NULL;
 RDApayroll *PAYROLL_SETUP=NULL;
@@ -2515,7 +2516,6 @@ static void quit_paymts(RDArsrc *parent)
 	if(PAYROLL_SETUP!=NULL) free_payroll(PAYROLL_SETUP);
 	if(finsetup!=NULL) free_finmgt(finsetup);
 	ShutdownSubsystems();
-	exit(0);
 }
 static void quitbpaymstr(MakeBrowseList *blist)
 {
@@ -2540,14 +2540,13 @@ static void quitbpaymstr(MakeBrowseList *blist)
 	ZERNRD(paymstr);
 	if(ADVEQLNRDKEYsec(paymstr,1,blist->list->keyvalue,SCRNvirtualSubData,blist->mainrsrc)) KEYNRD(paymstr,1);
 	FINDFLDGETSTRING(paymstr,"PAY IDENTIFICATION",&payid);
-/* DDC (02/27/2014): Why are we dumping PAY ID to the environment? The audit trail reports don't use it and the cookie gets stuck out there in 4.0.
 	if(!isEMPTY(payid))
 	{
 		temp=Rmalloc(RDAstrlen(payid)+20);
 		sprintf(temp,"PAY_IDENTIFICATION=%s",payid);
 		RDA_PutEnv(temp);
 	}
-*/
+
 	if(payid!=NULL) Rfree(payid);
 	if(blist->definelist!=NULL) 
 	{
@@ -2751,7 +2750,6 @@ void printwarnlistcb(RDArsrc *prsrc,RDArsrc *parent)
 static void print_list(RDArsrc *parent,void (*printfunc)(...))
 {
 	RDArsrc *prsrc=NULL;
-	char *defaultprinter=NULL;
 
 	if(diaggui)
 	{
@@ -2759,11 +2757,9 @@ static void print_list(RDArsrc *parent,void (*printfunc)(...))
 	}
 	print_style=FALSE;
 	prsrc=RDArsrcNEW("GUI","PRINT SCREEN");
-	defaultprinter=DefaultPrinter();
 	addbtnrsrc(prsrc,"LOAD DEVICE NAME",TRUE,LoadDeviceWindow,SelectFuncDevice);
 	addstdrsrc(prsrc,"DEVICE",VARIABLETEXT,0,defaultprinter,TRUE);
 	addstdrsrc(prsrc,"NORMAL PRINT",BOOLNS,1,&print_style,TRUE);
-	if(defaultprinter!=NULL) Rfree(defaultprinter);
 	addrfkwrsrc(prsrc,"PRINT",TRUE,printfunc,parent);
 	addrfkwrsrc(prsrc,"QUIT",TRUE,quit_print,NULL);
 	addbtnrsrc(prsrc,"HELP",TRUE,screenhelp,NULL);
@@ -2857,6 +2853,7 @@ int main(int argc,char **argv)
 	}
 	FreeRDAGenericSetup(GSV);	
 	if(libx!=NULL) Rfree(libx);
+	defaultprinter=DefaultPrinter();
 	if((payppms=APPOPNNRD(module,"PAYPPMS",TRUE,TRUE))==(-1)) return;
 	if((payjpms=APPOPNNRD(module,"PAYJPMS",TRUE,FALSE))==(-1)) return;
 	if((paymstr=APPOPNNRD(module,"PAYMSTR",TRUE,FALSE))==(-1)) return;

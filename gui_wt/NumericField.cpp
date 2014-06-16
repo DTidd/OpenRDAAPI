@@ -22,7 +22,6 @@ NumericField::NumericField(Wt::WContainerWidget *parent)
   Wt::WApplication::instance()->require("NumericField.js");
   keyWentDown().connect("jQuery.data(" + jsRef() + ", 'NumericField').keyWentDown");
   keyPressed().connect("jQuery.data(" + jsRef() + ", 'NumericField').keyPressed");
-  focussed().connect("jQuery.data(" + jsRef() + ", 'NumericField').focussed");
 }
 
 void NumericField::render(Wt::WFlags<Wt::RenderFlag> flags)
@@ -82,6 +81,12 @@ Wt::WString NumericField::formatDouble(double d) const
     sign = true;
     d = -d;
   }
+  double decimals = 0.0;
+  if (currency_) {
+    double factor = pow(10.0, currencyCents_ == 0 ? 2 : currencyCents_);
+    decimals = floor(d - (floor(d / factor) * factor));
+    d = floor(d / factor);
+  }
   if (d != d || d == std::numeric_limits<double>::infinity()) {
     throw NumericConversionError("The given double is not finite (NaN or infinity)!");
   }
@@ -94,9 +99,7 @@ Wt::WString NumericField::formatDouble(double d) const
     locale.setGroupSeparator(",");
   }
   int precision = 0;
-  if (currency_) {
-    precision = currencyCents_;
-  } else if (decimal_) {
+  if (!currency_ && decimal_) {
     precision = digits_ - intPartLength;
   }
   Wt::WString result = locale.toFixedString(d, precision);
@@ -110,6 +113,14 @@ Wt::WString NumericField::formatDouble(double d) const
       -- size;
     }
     result = Wt::WString::fromUTF8(std::string(result.toUTF8().c_str(), size));
+  }
+  if (currency_ && currencyCents_ > 0) {
+    result = result + ".";
+    for (std::size_t i = boost::lexical_cast<std::string>(decimals).size(); i < currencyCents_; ++i) {
+      result = result + "0";
+    }
+    result = result + boost::lexical_cast<std::string>(decimals);
+    size += currencyCents_ + 1;
   }
   if (allowNegative_) {
     if (sign) {
@@ -202,6 +213,7 @@ double NumericField::doubleValue() const
       }
     }
   }
+  std::size_t extraZeros = 0;
   if (currency_) {
     // Remove currency symbol and padding
     std::size_t symbolSize = currencySymbol_.toUTF8().size();
@@ -216,13 +228,27 @@ double NumericField::doubleValue() const
     value = value.substr(start);
     // Remove commas
     std::string::iterator end = std::remove(value.begin(), value.end(), ',');
+    std::string::iterator dotPos = std::find(value.begin(), end, '.');
+    if (dotPos + currencyCents_ + 1 < end) {
+      // Truncate extraneous digits
+      end = std::remove(value.begin(), dotPos + currencyCents_ + 1, '.');
+    } else {
+      end = std::remove(value.begin(), end, '.');
+      extraZeros = dotPos + currencyCents_ - end;
+    }
     value = std::string(value.begin(), end);
   }
   double result = 0.0;
   try {
     result = boost::lexical_cast<double>(value);
+    for (std::size_t i = 0; i < extraZeros; ++i) {
+      result *= 10.0;
+    }
     if (sign) {
       result *= -1.0;
+    }
+    if (currency_ && currencyCents_ == 0) {
+      result *= 100.0;
     }
   } catch (boost::bad_lexical_cast&) {
     throw NumericConversionError("Couldn't convert text: " + value);

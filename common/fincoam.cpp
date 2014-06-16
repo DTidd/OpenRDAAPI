@@ -216,7 +216,7 @@ void fincoam(short dowhich,void *targetkey)
 	} else {
 		addbtnrsrc(mtnrsrc,"SAVE",TRUE,save_record_nup,mtn);
 	}
-	addrfkwrsrc(mtnrsrc,"BROWSE",TRUE,browse_fincoa,mtn);
+	addbtnrsrc(mtnrsrc,"BROWSE",TRUE,browse_fincoa,mtn);
 	if(mbl_fincoa!=NULL)
 	{
 		 FINDRSCSETSENSITIVE(mtnrsrc,"BROWSE",FALSE);
@@ -354,17 +354,16 @@ static void quit_record(RDArsrc *mtnrsrc,mtnstruct *mtn)
 		if(mtn->previous!=NULL) FreeRDATData(mtn->previous);
 		Rfree(mtn);
 	}
-	if(WindowCount<2)
-	{
-		CLOSE_MASTER_FILES(MTNMASTER);
-		if(MTNMASTER!=NULL) FreeMaintainMaster(MTNMASTER);
-		ShutdownSubsystems();
-		exit(0);
-	}
 	if(mtnrsrc!=NULL)
 	{
 		killwindow(mtnrsrc);
 		free_rsrc(mtnrsrc); 
+	}
+	if(WindowCount<1)
+	{
+		CLOSE_MASTER_FILES(MTNMASTER);
+		if(MTNMASTER!=NULL) FreeMaintainMaster(MTNMASTER);
+		ShutdownSubsystems();
 	}
 }
 static void readscreen(RDArsrc *mtnrsrc,mtnstruct *mtn)

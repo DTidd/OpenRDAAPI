@@ -663,7 +663,6 @@ static void quitsetup(RDArsrc *r)
 		free_rsrc(r);
 	}
 	ShutdownSubsystems();
-	exit(0);
 }
 
 static void VIR_STATE_ALLOWANCES()

@@ -222,6 +222,7 @@ Wt::WContainerWidget *FixedAssetsByCategoryView()
 	xchart->setModel(FixedAssetsByCategorysUnProcessed);
 	xchart->setLabelsColumn(0);
 	xchart->setDataColumn((FixedAssetsByCategoryValuetoVisual+1));
+	xchart->setAvoidLabelRendering(2.99);
 	xchart->setDisplayLabels(Wt::Chart::LabelOption::Outside | Wt::Chart::LabelOption::TextLabel | Wt::Chart::LabelOption::TextPercentage);
 	xchart->setPerspectiveEnabled(true,0.2);
 	xchart->setExplode(0,0.3);

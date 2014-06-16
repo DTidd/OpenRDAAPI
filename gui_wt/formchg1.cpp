@@ -57,9 +57,9 @@ void xOpenRDAWiki(char *page,int line,char *file)
 	if(!isEMPTY(page))
 	{
 		url=Rmalloc(RDAstrlen(page)+40);
-		sprintf(url,"http://www.openrda.net/wiki/index.php/%s",(page!=NULL ? page:""));
+		sprintf(url,"http://wiki.openrda.com/wiki/index.php/%s",(page!=NULL ? page:""));
 	} else {
-		url=stralloc("http://www.openrda.net/wiki/index.php/Category:Modules");
+		url=stralloc("http://wiki.openrda.com/wiki/index.php/Category:Modules");
 	}
 	GUI_OpenURL(url);
 	if(url!=NULL) Rfree(url);
@@ -67,28 +67,14 @@ void xOpenRDAWiki(char *page,int line,char *file)
 }
 void WikiSupport(RDArsrc *rs)
 {
-	char *temp=NULL,*temp1=NULL,*temp2=NULL,*tempx=NULL;
-	char *page=NULL;
-	std::string name;
+	char *temp2=NULL,*page=NULL;
 
-	name=rs->swidget->id();
-	if(!name.empty())
-	{	
-		page = new char [name.length()+1];
-		std::strcpy(page,name.c_str());
-		temp1 = new char [name.length()+1];
-		std::strcpy(temp1,name.c_str());
-
-		for(temp=temp1;*temp;++temp) 
-		{
-			if(*temp=='(')
-			{
-				*temp=0;
-				break;
-			}
-		}
-		sprintf(page,"%s_%s",rs->module,temp1);
-		if(temp1!=NULL) Rfree(temp1);
+	if(rs!=NULL)
+	{
+		page=Rmalloc(RDAstrlen(rs->module)+RDAstrlen(rs->screen)+2);
+		temp2=adddashes(rs->screen);
+		sprintf(page,"%s_%s",(rs->module!=NULL ? rs->module:""),(temp2!=NULL ? temp2:""));
+		if(temp2!=NULL) Rfree(temp2);
 	}
 	OpenRDAWiki(page);
 	if(page!=NULL) Rfree(page);
@@ -547,33 +533,20 @@ void losingfocusfunction(RDArmem *member)
 	}
 #endif /* USE_RDA_DIAGNOSTICS */
 }
-void gainingfocusfunction(RDArmem *member)
+void membersetcursor(RDArmem *member)
 {
-	RDArsrc *rsrc=(RDArsrc *)member->parent;
-	Wt::WFormWidget *wFormW=NULL;
-	Wt::WWidget *WW=(Wt::WWidget *)member->w;
 	std::stringstream ss1;
-	int cp=0,col=(member->cols!=0 ? member->cols:member->field_length);
+	int cp=0,cp1=0,col=(member->cols!=0 ? member->cols:member->field_length);
+	Wt::WWidget *WW=(Wt::WWidget *)member->w;
 
-#ifdef USE_RDA_DIAGNOSTICS
-	if(diaggui || diaggui_field)
-	{
-		prterr("DIAG gainingfocusfunction for Resource [%s] on Screen [%s] [%s].",member->rscrname,rsrc->module,rsrc->screen);
-	}
-#endif /* USE_RDA_DIAGNOSTICS */
-	wFormW=(Wt::WFormWidget *)member->w;
-	if(NoLosingFocus!=NULL && NoLosingFocus!=member)
-	{
-		losingfocusfunction(NoLosingFocus);
-	}
-	NoLosingFocus=member;
 	switch(member->field_type)
 	{
 		case SCROLLEDTEXT:
 		case VARIABLETEXT:
 		case PLAINTEXT:
 			cp=0;
-			ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
+			cp1=RDAstrlen(member->value.string_value);
+			ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp1 << ";";
 			WW->doJavaScript(ss1.str());
 			break;
 		case DATES:
@@ -591,7 +564,8 @@ void gainingfocusfunction(RDArmem *member)
 			cp=0;
 			if(isEMPTY(member->value.string_value))
 			{
-				ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
+				cp1=RDAstrlen(member->value.string_value);
+				ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp1 << ";";
 			} else {
 				ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp+1 << ";";
 			}
@@ -599,10 +573,16 @@ void gainingfocusfunction(RDArmem *member)
 			break;
 		case DOLLARS:
 		case DOLLARS_NOCENTS:
+			cp=1;
+			cp1=col-1;
+			ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp1 << ";";
+			WW->doJavaScript(ss1.str());
+			break;
 		case SDOUBLEV:
 		case SDECIMALV:
 		case SSHORTV:
 		case SLONGV:
+			cp=0;
 			cp=col-1;
 			ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
 			WW->doJavaScript(ss1.str());
@@ -611,8 +591,9 @@ void gainingfocusfunction(RDArmem *member)
 		case DECIMALV:
 		case DOUBLEV:
 		case LONGV:
-			cp=col;
-			ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
+			cp=0;
+			cp1=col;
+			ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp1 << ";";
 			WW->doJavaScript(ss1.str());
 			break;
 		case SCROLLEDLIST:
@@ -624,6 +605,24 @@ void gainingfocusfunction(RDArmem *member)
 			prterr("Error field type [%d] is invalid for Resource [%s].",member->field_type,member->rscrname);
 			break;
 	}
+}
+void gainingfocusfunction(RDArmem *member)
+{
+	RDArsrc *rsrc=(RDArsrc *)member->parent;
+	Wt::WFormWidget *wFormW=NULL;
+
+#ifdef USE_RDA_DIAGNOSTICS
+	if(diaggui || diaggui_field)
+	{
+		prterr("DIAG gainingfocusfunction for Resource [%s] on Screen [%s] [%s].",member->rscrname,rsrc->module,rsrc->screen);
+	}
+#endif /* USE_RDA_DIAGNOSTICS */
+	wFormW=(Wt::WFormWidget *)member->w;
+	if(NoLosingFocus!=NULL && NoLosingFocus!=member)
+	{
+		losingfocusfunction(NoLosingFocus);
+	}
+	NoLosingFocus=member;
 
 	if(rsrc->input_focus!=NULL) Rfree(rsrc->input_focus);
 	rsrc->input_focus=stralloc(member->rscrname);
@@ -634,6 +633,7 @@ void gainingfocusfunction(RDArmem *member)
 		prterr("DIAG exiting gainingfocusfunction for Resource [%s] on Screen [%s] [%s].",member->rscrname,rsrc->module,rsrc->screen);
 	}
 #endif /* USE_RDA_DIAGNOSTICS */
+	membersetcursor(member);
 }
 void activatefunction(RDArmem *member)
 {
@@ -1313,7 +1313,7 @@ void RDArsrcKeyPressed(RDArsrc *r,Wt::WKeyEvent &e)
 short xmakescrn(RDArsrc  *scrnrscr,short modalx,short (*EvalFunc)(...),void *EvalFuncArgs,void (*SetOSWidgets)(RDArsrc *),char *(*EvalStr)(...),void *EvalStrArgs,void (*SubFunc)(...),void *SubFuncArgs,RDArsrc  *parent,int line,char *file)
 {
 	char *dashes,*temp=NULL,*title=NULL;
-	int x=0;
+	int x=0,y=0;
 	RDArmem *member=NULL;
 #ifdef _DEFER_RENDERING_ATTEMPT_
 	Wt::WApplication *myAPP=NULL;
@@ -1324,6 +1324,7 @@ short xmakescrn(RDArsrc  *scrnrscr,short modalx,short (*EvalFunc)(...),void *Eva
 	Wt::WFormWidget *WF=NULL;
 	Wt::WContainerWidget *rC=NULL,*dC=NULL;
 	Wt::WKeyEvent *e=NULL;
+	RDAScrolledList *SList=NULL;
 	int FrameW=0,FrameH=0,dt_W=0,dt_H=0,posx=0,posy=0;
 	std::string *s1=NULL;
 	char using_js=FALSE,using_ajax=FALSE;
@@ -1437,21 +1438,11 @@ short xmakescrn(RDArsrc  *scrnrscr,short modalx,short (*EvalFunc)(...),void *Eva
 			scrnrscr->primary->setClosable(FALSE);
 			scrnrscr->primary->setTitleBarEnabled(TRUE);
 			scrnrscr->primary->setInline(FALSE);
-#ifdef __NEED_WDIALOG_LAYOUT__
-/*
-			scrnrscr->primary->setResizable(FALSE);
-*/
 			scrnrscr->primary->setResizable(TRUE);
 			scrnrscr->primary->setMaximumSize(Wt::WLength::Auto,Wt::WLength(98,Wt::WLength::Percentage));
 			scrnrscr->swidget=scrnrscr->primary->contents();
 			scrnrscr->swidget->setOverflow(WContainerWidget::OverflowVisible,Vertical);	
 			scrnrscr->swidget->setOverflow(WContainerWidget::OverflowVisible,Horizontal);	
-#else
-			scrnrscr->primary->setResizable(TRUE);
-			scrnrscr->swidget=scrnrscr->primary->contents();
-			scrnrscr->swidget->setOverflow(WContainerWidget::OverflowAuto,Vertical);	
-			scrnrscr->swidget->setOverflow(WContainerWidget::OverflowAuto,Horizontal);	
-#endif /* __NEED_WDIALOG_LAYOUT__ */
 		}
 		scrnrscr->has_large_table=FALSE;
 /*setup screen*/
@@ -1465,6 +1456,18 @@ short xmakescrn(RDArsrc  *scrnrscr,short modalx,short (*EvalFunc)(...),void *Eva
 			scrnrscr->swidget->show();
 		}
 		++WindowCount;
+		if(scrnrscr->lists!=NULL)
+		{
+			for(y=0,SList=scrnrscr->lists;y<scrnrscr->numlists;++y,++SList)
+			{
+				x=FINDRSC(scrnrscr,SList->name);
+				if(x>(-1))
+				{
+					member=scrnrscr->rscs+x;
+					ExecuteRDArmemFunction(member);	
+				}	
+			}
+		}
 		if(scrnrscr->input_focus!=NULL)
 		{
 			x=FINDRSC(scrnrscr,scrnrscr->input_focus);

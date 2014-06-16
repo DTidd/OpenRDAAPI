@@ -202,9 +202,9 @@ static void ADD_ADD_FEEDBACK()
 		if(temp3!=NULL) Rfree(temp3);
 
 /* SOFTWARE NAME EDIT WIDGET */
-		temp1=Rmalloc(380+1);
+		temp1=Rmalloc(680+1);
 		sprintf(temp1,"%s",
-			"IF([OPENRDA SETUP]=TRUE) THEN RETURN_VALUE=\"OpenRDA\" \nELSE IF([SOFTWARE TYPE]<2) THEN RETURN_VALUE=\"xpert\" \nELSE RETURN_VALUE=\"mbgui\" FI FI");
+			"IF([OPENRDA 4.0 SETUP]=TRUE) THEN RETURN_VALUE=\"OpenRDA 4.0\" ELSE IF([OPENRDA SETUP]=TRUE) THEN RETURN_VALUE=\"OpenRDA\" \nELSE IF([SOFTWARE TYPE]<2) THEN RETURN_VALUE=\"xpert\" \nELSE RETURN_VALUE=\"mbgui\" FI FI FI");
 		temp2=Rmalloc(3+1);
 		sprintf(temp2,"%s",
 			"");
@@ -589,9 +589,9 @@ static void ADD_FEEDBACKC()
 		if(temp3!=NULL) Rfree(temp3);
 
 /* SOFTWARE NAME EDIT WIDGET */
-		temp1=Rmalloc(380+1);
+		temp1=Rmalloc(680+1);
 		sprintf(temp1,"%s",
-			"IF([OPENRDA SETUP]=TRUE) THEN RETURN_VALUE=\"OpenRDA\" \nELSE IF([SOFTWARE TYPE]<2) THEN RETURN_VALUE=\"xpert\" \nELSE RETURN_VALUE=\"mbgui\" FI FI");
+			"IF([OPENRDA 4.0 SETUP]=TRUE) THEN RETURN_VALUE=\"OpenRDA 4.0\" ELSE IF([OPENRDA SETUP]=TRUE) THEN RETURN_VALUE=\"OpenRDA\" \nELSE IF([SOFTWARE TYPE]<2) THEN RETURN_VALUE=\"xpert\" \nELSE RETURN_VALUE=\"mbgui\" FI FI FI");
 		temp2=Rmalloc(3+1);
 		sprintf(temp2,"%s",
 			"");

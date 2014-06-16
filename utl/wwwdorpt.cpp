@@ -50,7 +50,6 @@ short WWWInitializeSubsystems(int argc,char **argv,char *module,char *process)
 	Pay_Balance_of_Contract=FALSE;
 	Dump_Deferred_Pay_Balance=FALSE;
 #endif
-	RDA_NOGUI=TRUE;
 	SECURITY_USERLOGIN=USERLOGIN;
 	INITGUI(argc,argv,CURRENTDIRECTORY);
 	SETCWD();
@@ -89,7 +88,6 @@ int c_main(int argc,char **argv)
 int main(int argc,char **argv)
 #endif
 {
-	RDA_NOGUI=TRUE;
 #ifdef LINUX 
 	umask(002);
 #endif
@@ -107,7 +105,6 @@ int main(int argc,char **argv)
 		ShutdownSubsystems();
 		return(1);
 	}
-	RDA_NOGUI=TRUE;
 	RUNREPORTADV3(argv[1],argv[2],NULL,NULL,FALSE,TRUE,NULL,NULL,NULL,NULL,0,(void (*)(...))WWWprocess_dataline);
 	ShutdownSubsystems();
 	return(0);

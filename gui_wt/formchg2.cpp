@@ -955,8 +955,8 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				} else if(member->field_type==ZIPCODE)
 				{
 					member->definition=stralloc("nnnnn-nnnn");	
-					member->validobject = new Wt::WRegExpValidator("([0-9]{5})|([0-9]{5}-[0-9]{4})");
-					sprintf(stemp,"99999-9999");
+					member->validobject = new Wt::WRegExpValidator("([0-9]{5}-)|([0-9]{5}-[0-9]{4})");
+					sprintf(stemp,"99999-0000");
 					c=new Wt::WString(stemp);
 					LE->setInputMask(*c,Wt::WLineEdit::KeepMaskWhileBlurred);
 				}
@@ -1302,7 +1302,7 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				{
 					member->validobject = new Wt::WRegExpValidator(temp);
 				} else {
-					member->validobject = new Wt::WValidator();
+					member->validobject = new Wt::WValidator((Wt::WObject *)member->w);
 				}
 				mssc=ModuleScreenStyleClass(rsx);
 				fssc=InputFieldStyleClass(member);
@@ -1440,15 +1440,13 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				{
 					tColumn->setWidth(h);
 				}
-				member->validobject = new Wt::WValidator();
-				if(member->validobject!=NULL) LE->setValidator(member->validobject);
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
 					prterr("DIAG Setting Resource [%s]'s Initial value [%s].",member->rscrname,member->value.string_value);
 				}
 #endif /* USE_RDA_DIAGNOSTICS */
-				if(member->validobject!=NULL) LE->validate();
+				member->validobject = NULL;
 				if(!member->editable)
 				{
 					ADVMEMBERSETEDITABLE(member,FALSE,FALSE);
@@ -1510,15 +1508,14 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				NF->setDigits(digs);
 				NF->setDecimal(TRUE);
 				NF->setAllowNegative(TRUE);
-				NF->setValue((double)*member->value.float_value/100);
+				NF->setValue((double)*member->value.float_value);
 				LE->setTextSize(h);
 				
 				if(Parent_Table!=NULL)
 				{
 					tColumn->setWidth(h);
 				}
-				member->validobject = new Wt::WValidator();
-				if(member->validobject!=NULL) LE->setValidator(member->validobject);
+				member->validobject = NULL;
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -1589,15 +1586,13 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				{
 					tColumn->setWidth(h);
 				}
-				member->validobject = new Wt::WValidator((Wt::WObject *)member->w);
-				if(member->validobject!=NULL) LE->setValidator(member->validobject);
+				member->validobject = NULL;
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
 					prterr("DIAG Setting Resource [%s]'s Initial value [%s].",member->rscrname,member->value.string_value);
 				}
 #endif /* USE_RDA_DIAGNOSTICS */
-				if(member->validobject!=NULL) LE->validate();
 				if(!member->editable)
 				{
 					ADVMEMBERSETEDITABLE(member,FALSE,FALSE);
@@ -1661,15 +1656,13 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				{
 					tColumn->setWidth(h);
 				}
-				member->validobject = new Wt::WValidator((Wt::WObject *)member->w);
-				if(member->validobject!=NULL) LE->setValidator(member->validobject);
+				member->validobject = NULL;
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
 					prterr("DIAG Setting Resource [%s]'s Initial value [%s].",member->rscrname,member->value.string_value);
 				}
 #endif /* USE_RDA_DIAGNOSTICS */
-				if(member->validobject!=NULL) LE->validate();
 				if(!member->editable)
 				{
 					ADVMEMBERSETEDITABLE(member,FALSE,FALSE);
@@ -1733,15 +1726,13 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				{
 					tColumn->setWidth(h);
 				}
-				member->validobject = new Wt::WValidator((Wt::WObject *)member->w);
-				if(member->validobject!=NULL) LE->setValidator(member->validobject);
+				member->validobject = NULL;
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
 					prterr("DIAG Setting Resource [%s]'s Initial value [%s].",member->rscrname,member->value.string_value);
 				}
 #endif /* USE_RDA_DIAGNOSTICS */
-				if(member->validobject!=NULL) LE->validate();
 				if(!member->editable)
 				{
 					ADVMEMBERSETEDITABLE(member,FALSE,FALSE);
@@ -1805,15 +1796,13 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				{
 					tColumn->setWidth(h);
 				}
-				member->validobject = new Wt::WValidator((Wt::WObject *)member->w);
-				if(member->validobject!=NULL) LE->setValidator(member->validobject);
+				member->validobject = NULL;
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
 					prterr("DIAG Setting Resource [%s]'s Initial value [%s].",member->rscrname,member->value.string_value);
 				}
 #endif /* USE_RDA_DIAGNOSTICS */
-				if(member->validobject!=NULL) LE->validate();
 				if(!member->editable)
 				{
 					ADVMEMBERSETEDITABLE(member,FALSE,FALSE);
@@ -1889,8 +1878,7 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				{
 					tColumn->setWidth(h);
 				}
-				member->validobject = new Wt::WValidator((Wt::WObject *)member->w);
-				if(member->validobject!=NULL) LE->setValidator(member->validobject);
+				member->validobject = NULL;
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -1902,7 +1890,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					}
 				}
 #endif /* USE_RDA_DIAGNOSTICS */
-				if(member->validobject!=NULL) LE->validate();
 				if(!member->editable)
 				{
 					ADVMEMBERSETEDITABLE(member,FALSE,FALSE);
@@ -1978,8 +1965,7 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				{
 					tColumn->setWidth(h);
 				}
-				member->validobject = new Wt::WValidator((Wt::WObject *)member->w);
-				if(member->validobject!=NULL) LE->setValidator(member->validobject);
+				member->validobject = NULL;
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diaggui || diaggui_field)
 				{
@@ -1991,7 +1977,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					}
 				}
 #endif /* USE_RDA_DIAGNOSTICS */
-				if(member->validobject!=NULL) LE->validate();
 				if(!member->editable)
 				{
 					ADVMEMBERSETEDITABLE(member,FALSE,FALSE);
@@ -2713,19 +2698,25 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				}
 				if(!RDAstrcmp(member->rscrname,"BROWSE LIST") && USE_BROWSELISTLABEL)
 				{
+					if(Parent_Table!=NULL)
+					{
+						form1 = new Wt::WContainerWidget(tCell);
+					} else {
+						form1 = new Wt::WContainerWidget(parent);
+					}
 					browse_list_desc=rsx->rscs+FINDRSC(rsx,"BROWSE LIST DESCRIPTION");
 					if(Parent_Table!=NULL)
 					{
 						form1=new Wt::WContainerWidget();
 						form1->setOverflow(WContainerWidget::OverflowVisible,Vertical);	
-						form1->setOverflow(WContainerWidget::OverflowVisible,Horizontal);	
+						form1->setOverflow(WContainerWidget::OverflowAuto,Horizontal);	
 						form=new Wt::WVBoxLayout();
 						form1->setLayout(form);
 						tCell->addWidget((Wt::WWidget *)form1);
 					} else {
 						form1=new Wt::WContainerWidget((Wt::WContainerWidget *)parent);
 						form1->setOverflow(WContainerWidget::OverflowVisible,Vertical);	
-						form1->setOverflow(WContainerWidget::OverflowVisible,Horizontal);	
+						form1->setOverflow(WContainerWidget::OverflowAuto,Horizontal);	
 						form=new Wt::WVBoxLayout();
 						form1->setLayout(form);
 					}
@@ -2741,7 +2732,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					WW->addStyleClass(GUIstemp);
 					if(mssc!=NULL) Rfree(mssc);
 					if(fssc!=NULL) Rfree(fssc);
-					WW->setMaximumSize(Wt::WLength(1600),Wt::WLength::Auto);
 					browse_list_desc->w=(Wt::WWidget *)bLE;
 					c=new Wt::WString(browse_list_desc->value.string_value,UTF8);
 					bLE->setText(*c);
@@ -2756,7 +2746,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					WW->addStyleClass(GUIstemp);
 					if(mssc!=NULL) Rfree(mssc);
 					if(fssc!=NULL) Rfree(fssc);
-					WW->setMaximumSize(Wt::WLength(1600),Wt::WLength::Auto);
 					cB=(Wt::WComboBox *)LB;
 					wSIM=new Wt::WStandardItemModel();
 					cB->setModel(wSIM);
@@ -2830,7 +2819,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					if(mssc!=NULL) Rfree(mssc);
 					if(fssc!=NULL) Rfree(fssc);
 					wFormW=(Wt::WFormWidget *)cB;
-					WW->setMaximumSize(Wt::WLength(1600),Wt::WLength::Auto);
 					for(w=0;w<member->items;++w)
 					{
 						temp_xstr = new Wt::WString((*(member->list[0]+w)),UTF8);
@@ -2840,7 +2828,11 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					if(*member->value.integer_value<0 || *member->value.integer_value>member->items) *member->value.integer_value=0;
 					cB->setCurrentIndex(*member->value.integer_value);
 					cB->setValueText(cB->itemText(*member->value.integer_value));
+/*
+
+Exchange this slot on the clicked signal with a function a function to set RDAScrolledLists following initialization of the screen.
 					cB->clicked().connect(boost::bind(&list_callback,member));
+*/
 					cB->activated().connect(boost::bind(&list_callback,member));
 					if(!member->editable)
 					{
@@ -2862,11 +2854,23 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				} else {
 					if(Parent_Table!=NULL)
 					{
-						LB=new Wt::WSelectionBox((Wt::WContainerWidget *)tCell);
-						tCell->addWidget((Wt::WWidget *)LB);
+						form1=new Wt::WContainerWidget();
+						form1->setOverflow(WContainerWidget::OverflowVisible,Vertical);	
+						form1->setOverflow(WContainerWidget::OverflowAuto,Horizontal);	
+						form=new Wt::WVBoxLayout();
+						form1->setLayout(form);
+						tCell->addWidget((Wt::WWidget *)form1);
 					} else {
-						LB=new Wt::WSelectionBox((Wt::WContainerWidget *)parent);
+						form1=new Wt::WContainerWidget((Wt::WContainerWidget *)parent);
+						form1->setOverflow(WContainerWidget::OverflowVisible,Vertical);	
+						form1->setOverflow(WContainerWidget::OverflowAuto,Horizontal);	
+						form=new Wt::WVBoxLayout();
+						form1->setLayout(form);
 					}
+					daL=(Wt::WLayout *)form1;
+					daL->setContentsMargins(0,0,0,0);
+					LB=new Wt::WSelectionBox((Wt::WContainerWidget *)form1);
+					form->addWidget(LB);
 					member->w=(Wt::WWidget *)LB;
 					WW=(Wt::WWidget *)LB;
 					mssc=ModuleScreenStyleClass(rsx);
@@ -2882,7 +2886,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					cB->setModel(wSIM);
 					member->wSIM=wSIM;
 					LB->setVerticalSize(member->rows);
-					WW->setMaximumSize(Wt::WLength(1600),Wt::WLength::Auto);
 					if(*member->value.integer_value<0)
 					{
 						*member->value.integer_value=member->items-1;
