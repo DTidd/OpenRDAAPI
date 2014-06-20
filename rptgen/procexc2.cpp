@@ -2600,7 +2600,6 @@ static void abort_procexcp2(MakeBrowseList *blist)
 						FreeBrowseExit(BE);
 						if(MTNMASTER!=NULL) FreeMaintainMaster(MTNMASTER);
 						if(PSTRUCT!=NULL) Rfree(PSTRUCT);
-						ShutdownSubsystems();
 					}
 				} else {
 					prterr("Error HoldReport structure is NULL at line [%d] program [%s].",__LINE__,__FILE__);
@@ -4794,10 +4793,10 @@ void process_exceptions_TableEdit(MTNPassableStruct *PSTRUCTbl,int level,void (*
 		xSetVirFieldFuncs(mtnrsrc,updateallcb2,(void *)PSTRUCT,1,MTNMASTER,NULL,__LINE__,__FILE__);
 		addbtnrsrc(mtnrsrc,"DEFAULTS",TRUE,SaveDefaults,NULL);
 		addbtnrsrc(mtnrsrc,"RESET DEFAULTS",TRUE,resetdefs,PSTRUCT);
-		addrfcbrsrc(mtnrsrc,"QUIT",TRUE,quit_record_test3,PSTRUCT);
+		addbtnrsrc(mtnrsrc,"QUIT",TRUE,quit_record_test3,PSTRUCT);
 		addbtnrsrc(mtnrsrc,"CONTINUE",TRUE,TE_Continue,PSTRUCT);
-		addrfcbrsrc(mtnrsrc,"HELP",TRUE,screenhelp,NULL);
-		addrfcbrsrc(mtnrsrc,"PRINT RESOURCES",TRUE,printrsrcs,NULL);
+		addbtnrsrc(mtnrsrc,"HELP",TRUE,screenhelp,NULL);
+		addbtnrsrc(mtnrsrc,"PRINT RESOURCES",TRUE,printrsrcs,NULL);
        		PSTRUCT->rsrc=mtnrsrc;
        		PSTRUCT->MTNMASTER=MTNMASTER;
 		MakePrevNextButtons(mtnrsrc,keys,nokeys,PSTRUCT);

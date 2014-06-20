@@ -921,27 +921,25 @@ char *xUsers_Department(int line,char *file)
 	if(DEPART_FILENO==(-1)) DEPART_FILENO=OPNNRD("SECURITY","DEPARTMENT");
 	if(isEMPTY(UsersDepartment))
 	{
-	if(SEC_USERS_FILENO!=(-1))
-	{
-	prterr("USERLOGIN [%s]",USERLOGIN);
-		FINDFLDSETSTRING(SEC_USERS_FILENO,"USER IDENTIFICATION",USERLOGIN);
-		if(!EQLNRD(SEC_USERS_FILENO,1))
+		if(SEC_USERS_FILENO!=(-1))
 		{
-			FINDFLDGETSTRING(SEC_USERS_FILENO,"DEPARTMENT",&department);
+			FINDFLDSETSTRING(SEC_USERS_FILENO,"USER IDENTIFICATION",USERLOGIN);
+			if(!EQLNRD(SEC_USERS_FILENO,1))
+			{
+				FINDFLDGETSTRING(SEC_USERS_FILENO,"DEPARTMENT",&department);
+			}
 		}
-	prterr("DEPARTMENT [%s]",department);
-	}
-	if(isEMPTY(department))
-	{
-		if(!RDAstrcmp(SECURITY_USERLOGIN,"root"))
+		if(isEMPTY(department))
 		{
-			department=stralloc("admin");
-		} else if(!RDAstrcmp(SECURITY_USERLOGIN,"GUEST"))
-		{
-			department=stralloc("guest");
+			if(!RDAstrcmp(SECURITY_USERLOGIN,"root"))
+			{
+				department=stralloc("admin");
+			} else if(!RDAstrcmp(SECURITY_USERLOGIN,"GUEST"))
+			{
+				department=stralloc("guest");
+			}
 		}
-	}
-	UsersDepartment=stralloc(department);
+		UsersDepartment=stralloc(department);
 	} else {
 		department=stralloc(UsersDepartment);
 	}

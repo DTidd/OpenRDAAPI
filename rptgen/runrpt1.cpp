@@ -258,7 +258,7 @@ void xexit_cleanly(RDArunrpt *runrpt,RDAreport *rpt,short exit_report,char *err_
 #ifdef USE_RDA_DIAGNOSTICS
 	if(diagrptgen)
 	{
-		prterr("DIAG xexit_cleanly called at line [%d] program [%s].",line,file);
+		prterr("DIAG xexit_cleanly called exit_report [%d] error-header [%s] err_message [%s] remove_sort [%d] error_type [%d] level [%d] at line [%d] program [%s].",exit_report,(err_header!=NULL ? err_header:""),(err_message!=NULL ? err_message:""),remove_sort,error_type,level,line,file);
 	}
 #endif /* ifdef USE_RDA_DIAGNOSTICS */
 	if(runrpt->sortno!=(-1)) CLSNRD(runrpt->sortno);
@@ -305,7 +305,7 @@ void xexit_cleanly(RDArunrpt *runrpt,RDAreport *rpt,short exit_report,char *err_
 		} else {
 			if(runrpt->exit_status!=2)
 			{
-				if(exit_report==TRUE) 
+				if(exit_report==TRUE && level==0) 
 				{
 					prterr(err_message);
 					shutdown_report(runrpt->rsrsrc);
@@ -316,7 +316,7 @@ void xexit_cleanly(RDArunrpt *runrpt,RDAreport *rpt,short exit_report,char *err_
 	if(runrpt!=NULL) CLSReportfiles(runrpt,FALSE);
 	if(isEMPTY(err_header))
 	{
-		if((exit_report==TRUE) && (runrpt->exit_status!=2))
+		if((exit_report==TRUE) && (runrpt->exit_status!=2) && level==0)
 		{
 			shutdown_report(runrpt->rsrsrc);
 			return;
@@ -1014,6 +1014,10 @@ void xRUNREPORT(char *module,char *name,char *server_name,char *sortfile,short A
 #endif /* ifdef USE_RDA_DIAGNOSTICS */
 #endif /* XXXX */
 
+	if(diagrptgen)
+	{
+		prterr("DIAG RUNREPORT level [%d] exitstatus [%d] APPmainLoop [%d] at line [%d] program [%s].",level,exitstatus,APPmainLoop,line,file);TRACE;
+	}
 	x=0;
 	ArchiveSource=4;
 	ArchiveExtension=0;
@@ -7854,12 +7858,14 @@ void xReportBackEnd(RDArunrpt *runrpt,RDAreport *rpt,int line,char *file)
 			break;
 	}
 /* if chain_report then run next report */
+#ifdef XXXX
 	if(runrpt->diagrsrc!=NULL)
 	{
 		if(!abort_diagnostic) killwindow(runrpt->diagrsrc);
 		free_rsrc(runrpt->diagrsrc);
 		runrpt->diagrsrc=NULL;
 	}
+#endif /* XXXX */
 	if(rpt->remove_file==1)
 	{
 		if(unlink(rpt->remove_name)==(-1)) if(errno!=ENOENT) { prterr("Error can't remove file(%s)%s",rpt->remove_name,errname()); }

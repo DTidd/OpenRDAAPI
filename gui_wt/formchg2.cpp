@@ -13,6 +13,7 @@ var h=window.innerHeight || document.documentElement.clientHeight ||
 	document.body.clientHeight;
 
 */
+#define ORIGINAL_SCROLLEDLIST 
 
 #define _USING_OUR_CALLBACKS_
 RDArmem *NoLosingFocus=NULL;
@@ -2698,6 +2699,7 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 				}
 				if(!RDAstrcmp(member->rscrname,"BROWSE LIST") && USE_BROWSELISTLABEL)
 				{
+#ifdef ORIGINAL_SCROLLEDLIST 
 					if(Parent_Table!=NULL)
 					{
 						form1 = new Wt::WContainerWidget(tCell);
@@ -2707,14 +2709,12 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					browse_list_desc=rsx->rscs+FINDRSC(rsx,"BROWSE LIST DESCRIPTION");
 					if(Parent_Table!=NULL)
 					{
-						form1=new Wt::WContainerWidget();
 						form1->setOverflow(WContainerWidget::OverflowVisible,Vertical);	
 						form1->setOverflow(WContainerWidget::OverflowAuto,Horizontal);	
 						form=new Wt::WVBoxLayout();
 						form1->setLayout(form);
 						tCell->addWidget((Wt::WWidget *)form1);
 					} else {
-						form1=new Wt::WContainerWidget((Wt::WContainerWidget *)parent);
 						form1->setOverflow(WContainerWidget::OverflowVisible,Vertical);	
 						form1->setOverflow(WContainerWidget::OverflowAuto,Horizontal);	
 						form=new Wt::WVBoxLayout();
@@ -2738,6 +2738,38 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					if(c!=NULL) c->~WString();
 					form->addWidget((Wt::WWidget *)bLE,10,Wt::AlignLeft | Wt::AlignJustify);
 					LB=new Wt::WSelectionBox(form1);
+					form->addWidget((Wt::WWidget *)LB,10,Wt::AlignLeft | Wt::AlignJustify);
+#else /* ORIGINAL_SCROLLEDLIST */
+					if(Parent_Table!=NULL)
+					{
+						form1 = new Wt::WContainerWidget(tCell);
+						form1->setOverflow(WContainerWidget::OverflowAuto,Horizontal);	
+						tCell->addWidget((Wt::WWidget *)form1);
+					} else {
+						form1 = new Wt::WContainerWidget(parent);
+						form1->setOverflow(WContainerWidget::OverflowAuto,Horizontal);	
+					}
+					browse_list_desc=rsx->rscs+FINDRSC(rsx,"BROWSE LIST DESCRIPTION");
+					form=new Wt::WVBoxLayout();
+					form1->setLayout(form);
+					bLE=new Wt::WLineEdit((Wt::WWidget *)form1);
+					form->addWidget((Wt::WWidget *)bLE,10,Wt::AlignLeft | Wt::AlignJustify);
+					bLE->setReadOnly(TRUE);
+					WW=(Wt::WWidget *)bLE;
+					mssc=ModuleScreenStyleClass(rsx);
+					fssc=InputFieldStyleClass(member);
+					memset(GUIstemp,0,1024);
+					sprintf(GUIstemp,"OpenRDA %s %s BrowseListLabel",mssc,fssc);
+					WW->addStyleClass(GUIstemp);
+					if(mssc!=NULL) Rfree(mssc);
+					if(fssc!=NULL) Rfree(fssc);
+					browse_list_desc->w=(Wt::WWidget *)bLE;
+					c=new Wt::WString(browse_list_desc->value.string_value,UTF8);
+					bLE->setText(*c);
+					if(c!=NULL) c->~WString();
+					LB=new Wt::WSelectionBox(form1);
+					form->addWidget((Wt::WWidget *)LB,10,Wt::AlignLeft | Wt::AlignJustify);
+#endif /* ORIGINAL_SCROLLEDLIST */
 					WW=(Wt::WWidget *)LB;
 					mssc=ModuleScreenStyleClass(rsx);
 					fssc=InputFieldStyleClass(member);
@@ -2754,7 +2786,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 					WW=(Wt::WWidget *)LB;
 	
 					wFormW=(Wt::WFormWidget *)LB;
-					form->addWidget((Wt::WWidget *)LB,10,Wt::AlignLeft | Wt::AlignJustify);
 					LB->setVerticalSize(member->rows);
 					if(*member->value.integer_value<0)
 					{
@@ -2852,6 +2883,7 @@ Exchange this slot on the clicked signal with a function a function to set RDASc
 						ADVMEMBERSETEDITABLE(member,member->user_editable,TRUE);
 					}
 				} else {
+#ifdef ORIGINAL_SCROLLEDLIST 
 					if(Parent_Table!=NULL)
 					{
 						form1=new Wt::WContainerWidget();
@@ -2871,6 +2903,21 @@ Exchange this slot on the clicked signal with a function a function to set RDASc
 					daL->setContentsMargins(0,0,0,0);
 					LB=new Wt::WSelectionBox((Wt::WContainerWidget *)form1);
 					form->addWidget(LB);
+#else /* ORIGINAL_SCROLLEDLIST */
+					if(Parent_Table!=NULL)
+					{
+						form1=new Wt::WContainerWidget();
+						form1->setOverflow(WContainerWidget::OverflowAuto,Horizontal);	
+						tCell->addWidget((Wt::WWidget *)form1);
+					} else {
+						form1=new Wt::WContainerWidget((Wt::WContainerWidget *)parent);
+						form1->setOverflow(WContainerWidget::OverflowAuto,Horizontal);	
+					}
+					form=new Wt::WVBoxLayout();
+					form1->setLayout(form);
+					LB=new Wt::WSelectionBox((Wt::WContainerWidget *)form1);
+					form->addWidget((Wt::WWidget *)LB,10,Wt::AlignLeft | Wt::AlignJustify);
+#endif /* ORIGINAL_SCROLLEDLIST */
 					member->w=(Wt::WWidget *)LB;
 					WW=(Wt::WWidget *)LB;
 					mssc=ModuleScreenStyleClass(rsx);

@@ -386,38 +386,54 @@ void xCLSReportfiles(RDArunrpt *rrpt,short type,int line,char *file)
 #endif /* ifdef USE_RDA_DIAGNOSTICS */
 	if(!type)
 	{
-		for(x=0,tmp=rrpt->files;x<rrpt->numfiles;++x,++tmp)
+		if(rrpt->files!=NULL)
 		{
-			if(tmp->fileno!=(-1)) 
+			for(x=0,tmp=rrpt->files;x<rrpt->numfiles;++x,++tmp)
 			{
-				for(y=(x+1),hold=(rrpt->files+x+1);y<rrpt->numfiles;++y,++hold)
+				if(tmp->fileno!=(-1)) 
 				{
-					if(!RDAstrcmp(hold->module,tmp->module) &&
-						!RDAstrcmp(hold->filename,tmp->filename) && tmp->fileno==hold->fileno)
+					for(y=(x+1),hold=(rrpt->files+x+1);y<rrpt->numfiles;++y,++hold)
 					{
-						hold->fileno=(-1);
+						if(!RDAstrcmp(hold->module,tmp->module) &&
+							!RDAstrcmp(hold->filename,tmp->filename) && tmp->fileno==hold->fileno)
+						{
+							hold->fileno=(-1);
+						}
 					}
+					CLSNRD(tmp->fileno);
 				}
-				CLSNRD(tmp->fileno);
 				tmp->fileno=(-1);
+				if(tmp->module!=NULL) Rfree(tmp->module);
+				if(tmp->filename!=NULL) Rfree(tmp->filename);
 			}
+			Rfree(rrpt->files);
+			rrpt->files=NULL;
+			rrpt->numfiles=0;
 		}
 	} else {
-		for(x=0,tmp=rrpt->ofiles;x<rrpt->numofiles;++x,++tmp)
+		if(rrpt->ofiles!=NULL)
 		{
-			if(tmp->fileno!=(-1)) 
+			for(x=0,tmp=rrpt->ofiles;x<rrpt->numofiles;++x,++tmp)
 			{
-				for(y=0,hold=rrpt->ofiles;y<rrpt->numofiles;++y,++hold)
+				if(tmp->fileno!=(-1)) 
 				{
-					if(!RDAstrcmp(hold->module,tmp->module) &&
-						!RDAstrcmp(hold->filename,tmp->filename) && hold->fileno==tmp->fileno)
+					for(y=0,hold=rrpt->ofiles;y<rrpt->numofiles;++y,++hold)
 					{
-						hold->fileno=(-1);
+						if(!RDAstrcmp(hold->module,tmp->module) &&
+							!RDAstrcmp(hold->filename,tmp->filename) && hold->fileno==tmp->fileno)
+						{
+							hold->fileno=(-1);
+						}
 					}
+					CLSNRD(tmp->fileno);
+					tmp->fileno=(-1);
 				}
-				CLSNRD(tmp->fileno);
-				tmp->fileno=(-1);
+				if(tmp->module!=NULL) Rfree(tmp->module);
+				if(tmp->filename!=NULL) Rfree(tmp->filename);
 			}
+			if(rrpt->ofiles!=NULL) Rfree(rrpt->ofiles);
+			rrpt->ofiles=NULL;
+			rrpt->numofiles=0;
 		}
 	}
 }
@@ -4238,7 +4254,7 @@ static short writeonlyREADRecords(RDArunrpt *rrpt,RDAreport *rpt,int line,char *
 			if(rpt->range_screen)
 			{
 #endif
-#endif
+#endif 
 			if(rpt->diag_breakable<2)
 			{
 /*
@@ -4277,6 +4293,7 @@ static short writeonlyREADRecords(RDArunrpt *rrpt,RDAreport *rpt,int line,char *
 			}
 			if(process_records(rrpt,rpt,prim,h)==(-1)) 
 			{
+#ifdef XXXX
 				if(rrpt->diagrsrc!=NULL)
 				{
 					if(!abort_diagnostic)
@@ -4284,6 +4301,7 @@ static short writeonlyREADRecords(RDArunrpt *rrpt,RDAreport *rpt,int line,char *
 					free_rsrc(rrpt->diagrsrc);
 					rrpt->diagrsrc=NULL;
 				}
+#endif /* XXXX */
 #ifdef USE_RDA_DIAGNOSTICS
 				if(diagrptgen_sltall)
 				{
@@ -4305,12 +4323,14 @@ static short writeonlyREADRecords(RDArunrpt *rrpt,RDAreport *rpt,int line,char *
 				--rrpt->detail_count;
 				return(-1);
 			}
+#ifdef XXXX
 			if(rrpt->diagrsrc!=NULL)
 			{
 				if(!abort_diagnostic) killwindow(rrpt->diagrsrc);
 				free_rsrc(rrpt->diagrsrc);
 				rrpt->diagrsrc=NULL;
 			}
+#endif /* XXXX */
 		}
 		--rrpt->detail_count;
 	}
@@ -4453,6 +4473,7 @@ static short regularREADRecords(RDArunrpt *rrpt,RDAreport *rpt,int line,char *fi
 				s=NULL;
 			}
 			ZERNRD(prim->fileno);
+#ifdef XXXX
 #ifdef WIN32
 #ifdef __GTK_H__
 			if(rpt->range_screen)
@@ -4485,6 +4506,7 @@ static short regularREADRecords(RDArunrpt *rrpt,RDAreport *rpt,int line,char *fi
 			} else rrpt->diagrsrc=NULL;
 #endif
 #endif
+#endif /* XXXX */
 			if(rrpt->diagrsrc!=NULL)
 			{
 				if(ADVmakescrn(rrpt->diagrsrc,TRUE))
@@ -4582,6 +4604,7 @@ static short regularREADRecords(RDArunrpt *rrpt,RDAreport *rpt,int line,char *fi
 					{
 						if(process_records(rrpt,rpt,prim,h)==(-1)) 
 						{
+#ifdef XXXX
 							if(rrpt->diagrsrc!=NULL)
 							{
 								if(!abort_diagnostic)
@@ -4589,6 +4612,7 @@ static short regularREADRecords(RDArunrpt *rrpt,RDAreport *rpt,int line,char *fi
 								free_rsrc(rrpt->diagrsrc);
 								rrpt->diagrsrc=NULL;
 							}
+#endif /* XXXX */
 #ifdef USE_RDA_DIAGNOSTICS
 							if(diagrptgen_sltall)
 							{
@@ -4650,12 +4674,14 @@ static short regularREADRecords(RDArunrpt *rrpt,RDAreport *rpt,int line,char *fi
 					{
 						if(process_records(rrpt,rpt,prim,h)==(-1)) 
 						{
+#ifdef XXXX
 							if(rrpt->diagrsrc!=NULL)
 							{
 								if(!abort_diagnostic) if(IsScreenDisplayed(rrpt->diagrsrc)) killwindow(rrpt->diagrsrc);
 								free_rsrc(rrpt->diagrsrc);
 								rrpt->diagrsrc=NULL;
 							}
+#endif /* XXXX */
 #ifdef USE_RDA_DIAGNOSTICS
 							if(diagrptgen_sltall)
 							{
@@ -4726,12 +4752,14 @@ static short regularREADRecords(RDArunrpt *rrpt,RDAreport *rpt,int line,char *fi
 					}
 				}
 			}
+#ifdef XXXX
 			if(rrpt->diagrsrc!=NULL)
 			{
 				if(!abort_diagnostic) killwindow(rrpt->diagrsrc);
 				free_rsrc(rrpt->diagrsrc);
 				rrpt->diagrsrc=NULL;
 			}
+#endif /* XXXX */
 		}
 		--rrpt->detail_count;
 	}

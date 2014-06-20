@@ -1,4 +1,6 @@
 #include "NumericField.h"
+#include<guip.hpp>
+#include<misc.hpp>
 
 #include <algorithm>
 #include <cmath>
@@ -100,7 +102,24 @@ Wt::WString NumericField::formatDouble(double d) const
   }
   int precision = 0;
   if (!currency_ && decimal_) {
-    precision = digits_ - intPartLength;
+/* added code below */
+    std::stringstream ss1;
+    char *temp=NULL,*tmp=NULL;
+    short count=0,found_period=FALSE,x=0;
+    ss1 << d; 
+    tmp=ss1.str().c_str();
+    if(!isEMPTY(tmp))
+    {
+     for(x=0,temp=tmp;*temp;++x,++temp) 
+     {
+      if(*temp=='.') found_period=x;
+      if(x>found_period) ++count;
+     }
+     precision=count;
+   } else {
+/* added code above */
+     precision = digits_ - intPartLength;
+   }
   }
   Wt::WString result = locale.toFixedString(d, precision);
   std::size_t size = result.toUTF8().size();
@@ -252,7 +271,7 @@ double NumericField::doubleValue() const
     }
   } catch (boost::bad_lexical_cast&) {
     throw NumericConversionError("Couldn't convert text: " + value);
-  }
+  } 
   return result;
 }
 

@@ -36,7 +36,7 @@ extern void c_main(int,char **);
 char using_js=FALSE,using_ajax=FALSE;
 char inside_rfkw=FALSE; 
 RDArsrc *rfkw_rsrc=NULL;
-short USE_DIAGNOSTIC_SCREENS=TRUE,MODULE_GROUP=0;
+short USE_DIAGNOSTIC_SCREENS=FALSE,MODULE_GROUP=0;
 
 
 char *(*RDA_AutoComplete)(char *,char *,char *,char *);
@@ -9020,10 +9020,8 @@ short xFINDRSCGETDEFTYPE(RDArsrc *rsc,char *name,short *deftype,int line,char *f
 short xMEMBERSETACCTTYPE(RDArmem *member,short acctype,int line,char *file)
 {
 	RDArsrc *rsc=NULL;
-	RDAacct *holdacct=NULL;
 	char *temp2=NULL;
-	Wt::WLineEdit *LE=NULL;
-	Wt::WRegExpValidator *REv=NULL;
+	short dtype=member->items;
 
 	rsc=(RDArsrc *)member->parent;
 	switch(member->field_type)
@@ -9057,77 +9055,7 @@ short xMEMBERSETACCTTYPE(RDArmem *member,short acctype,int line,char *file)
 		default:
 			return(-1);
 	}
-	if(member->definition!=NULL) Rfree(member->definition);
-	switch(member->field_type)
-	{
-		case EXPENDITURE:
-			if(EXPENDITURE_ACCOUNT->num>member->items)
-			{
-				holdacct=EXPENDITURE_ACCOUNT->codetype+member->items;
-			}
-			if(holdacct!=NULL)
-			{
-				member->definition=fullacctdef(holdacct);
-			}
-			break;
-		case REVENUE:
-			if(REVENUE_ACCOUNT->num>member->items)
-			{
-				holdacct=REVENUE_ACCOUNT->codetype+member->items;
-			}
-			if(holdacct!=NULL)
-			{
-				member->definition=fullacctdef(holdacct);
-			}
-			break;
-		case BALANCESHEET:
-			if(BALANCE_SHEET_ACCOUNT->num>member->items)
-			{
-				holdacct=BALANCE_SHEET_ACCOUNT->codetype+member->items;
-			}
-			if(holdacct!=NULL)
-			{
-				member->definition=fullacctdef(holdacct);
-			}
-			break;
-		case BEGINNINGBALANCE:
-			if(BEGINNING_BALANCE_ACCOUNT->num>member->items)
-			{
-				holdacct=BEGINNING_BALANCE_ACCOUNT->codetype+member->items;
-			}
-			if(holdacct!=NULL)
-			{
-				member->definition=fullacctdef(holdacct);
-			}
-			break;
-		case CUSTOMTYPE:
-			if(CUSTOM_INPUTS_ACCOUNT->num>member->items)
-			{
-				holdacct=CUSTOM_INPUTS_ACCOUNT->codetype+member->items;
-			}
-			if(holdacct!=NULL)
-			{
-				member->definition=fullacctdef(holdacct);
-			}
-			break;
-		default:
-			return(-1);
-	}
-	if(member->w!=NULL)
-	{
-		temp2=CreateRegExpString(member->definition);
-		if(diaggui)
-		{
-			prterr("Regex Created: [%s]",temp2);
-		}
-		LE=(Wt::WLineEdit *)member->w;
-		REv=(Wt::WRegExpValidator *)member->validobject;
-		REv->~WRegExpValidator();
-		member->validobject = new Wt::WRegExpValidator(temp2);
-		if(member->validobject!=NULL) LE->setValidator(member->validobject);
-		if(temp2!=NULL) Rfree(temp2);
-	}
-	updatemember(member);
+	MEMBERSETDEFTYPE(member,dtype);
 	return(0);
 }
 short xFINDRSCSETACCTTYPE(RDArsrc *rsc,char *name,short acctype,

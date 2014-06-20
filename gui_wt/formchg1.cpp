@@ -1460,11 +1460,17 @@ short xmakescrn(RDArsrc  *scrnrscr,short modalx,short (*EvalFunc)(...),void *Eva
 		{
 			for(y=0,SList=scrnrscr->lists;y<scrnrscr->numlists;++y,++SList)
 			{
-				x=FINDRSC(scrnrscr,SList->name);
-				if(x>(-1))
+				if(SList->contype==3)
 				{
-					member=scrnrscr->rscs+x;
-					ExecuteRDArmemFunction(member);	
+					x=FINDRSC(scrnrscr,SList->name);
+					if(x>(-1))
+					{
+						member=scrnrscr->rscs+x;
+						if(member->w!=NULL)
+						{
+							ExecuteRDArmemFunction(member);	
+						}
+					}	
 				}	
 			}
 		}
@@ -1476,10 +1482,8 @@ short xmakescrn(RDArsrc  *scrnrscr,short modalx,short (*EvalFunc)(...),void *Eva
 				member=scrnrscr->rscs+x;
 				if(member->w!=NULL)
 				{
-/*
 					WF=(Wt::WFormWidget *)member->w;
 					WF->setFocus(TRUE);
-*/
 /* Add Method to move TabWidget */
 #ifdef XXXXX
 					if(scrnrscr->has_tabbar==TRUE)
