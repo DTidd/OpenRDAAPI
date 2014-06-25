@@ -250,7 +250,7 @@ Wt::WContainerWidget *UnPostedExpenditureActivity()
 	xchart=new Wt::Chart::WPieChart(UnPostedExpenditureActivityDashBoard);
 	xchart->setModel(ExpenditureUnPosted);
 	xchart->setLabelsColumn(0);
-	xchart->setAvoidLabelRendering(2.99);
+	xchart->setAvoidLabelRendering(4.99);
 	xchart->setDataColumn((ExpendActValuetoVisual+1));
 	xchart->setDisplayLabels(Wt::Chart::LabelOption::Outside | Wt::Chart::LabelOption::TextLabel | Wt::Chart::LabelOption::TextPercentage);
 	xchart->setPerspectiveEnabled(true,0.2);
@@ -547,7 +547,7 @@ Wt::WContainerWidget *UnPostedRevenueActivity()
 	xchart=new Wt::Chart::WPieChart(UnPostedRevenueActivityDashBoard);
 	xchart->setModel(RevenueUnPosted);
 	xchart->setLabelsColumn(0);
-	xchart->setAvoidLabelRendering(2.99);
+	xchart->setAvoidLabelRendering(4.99);
 	xchart->setDataColumn((RevenueActValuetoVisual+1));
 	xchart->setDisplayLabels(Wt::Chart::LabelOption::Outside | Wt::Chart::LabelOption::TextLabel | Wt::Chart::LabelOption::TextPercentage);
 	xchart->setPerspectiveEnabled(true,0.2);
@@ -815,7 +815,7 @@ Wt::WContainerWidget *UnProcessedJournalEntry()
 	xchart=new Wt::Chart::WPieChart(UnProcessedJournalEntryDashBoard);
 	xchart->setModel(JournalEntriesUnProcessed);
 	xchart->setLabelsColumn(0);
-	xchart->setAvoidLabelRendering(2.99);
+	xchart->setAvoidLabelRendering(4.99);
 	xchart->setDataColumn((JournalEntryValuetoVisual+1));
 	xchart->setDisplayLabels(Wt::Chart::LabelOption::Outside | Wt::Chart::LabelOption::TextLabel | Wt::Chart::LabelOption::TextPercentage);
 	xchart->setPerspectiveEnabled(true,0.2);
@@ -1079,7 +1079,7 @@ Wt::WContainerWidget *UnProcessedReceipt()
 	xchart=new Wt::Chart::WPieChart(UnProcessedReceiptDashBoard);
 	xchart->setModel(ReceiptsUnProcessed);
 	xchart->setLabelsColumn(0);
-	xchart->setAvoidLabelRendering(2.99);
+	xchart->setAvoidLabelRendering(4.99);
 	xchart->setDataColumn((ReceiptValuetoVisual+1));
 	xchart->setDisplayLabels(Wt::Chart::LabelOption::Outside | Wt::Chart::LabelOption::TextLabel | Wt::Chart::LabelOption::TextPercentage);
 	xchart->setPerspectiveEnabled(true,0.2);
@@ -1380,7 +1380,7 @@ Wt::WContainerWidget *UnPostedGeneralLedgerActivity()
 	xchart=new Wt::Chart::WPieChart(UnPostedGeneralLedgerActivityDashBoard);
 	xchart->setModel(GeneralLedgerUnPosted);
 	xchart->setLabelsColumn(0);
-	xchart->setAvoidLabelRendering(2.99);
+	xchart->setAvoidLabelRendering(4.99);
 	xchart->setDataColumn((GenLdgrActValuetoVisual+1));
 	xchart->setDisplayLabels(Wt::Chart::LabelOption::Outside | Wt::Chart::LabelOption::TextLabel | Wt::Chart::LabelOption::TextPercentage);
 	xchart->setPerspectiveEnabled(true,0.2);

@@ -468,6 +468,7 @@ struct RDArsrcs
 	Wt::WToolBar *window_toolbar;
 	char has_tabbar;
 	char has_large_table;
+	Wt::WTabWidget *tabbar;
 };
 typedef struct RDArsrcs RDArsrc;
 

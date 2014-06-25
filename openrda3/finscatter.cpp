@@ -1370,7 +1370,7 @@ Wt::WContainerWidget *BSScatterWidget(short dtype2use,char *fd2use)
 			FUND_CODE=DetermineFund(DEFINITION_TYPE,pFUND_CODE);
 			if(isEMPTY(FUND_CODE) && DEFINITION_TYPE>0) 
 			{
-				fprintf(RDA_STDERR,"Unable to identify FUND_CODE and build BalSumData.");TRACE;
+				prterr("ERROR:  Unable to identify FUND_CODE and build BalSumData.");
 				return(NULL);
 			}
 			DEFINITION_TYPE=DetermineDEFTYPE(FUND_CODE);
@@ -1506,6 +1506,28 @@ Wt::WContainerWidget *BSScatterWidget(short dtype2use,char *fd2use)
 }
 Wt::WContainerWidget *BalSumScatterWidget()
 {
+	char *libx=NULL,display_plot=FALSE;
+	RDAGenericSetup *gsv=NULL;
+
+	libx=Rmalloc(RDAstrlen(CURRENTDIRECTORY)+17);
+#ifndef WIN32
+	sprintf(libx,"%s/rda/FINMGT.GSV",CURRENTDIRECTORY);
+#endif
+#ifdef WIN32
+	sprintf(libx,"%s\\rda\\FINMGT.GSV",CURRENTDIRECTORY);
+#endif
+
+	gsv=RDAGenericSetupNew("FINMGT","DISPLAY G/L CATEGORY PLOT");
+	if(gsv!=NULL)
+	{
+		if(!getRDAGenericSetupbin(libx,gsv))
+		{
+			display_plot=*gsv->value.string_value;
+		}
+	}
+	if(gsv!=NULL) FreeRDAGenericSetup(gsv);
+	if(libx!=NULL) Rfree(libx);
+	if(display_plot==FALSE) return(NULL);
 	ActualBalSumScatter=NULL;
 	DEFINITION_TYPE=0;
 	FUND_CODE=NULL;

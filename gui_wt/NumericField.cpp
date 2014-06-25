@@ -115,7 +115,8 @@ Wt::WString NumericField::formatDouble(double d) const
       if(*temp=='.') found_period=x;
       if(x>found_period) ++count;
      }
-     precision=count;
+     if(count<(digits_ -intPartLength)) precision=count;
+	else precision=digits_ - intPartLength;
    } else {
 /* added code above */
      precision = digits_ - intPartLength;
@@ -222,7 +223,7 @@ double NumericField::doubleValue() const
   std::string value = text().toUTF8();
   bool sign = false;
   if (allowNegative_) {
-    // Extract and remove sign
+// Extract and remove sign
     if (!value.empty()) {
       if (value[value.size() - 1] == '-') {
 	sign = true;

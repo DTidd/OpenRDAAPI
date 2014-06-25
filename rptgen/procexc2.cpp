@@ -1998,10 +1998,10 @@ static void MakeREPORTMasterButtons(RDArsrc *mainrsrc,
 
 void process_exceptions_browseA(RDArsrc *parent,MTNPassableStruct *PSTRUCT,int level,void (*quitfunc)(...),RDArsrc *fromrsrc,void *fromargs)
 {
-	HoldReport *h=NULL;
-	RDArunrpt *rrpt=NULL;
-	RDAreport *rpt=NULL;
-	MaintainMaster *MTNMASTER=NULL;
+	MaintainMaster *MTNMASTER=PSTRUCT->MTNMASTER;
+	HoldReport *h=(HoldReport *)MTNMASTER->passparent;
+	RDArunrpt *rrpt=h->rrpt;
+	RDAreport *rpt=h->rpt;
 	RDAaccum *a=NULL;
 	NRDfield *field=NULL;
 	int x=0;
@@ -2269,8 +2269,8 @@ void process_exceptions_browseB(RDArsrc *parent,MTNPassableStruct *PSTRUCT)
 
 void process_exceptions2(HoldReport *h)
 {
-	RDArunrpt *rrpt=NULL;
-	RDAreport *rpt=NULL;
+	RDArunrpt *rrpt=h->rrpt;
+	RDAreport *rpt=h->rpt;
 	MTNPassableStruct *PSTRUCT=NULL;
 	MaintainMaster *MTNMASTER=NULL;
 	void *targetkey=NULL;
@@ -2504,6 +2504,7 @@ static void abort_procexcp3(RDArsrc *mtnrsrc,MTNPassableStruct *PSTRUCT)
 	MaintainMaster *MTNMASTER=NULL;
 	HoldReport *h=NULL;
 	RDArsrc *rsrc=NULL;
+	RDAreport *rpt=NULL;
 	RDArunrpt *rrpt=NULL;
 	int level=0,rrptlevel=0;
 
@@ -2516,6 +2517,7 @@ static void abort_procexcp3(RDArsrc *mtnrsrc,MTNPassableStruct *PSTRUCT)
 			if(h!=NULL)
 			{
 				rrpt=h->rrpt;
+				rpt=h->rpt;
 				rrptlevel=rrpt->level;
 				level=MTNMASTER->level;
 				rsrc=MTNMASTER->mtnrsrc;
@@ -2527,11 +2529,11 @@ static void abort_procexcp3(RDArsrc *mtnrsrc,MTNPassableStruct *PSTRUCT)
 					MTNMASTER->mtnrsrc=NULL;
 				}
 				rrpt->screen_count-=1; 
+				quitreport(rsrc,h);
+				if(rpt->MTNMSTR!=NULL) FreeMaintainMaster(rpt->MTNMSTR);
+				if(PSTRUCT!=NULL) Rfree(PSTRUCT);
 				if(rrptlevel==0) 
 				{
-					quitreport(rsrc,h);
-					if(MTNMASTER!=NULL) FreeMaintainMaster(MTNMASTER);
-					if(PSTRUCT!=NULL) Rfree(PSTRUCT);
 					ShutdownSubsystems();
 				}
 			} else {
@@ -2550,6 +2552,7 @@ static void abort_procexcp2(MakeBrowseList *blist)
 	MaintainMaster *MTNMASTER=NULL;
 	RDArsrc *brsrc=NULL,*drsrc=NULL,*srsrc=NULL;
 	HoldReport *h=NULL;
+	RDAreport *rpt=NULL;
 	RDArunrpt *rrpt=NULL;
 	int level=0,rrptlevel=0;
 	Browse_Exit *BE=NULL;
@@ -2566,6 +2569,7 @@ static void abort_procexcp2(MakeBrowseList *blist)
 				if(h!=NULL)
 				{
 					rrpt=h->rrpt;
+					rpt=h->rpt;
 					rrptlevel=rrpt->level;
 					level=MTNMASTER->level;
 					drsrc=blist->definelist;
@@ -2594,6 +2598,11 @@ static void abort_procexcp2(MakeBrowseList *blist)
 						rrpt->mainrsrc=NULL;
 						rrpt->screen_count-=1; 
 					}
+					quitreport(brsrc,h);
+					FreeBrowseExit(BE);
+					if(rpt->MTNMSTR!=NULL) FreeMaintainMaster(rpt->MTNMSTR);
+					if(PSTRUCT!=NULL) Rfree(PSTRUCT);
+/*
 					if(rrptlevel==0) 
 					{
 						quitreport(brsrc,h);
@@ -2601,6 +2610,7 @@ static void abort_procexcp2(MakeBrowseList *blist)
 						if(MTNMASTER!=NULL) FreeMaintainMaster(MTNMASTER);
 						if(PSTRUCT!=NULL) Rfree(PSTRUCT);
 					}
+*/
 				} else {
 					prterr("Error HoldReport structure is NULL at line [%d] program [%s].",__LINE__,__FILE__);
 				}

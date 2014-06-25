@@ -574,7 +574,7 @@ void membersetcursor(RDArmem *member)
 		case DOLLARS:
 		case DOLLARS_NOCENTS:
 			cp=1;
-			cp1=col-1;
+			cp1=col;
 			ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp1 << ";";
 			WW->doJavaScript(ss1.str());
 			break;
@@ -583,7 +583,7 @@ void membersetcursor(RDArmem *member)
 		case SSHORTV:
 		case SLONGV:
 			cp=0;
-			cp=col-1;
+			cp=col;
 			ss1 << WW->jsRef() << ".selectionStart = " << cp << ";" << WW->jsRef() << ".selectionEnd = " << cp << ";";
 			WW->doJavaScript(ss1.str());
 			break;
@@ -1280,6 +1280,18 @@ void RDArsrcKeyPressed(RDArsrc *r,Wt::WKeyEvent &e)
 		}
 	}
 }
+short isParentOf(Wt::WContainerWidget *parent,Wt::WWidget *child)
+{
+	Wt::WWidget *w=NULL;
+
+	w=child;
+	while(w!=NULL)
+	{
+		if(parent==w->parent()) return(TRUE);
+		w=w->parent();
+	}
+	return(FALSE);
+}
 //*---------------------------------------------------------------------------
 //	makescrn - Program to make a custom screen from resources.
 //
@@ -1319,7 +1331,7 @@ short xmakescrn(RDArsrc  *scrnrscr,short modalx,short (*EvalFunc)(...),void *Eva
 	Wt::WApplication *myAPP=NULL;
 #endif /* _DEFER_RENDERING_ATTEMPT_ */
 	Wt::WString *qc=NULL;
-	Wt::WWidget *TabD=NULL,*last=NULL,*pnt=NULL;
+	Wt::WWidget *last=NULL,*pnt=NULL;
 	Wt::WWidget *pw=NULL,*LIW=NULL;
 	Wt::WFormWidget *WF=NULL;
 	Wt::WContainerWidget *rC=NULL,*dC=NULL;
@@ -1327,8 +1339,9 @@ short xmakescrn(RDArsrc  *scrnrscr,short modalx,short (*EvalFunc)(...),void *Eva
 	RDAScrolledList *SList=NULL;
 	int FrameW=0,FrameH=0,dt_W=0,dt_H=0,posx=0,posy=0;
 	std::string *s1=NULL;
-	char using_js=FALSE,using_ajax=FALSE;
+	char using_js=FALSE,using_ajax=FALSE,*hold_input_field=NULL;
 	Wt::WWebWidget *WWeb=NULL;
+	Wt::WContainerWidget *TabD=NULL;
 
 	if(RDA_NOGUI==TRUE)
 	{
@@ -1447,6 +1460,7 @@ short xmakescrn(RDArsrc  *scrnrscr,short modalx,short (*EvalFunc)(...),void *Eva
 		scrnrscr->has_large_table=FALSE;
 /*setup screen*/
 		crtwdgts((WWidget *)scrnrscr->swidget,scrnrscr->scn,scrnrscr,temp);
+		hold_input_field=stralloc(scrnrscr->input_focus);
 		if(temp!=NULL) Rfree(temp);
 		if(dashes!=NULL) Rfree(dashes);
 		if(scrnrscr->primary!=NULL)
@@ -1474,6 +1488,9 @@ short xmakescrn(RDArsrc  *scrnrscr,short modalx,short (*EvalFunc)(...),void *Eva
 				}	
 			}
 		}
+		if(scrnrscr->input_focus!=NULL) Rfree(scrnrscr->input_focus);
+		scrnrscr->input_focus=stralloc(hold_input_field);
+		if(hold_input_field!=NULL) Rfree(hold_input_field);
 		if(scrnrscr->input_focus!=NULL)
 		{
 			x=FINDRSC(scrnrscr,scrnrscr->input_focus);
@@ -1484,23 +1501,21 @@ short xmakescrn(RDArsrc  *scrnrscr,short modalx,short (*EvalFunc)(...),void *Eva
 				{
 					WF=(Wt::WFormWidget *)member->w;
 					WF->setFocus(TRUE);
-/* Add Method to move TabWidget */
-#ifdef XXXXX
-					if(scrnrscr->has_tabbar==TRUE)
+					if(scrnrscr->has_tabbar)
 					{
-						pnt=((WWidget *)member->w->parent());
-						while(pnt!=NULL)
+						if(scrnrscr->tabbar!=NULL)
 						{
-							if(last!=NULL) 
+							for(y=0;y<scrnrscr->tabbar->count();++y)
 							{
-								if(RDAstrstr((WWebWidget *)last->id(),"New Tab VBox")) TabD=pnt;
+								TabD=scrnrscr->tabbar->widget(y);
+								if(isParentOf(TabD,member->w)) 
+								{
+									scrnrscr->tabbar->setCurrentWidget((Wt::WWidget *)TabD);
+									break;
+								}
 							}
-							last=pnt;
-							pnt=((WWidget *)last->parent());
-						}	
-
+						}
 					}
-#endif /* XXXXX */
 				}
 			}
 		}

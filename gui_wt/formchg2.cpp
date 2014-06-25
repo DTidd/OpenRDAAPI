@@ -2004,7 +2004,6 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 			if(!USER_INTERFACE)
 			{
 				if(PUSHBUTTON_STYLE==2 && rtype>6 && rtype!=20 && rtype!=21 && rtype!=41 && rtype!=42 && rtype!=62 && rtype!=63) rtype=0;
-
 				if(rtype==5)
 				{
 					if(isEMPTY(pixmap)) 
@@ -2176,278 +2175,205 @@ void makefield(Wt::WWidget *parent,RDArmem *member,
 							break;
 						case 1: /* right */
 							pB->addStyleClass("Right-Arrow");
-							rname=stralloc("resources/OpenRDA/forward.png");
 							break;
 						case 2: /* left */
 							pB->addStyleClass("Left-Arrow");
-							rname=stralloc("resources/OpenRDA/back.png");
 							break;
 						case 3: /* up */
 							pB->addStyleClass("Up-Arrow");
-							rname=stralloc("resources/OpenRDA/up.png");
 							break;
 						case 4: /* down */
 							pB->addStyleClass("Down-Arrow");
-							rname=stralloc("resources/OpenRDA/down.png");
 							break;
 						case 6: /* find */
 							pB->addStyleClass("Find");
-							rname=stralloc("resources/OpenRDA/find.png");
 							break;
 						case 7: /* Printer */
 							pB->addStyleClass("Printer");
-							rname=stralloc("resources/OpenRDA/printer.png");
 							break;
 						case 8: /* Redo */
 							pB->addStyleClass("Redo");
-							rname=stralloc("resources/OpenRDA/redo.png");
 							break;
 						case 9: /* undo */
 							pB->addStyleClass("Undo");
-							rname=stralloc("resources/OpenRDA/undo.png");
 							break;
 						case 10: /* findfile */
 							pB->addStyleClass("Find-File");
-							rname=stralloc("resources/OpenRDA/filefind.png");
 							break;
 						case 11: /* help */
 							pB->addStyleClass("Help");
-							rname=stralloc("resources/OpenRDA/help.png");
 							break;
 						case 12: /* Search */
 							pB->addStyleClass("SearchButton");
-							rname=stralloc("resources/OpenRDA/search.png");
 							break;
 						case 13: /* Edit */
 							pB->addStyleClass("Edit");
-							rname=stralloc("resources/OpenRDA/edit.png");
 							break;
 						case 14: /* Exit */
 							pB->addStyleClass("Quit");
-							rname=stralloc("resources/OpenRDA/exit.png");
 							break;
 						case 15: /* definelist */
 							pB->addStyleClass("DefineList");
-							rname=stralloc("resources/OpenRDA/definelist.png");
 							break;
 						case 16: /* add-create */
 							pB->addStyleClass("Add");
-							rname=stralloc("resources/OpenRDA/add.png");
 							break;
 						case 17: /* save defaults */
 							pB->addStyleClass("SaveScreenDefaults");
-							rname=stralloc("resources/OpenRDA/savedefaults.png");
 							break;
 						case 18: /* reset defaults */
 							pB->addStyleClass("ResetScreenDefaults");
-							rname=stralloc("resources/OpenRDA/resetdefaults.png");
 							break;
 						case 19: /* cabinet */
 							pB->addStyleClass("FilingCabinet");
-							rname=stralloc("resources/OpenRDA/cabinet.png");
 							break;
 						case 20: /* mail_send */
 							pB->addStyleClass("SendEmail");
-							rname=stralloc("resources/OpenRDA/mail_send.png");
 							break;
 						case 21: /* scanner */
 							pB->addStyleClass("Scanner");
-							rname=stralloc("resources/OpenRDA/scanner.png");
 							break;
 						case 22: /* wizard */
 							pB->addStyleClass("Wizard");
-							rname=stralloc("resources/OpenRDA/wizard.png");
 							break;
 						case 23: /* save */
 							pB->addStyleClass("SaveFile");
-							rname=stralloc("resources/OpenRDA/filesave.png");
 							break;
 						case 24: /* fastsave */
 							pB->addStyleClass("FastSave");
-							rname=stralloc("resources/OpenRDA/fastsave.png");
 							break;
 						case 25: /* exec */
 							pB->addStyleClass("Execute");
-							rname=stralloc("resources/OpenRDA/exec.png");
 							break;
 						case 26: /* html */
 							pB->addStyleClass("HTML");
-							rname=stralloc("resources/OpenRDA/html.png");
 							break;
 						case 27: /* pdf */
 							pB->addStyleClass("PortableDocumentFormat");
-							rname=stralloc("resources/OpenRDA/pdf.png");
 							break;
 						case 28: /* zip */
 							pB->addStyleClass("Zip");
-							rname=stralloc("resources/OpenRDA/zip.png");
 							break;
 						case 29: /* display */
 							pB->addStyleClass("Display");
-							rname=stralloc("resources/OpenRDA/display.png");
 							break;
 						case 30: /* archive */
 							pB->addStyleClass("Archive");
-							rname=stralloc("resources/OpenRDA/archive.png");
 							break;
 						case 31: /* folder */
 							pB->addStyleClass("Folder");
-							rname=stralloc("resources/OpenRDA/folder.png");
 							break;
 						case 32: /* www */
 							pB->addStyleClass("World-Wide-Web");
-							rname=stralloc("resources/OpenRDA/www.png");
 							break;
 						case 33: /* delete */
 							pB->addStyleClass("Delete");
-							rname=stralloc("resources/OpenRDA/delete.png");
 							break;
 						case 34: /* configure */
 							pB->addStyleClass("Configure");
-							rname=stralloc("resources/OpenRDA/configure.png");
 							break;
 						case 35: /* looknfeel */
 							pB->addStyleClass("LooknFeel");
-							rname=stralloc("resources/OpenRDA/looknfeel.png");
 							break;
 						case 36: /* view */
 							pB->addStyleClass("View");
-							rname=stralloc("resources/OpenRDA/view.png");
 							break;
 						case 37: /* view_detailed */
 							pB->addStyleClass("ViewDetails");
-							rname=stralloc("resources/OpenRDA/view_detailed.png");
 							break;
 						case 38: /* MainMenu */
 							pB->addStyleClass("MainMenu");
-							rname=stralloc("resources/OpenRDA/mainmenu.png");
 							break;
 						case 39: /* Open_Source */
 							pB->addStyleClass("OpenSource");
-							rname=stralloc("resources/OpenRDA/open_source.png");
 							break;
 						case 40: /* GoogleMaps */
 							pB->addStyleClass("GoogleMaps");
-							rname=stralloc("resources/OpenRDA/GoogleMaps.png");
 							break;
 						case 41: /* top */
 							pB->addStyleClass("TopofList");
-							rname=stralloc("resources/OpenRDA/top.png");
 							break;
 						case 42: /* bottom */
 							pB->addStyleClass("BottomofList");
-							rname=stralloc("resources/OpenRDA/bottom.png");
 							break;
 						case 43: /* announcement */
 							pB->addStyleClass("Announcement");
-							rname=stralloc("resources/OpenRDA/announcement.png");
 							break;
 						case 44: /* chat */
 							pB->addStyleClass("Chat");
-							rname=stralloc("resources/OpenRDA/chat.png");
 							break;
 						case 45: /* download */
 							pB->addStyleClass("Download");
-							rname=stralloc("resources/OpenRDA/download.png");
 							break;
 						case 46: /* upload */
 							pB->addStyleClass("Upload");
-							rname=stralloc("resources/OpenRDA/upload.png");
 							break;
 						case 47: /* news */
 							pB->addStyleClass("News");
-							rname=stralloc("resources/OpenRDA/news.png");
 							break;
 						case 48: /* documentation */
 							pB->addStyleClass("Documentation");
-							rname=stralloc("resources/OpenRDA/documentation.png");
 							break;
 						case 49: /* copy */
 							pB->addStyleClass("Copy");
-							rname=stralloc("resources/OpenRDA/copy.png");
 							break;
 						case 50: /* video */
 							pB->addStyleClass("Video");
-							rname=stralloc("resources/OpenRDA/video.png");
 							break;
 						case 51: /* ksnapshot */
 							pB->addStyleClass("ScreenSnapShot");
-							rname=stralloc("resources/OpenRDA/ksnapshot.png");
 							break;
 						case 52: /* konqueror */
 							pB->addStyleClass("Konqueror");
-							rname=stralloc("resources/OpenRDA/konqueror.png");
 							break;
 						case 53: /* cybersupport */
 							pB->addStyleClass("CuberSupport");
-							rname=stralloc("resources/OpenRDA/cybersupport.png");
 							break;
 						case 54: /* saveupdate */
 							pB->addStyleClass("SaveandUpdate");
-							rname=stralloc("resources/OpenRDA/saveupdate.png");
 							break;
 						case 55: /* printerror */
 							pB->addStyleClass("PrintErrors");
-							rname=stralloc("resources/OpenRDA/printerror.png");
 							break;
 						case 56: /* printwarning */
 							pB->addStyleClass("PrintWarnings");
-							rname=stralloc("resources/OpenRDA/printwarning.png");
 							break;
 						case 57: /* addabove */
 							pB->addStyleClass("AddAbove");
-							rname=stralloc("resources/OpenRDA/addabove.png");
 							break;
 						case 58: /* addbelow */
 							pB->addStyleClass("AddBelow");
-							rname=stralloc("resources/OpenRDA/addbelow.png");
 							break;
 						case 59: /* dotdotdot */
 							pB->addStyleClass("DotDotDot");
-							rname=stralloc("resources/OpenRDA/dotdotdot.png");
 							break;
 						case 60: /* tuxCloud */
 							pB->addStyleClass("TuxCloud");
-							rname=stralloc("resources/OpenRDA/tuxCloud.png");
 							break;
 						case 61: /* FYdotdot */
 							pB->addStyleClass("FYDotDotDot");
-							rname=stralloc("resources/OpenRDA/FYdotdot.png");
 							break;
 						case 62: /* csv */
 							pB->addStyleClass("CSV");
-							rname=stralloc("resources/OpenRDA/csv.png");
 							break;
 						case 63: /* paperclip */
 							pB->addStyleClass("Paperclip");
-							rname=stralloc("resources/OpenRDA/paperclip.png");
 							break;
 						case 64: /* delete small*/
 							pB->addStyleClass("DeleteSmall");
-							rname=stralloc("resources/OpenRDA/delete_small.png");
 							break;
 						case 65: /* user */
 							pB->addStyleClass("UserProfile");
-							rname=stralloc("resources/OpenRDA/user.png");
 							break;
 						case 66: /* wiki */
 							pB->addStyleClass("Wiki");
-							rname=stralloc("resources/OpenRDA/wiki.png");
 							break;
 						case 67: /* browse */
 							pB->addStyleClass("Browse");
-							rname=stralloc("resources/OpenRDA/browse.png");
 							break;
 						case 68: /* select */
 							pB->addStyleClass("Select");
-							rname=stralloc("resources/OpenRDA/select.png");
 							break;
-					}
-					if(!isEMPTY(rname))
-					{
-						WK = new WLink(rname);
-						if(pB!=NULL) pB->setIcon(*WK);
-							else myImage->setImageLink(*WK);
 					}
 				} else if(rtype==5)
 				{

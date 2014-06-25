@@ -494,6 +494,7 @@ void NULL_RSCS(RDArsrc *r)
 		r->primary=NULL;
 		r->swidget=NULL;
 		r->window_toolbar=NULL;
+		r->tabbar=NULL;
 		for(x=0,mem=r->rscs;x<r->numrscs;++x,++mem)
 		{
 			if(!USER_INTERFACE)
@@ -1426,6 +1427,7 @@ void xfree_rsrc(RDArsrc *rscrs,int line,char *file)
 		if(rscrs->scn!=NULL) free_scrn(rscrs->scn);
 		if(rscrs->input_focus!=NULL) Rfree(rscrs->input_focus);
 		rscrs->window_toolbar=NULL;
+		rscrs->tabbar=NULL;
 		if(rscrs->rscs!=NULL)
 		{
 			for(x=0,member=rscrs->rscs;x<rscrs->numrscs;++x,++member)
@@ -5339,6 +5341,7 @@ void xkillwindow(RDArsrc *r,int line,char *file)
 		}
 		r->swidget=NULL;
 		r->primary=NULL;
+		r->tabbar=NULL;
 	}
 	--WindowCount;
 	if(WindowCount<1)
@@ -7789,6 +7792,7 @@ RDArsrc *xRDArsrcNEW(char *module,char *screen,int line,char *file)
 	t->has_tabbar=FALSE;
 	t->has_large_table=FALSE;
 	t->window_toolbar=NULL;
+	t->tabbar=NULL;
 	return(t);
 }
 short xFINDRSCSHOWVALUE(RDArsrc *rsc,char *name,int line,char *file)

@@ -296,8 +296,8 @@ void xmakebrowselist(MakeBrowseList *m,RDArsrc *tmprsrc)
 /* this function is used to take the define list values, search browse values, and the file pointer, and create the viewable browse list and array of key values. */
 	short f=0,x,cur=1,length=0,lcount=0,addit=FALSE;
 	short test_browse=FALSE,breakout=TRUE,select=TRUE;
-	int z;
-	RDArmem *len_member=NULL,*pos_member=NULL;
+	int z,w=0,total_widgets=0;
+	RDArmem *len_member=NULL,*pos_member=NULL,*mem=NULL;
 	char *s=NULL,*hold=NULL,*temp=NULL;
 	NRDfield *field=NULL;
 	RDArsrc *definelist=NULL;
@@ -319,8 +319,12 @@ void xmakebrowselist(MakeBrowseList *m,RDArsrc *tmprsrc)
 	if(!isEMPTY(test_exp1)) test_exp=PP_translate(test_exp1);
 	if(test_exp1!=NULL) Rfree(test_exp1);
 	definelist=m->definelist;
+	for(w=0,mem=definelist->rscs;w<definelist->numrscs;++w,++mem)
+	{
+		if(mem->field_type==SHORTV && (!RDAstrstr(mem->rscrname," POSITION") || !RDAstrstr(mem->rscrname," LENGTH"))) ++total_widgets;
+	}
 /* determining the maximum length of the viewable browse line */
-	for(x=1,length=0;x<(definelist->numrscs-7);x+=2)
+	for(x=1,length=0;x<(total_widgets);x+=2)
 	{
 		pos_member=definelist->rscs+x;
 		len_member=definelist->rscs+(x+1);
@@ -451,9 +455,9 @@ void xmakebrowselist(MakeBrowseList *m,RDArsrc *tmprsrc)
 			cur=0;
 /* loop through the resources in the define list structure, to create the
 	viewable browse list strings in the specified order */
-			while(cur<(definelist->numrscs-6))
+			while(cur<(total_widgets))
 			{
-				for(x=1;x<(definelist->numrscs-6);x+=2)
+				for(x=1;x<(total_widgets);x+=2)
 				{
 /* getting the appropriate RDArmem structure for the position and length */ 
 					pos_member=definelist->rscs+x;
@@ -882,7 +886,7 @@ void xmakebrowselist(MakeBrowseList *m,RDArsrc *tmprsrc)
 	{
 		updatersrc(m->mainrsrc,"SEARCH CRITERIA");
 	}
-	for(x=1,length=0;x<(m->definelist->numrscs-6);x+=2)
+	for(x=1,length=0;x<(total_widgets);x+=2)
 	{
 		pos_member=m->definelist->rscs+x;
 		len_member=m->definelist->rscs+(x+1);

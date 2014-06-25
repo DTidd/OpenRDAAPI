@@ -1449,7 +1449,7 @@ int xcrtline(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,
 						{
 							tmpstr=RDA_EncodeWhiteSpace(wdgt->label);
 						} else {
-							tmpstr=stralloc("<pre> </pre>");
+							tmpstr=stralloc("&nbsp;");
 						}
 						temp_xstr = new WString(tmpstr,UTF8);
 						dashes=adddashes(wdgt->label);
@@ -2573,6 +2573,7 @@ int xcrttab(Wt::WWidget *parent,RDAscrn *scn,RDArsrc *rsrc,int *widgetcount,WWid
 	rsrc->has_tabbar=TRUE;
 	wdgt=scn->wdgts+(*widgetcount);
 	Tab=new Wt::WTabWidget((Wt::WContainerWidget *)parent);
+	rsrc->tabbar=Tab;
 	*tabw=(Wt::WWidget *)Tab;
 	WW=(Wt::WWidget *)Tab;
 	mssc=ModuleScreenStyleClass(rsrc);

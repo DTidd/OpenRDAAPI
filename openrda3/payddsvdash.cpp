@@ -228,7 +228,7 @@ Wt::WContainerWidget *UnProcessedVendorWithholding()
 	xchart->setModel(VendorWithholdingsUnProcessed);
 	xchart->setLabelsColumn(0);
 	xchart->setDataColumn((VendorWithholdingValuetoVisual+1));
-	xchart->setAvoidLabelRendering(2.99);
+	xchart->setAvoidLabelRendering(4.99);
 	xchart->setDisplayLabels(Wt::Chart::LabelOption::Outside | Wt::Chart::LabelOption::TextLabel | Wt::Chart::LabelOption::TextPercentage);
 	xchart->setPerspectiveEnabled(true,0.2);
 	xchart->setExplode(0,0.3);
@@ -465,7 +465,7 @@ Wt::WContainerWidget *UnProcessedAccumulatedWithholding()
 	xchart->setModel(AccumulatedWithholdingsUnProcessed);
 	xchart->setLabelsColumn(0);
 	xchart->setDataColumn((AccumulatedWithholdingValuetoVisual+1));
-	xchart->setAvoidLabelRendering(2.99);
+	xchart->setAvoidLabelRendering(4.99);
 	xchart->setDisplayLabels(Wt::Chart::LabelOption::Outside | Wt::Chart::LabelOption::TextLabel | Wt::Chart::LabelOption::TextPercentage);
 	xchart->setPerspectiveEnabled(true,0.2);
 	xchart->setExplode(0,0.3);
@@ -473,7 +473,7 @@ Wt::WContainerWidget *UnProcessedAccumulatedWithholding()
 	xchart->setMargin(2,Wt::Side::Top | Wt::Side::Bottom);
 	xchart->setMargin(Wt::WLength::Auto,Wt::Side::Left | Wt::Side::Right);
 	TablePanel=new Wt::WPanel(UnProcessedAccumulatedWithholdingDashBoard);
-	TablePanel->setTitle(Wt::WString("Accumulated Withholdings Table"));
+	TablePanel->setTitle(Wt::WString("Accumulated Withholdings Table by Deduction Type"));
 	TablePanel->collapsed().connect(std::bind([=]() { AccumulatedWithholdingShowTable=FALSE; }));
 	TablePanel->expanded().connect(std::bind([=]() { AccumulatedWithholdingShowTable=TRUE; }));
 	TablePanel->setTitleBar(TRUE);
@@ -695,7 +695,7 @@ Wt::WContainerWidget *UnProcessedAccumulatedWithholdingbyVen()
 	xchart->setModel(AccumulatedWithholdingbyVensUnProcessed);
 	xchart->setLabelsColumn(0);
 	xchart->setDataColumn((AccumulatedWithholdingbyVenValuetoVisual+1));
-	xchart->setAvoidLabelRendering(2.99);
+	xchart->setAvoidLabelRendering(4.99);
 	xchart->setDisplayLabels(Wt::Chart::LabelOption::Outside | Wt::Chart::LabelOption::TextLabel | Wt::Chart::LabelOption::TextPercentage);
 	xchart->setPerspectiveEnabled(true,0.2);
 	xchart->setExplode(0,0.3);
@@ -703,7 +703,7 @@ Wt::WContainerWidget *UnProcessedAccumulatedWithholdingbyVen()
 	xchart->setMargin(2,Wt::Side::Top | Wt::Side::Bottom);
 	xchart->setMargin(Wt::WLength::Auto,Wt::Side::Left | Wt::Side::Right);
 	TablePanel=new Wt::WPanel(UnProcessedAccumulatedWithholdingbyVenDashBoard);
-	TablePanel->setTitle(Wt::WString("Accumulated Withholdings Table"));
+	TablePanel->setTitle(Wt::WString("Accumulated Withholdings Table by Vendor"));
 	TablePanel->collapsed().connect(std::bind([=]() { AccumulatedWithholdingbyVenShowTable=FALSE; }));
 	TablePanel->expanded().connect(std::bind([=]() { AccumulatedWithholdingbyVenShowTable=TRUE; }));
 	TablePanel->setTitleBar(TRUE);

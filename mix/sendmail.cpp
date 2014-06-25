@@ -39,6 +39,7 @@ short xRunVMimeSendmail(MAIL_VARS *email,int line,char *file)
 	APPlib *newenv=NULL;
 	APPlib *remove_env=NULL;
 	std::string tempstr;
+	void (*myUI_OpenWindow)(char *)=NULL;
 
 	int x=0;
 	int status=0;
@@ -210,9 +211,14 @@ short xRunVMimeSendmail(MAIL_VARS *email,int line,char *file)
 	}
 
 	x=RDA_NOGUI;
+	myUI_OpenWindow=UI_OpenWindow;
+	UI_OpenWindow=NULL;
 	RDA_NOGUI=TRUE;
 	status=ADV4Execute2Program("vmime-sendmail",NULL,newenv,TRUE,FALSE,remove_env);
 	RDA_NOGUI=x;
+	UI_OpenWindow=myUI_OpenWindow;
+	myUI_OpenWindow=NULL;
+
 	prterr("\nvmime-sendmail exited with code [%d]\n",status);
 	if(newenv!=NULL) freeapplib(newenv);
 	if(remove_env!=NULL) freeapplib(remove_env);

@@ -1012,22 +1012,22 @@ void ExecuteDockRSRC(RDArmem *member)
 {
 	ExecuteOption(member->items);
 }
-Wt::WPopupMenu *MySubMenu(Wt::WWidget *Parent_Widget,short ddl,int p,char *namex)
+Wt::WPopupMenu *MySubMenu(Wt::WWidget *Parent_Widget,short ddl,int p,char *namex,short *NumItems)
 {
 	Wt::WPopupMenu *pop=NULL,*pop1=NULL;
-	char *mod=NULL,DID_STUFF=FALSE,*name=NULL,delflag=FALSE;
+	char *mod=NULL,*name=NULL,delflag=FALSE;
 	char *vis_exp=NULL;
 	short ddl1=0,style=0;
 	int itemNumber=0,p1=0,a=0;
 	Wt::WString *c=NULL;
 	Wt::WWidget *label=NULL;
-	Wt::WMenuItem *WMi=NULL;
-	short ef=0,count=0;
+	Wt::WMenuItem *WMi=NULL,*mM=NULL;
+	short ef=0,count=0,nItems=0;
 
 
 	pop=new Wt::WPopupMenu();
 	pop1=(Wt::WWidget *)Parent_Widget;
-	pop1->addMenu(namex,(Wt::WMenu *)pop);
+	mM=pop1->addMenu(namex,(Wt::WMenu *)pop);
 	ZERNRD(MENUITEM_FILENO);
 	FINDFLDSETSTRING(MENUITEM_FILENO,"MODULE NAME",CURRENT_MODULE);
 	FINDFLDSETSHORT(MENUITEM_FILENO,"DROP DOWN LIST",ddl);
@@ -1054,7 +1054,7 @@ Wt::WPopupMenu *MySubMenu(Wt::WWidget *Parent_Widget,short ddl,int p,char *namex
 			{
 				default:
 				case 0: /* Action */
-					DID_STUFF=TRUE;
+					++(*NumItems);
 							
 					pop->addItem(name)->triggered().connect(boost::bind(&ExecuteOption,itemNumber));
 					WMi=pop->items().at(count);
@@ -1066,8 +1066,15 @@ Wt::WPopupMenu *MySubMenu(Wt::WWidget *Parent_Widget,short ddl,int p,char *namex
 					}
 					break;
 				case 1: /* Anchor */
-					pop1=MySubMenu((Wt::WWidget *)pop,ddl,itemNumber,name);
-					pop1->setDisabled(FALSE);
+					nItems=0;
+					pop1=MySubMenu((Wt::WWidget *)pop,ddl,itemNumber,name,&nItems);
+					if(nItems>0)
+					{
+						++(*NumItems);
+						pop1->setDisabled(FALSE);
+					} else {
+						pop1->setDisabled(TRUE);
+					}
 					break;
 				case 2: /* Heading - Label */
 					c=new Wt::WString(name);
@@ -1088,21 +1095,25 @@ Wt::WPopupMenu *MySubMenu(Wt::WWidget *Parent_Widget,short ddl,int p,char *namex
 	}
 	if(mod!=NULL) Rfree(mod);
 	if(name!=NULL) Rfree(name);
-	pop->setDisabled((DID_STUFF ? TRUE:FALSE));
+	pop->setDisabled((*NumItems<1 ? TRUE:FALSE));
+	if(*NumItems<1)
+	{
+		pop->setItemHidden(mM,TRUE);
+	}
 	return(pop);
 }
 Wt::WPopupMenu *ModuleDDL(short ddl)
 {
 	Wt::WPopupMenu *WHICH=NULL;
 	Wt::WPopupMenu *pop1=NULL;
-	char *mod=NULL,DID_STUFF=FALSE,*name=NULL,delflag=FALSE;
+	char *mod=NULL,*name=NULL,delflag=FALSE;
 	char *vis_exp=NULL;
 	short ddl1=0,style=0,count=0;
 	int itemNumber=0,p=0,p1=0,a=0;
 	Wt::WString *c=NULL;
 	Wt::WWidget *label=NULL,*pop=NULL;
 	Wt::WMenuItem *WMi=NULL;
-	short ef=0;
+	short ef=0,nItems=0,lItems=0;
 
 	WHICH=new Wt::WPopupMenu();
 	ZERNRD(MENUITEM_FILENO);
@@ -1131,8 +1142,8 @@ Wt::WPopupMenu *ModuleDDL(short ddl)
 			{
 				default:
 				case 0: /* Action */
+					++nItems;
 					WHICH->addItem(name)->triggered().connect(boost::bind(&ExecuteOption,itemNumber));
-					DID_STUFF=TRUE;
 					WMi=WHICH->items().at(count);
 					if(itemNumber==LAST_EXE)
 					{
@@ -1142,9 +1153,15 @@ Wt::WPopupMenu *ModuleDDL(short ddl)
 					}
 					break;
 				case 1: /* Anchor */
-					pop1=MySubMenu((Wt::WWidget *)WHICH,ddl,itemNumber,name);
-					DID_STUFF=TRUE;
-					pop1->setDisabled(FALSE);
+					lItems=0;
+					pop1=MySubMenu((Wt::WWidget *)WHICH,ddl,itemNumber,name,&lItems);
+					if(lItems>0)
+					{
+						++nItems;
+						pop1->setDisabled(FALSE);
+					} else {
+						pop1->setDisabled(TRUE);
+					}
 					break;
 				case 2: /* Heading - Label */
 					c=new Wt::WString(name);
@@ -1165,7 +1182,7 @@ Wt::WPopupMenu *ModuleDDL(short ddl)
 	}
 	if(mod!=NULL) Rfree(mod);
 	if(name!=NULL) Rfree(name);
-	if(!DID_STUFF)
+	if(nItems<1)
 	{
 		if(WHICH!=NULL) WHICH->~WMenu();
 		WHICH=NULL;
@@ -1320,7 +1337,7 @@ void CreateDockRSRC(char *modname)
 	{
 		ERRORDIALOG("MAKESCRN FAILED","The Make Screen function failed for the Dock Window.  Check to see the screen is available. If it is, call your installer.",NULL,FALSE);
 	}
-	SC->resize(300,Wt::WLength::Auto);
+	SC->resize(380,Wt::WLength::Auto);
 	QN2IT_PARENT_TYPE=0;
 }
 void CreateCenterPanel(char *modname)
@@ -1353,8 +1370,6 @@ void CreateCenterPanel(char *modname)
 		if(w!=NULL)
 		{
 			tabW->addTab(w,"G/L Category",Wt::WTabWidget::PreLoading);
-		} else {
-			prterr("Error:  G/L Category didn't generate a container.");TRACE;
 		}
 		w=UnPostedExpenditureActivity();
 		tabW->addTab(w,"Exp Activity",Wt::WTabWidget::PreLoading);
@@ -1400,7 +1415,12 @@ void CreateCenterPanel(char *modname)
 	{
 		hbox=new Wt::WHBoxLayout();
 		MainWindowCenter->setLayout(hbox);
-		myText=new Wt::WText("<iframe src='http://www.openrda.com/blog' width=100% height=100%></iframe>");
+		if(UseHTTPS) 
+		{
+			myText=new Wt::WText("<iframe src='https://www.openrda.com/blog' width=100% height=100%></iframe>");
+		} else {
+			myText=new Wt::WText("<iframe src='http://www.openrda.com/blog' width=100% height=100%></iframe>");
+		}
 		myText->setTextFormat(Wt::TextFormat::XHTMLUnsafeText);
 		hbox->addWidget(myText,500);
 	} else if(!RDAstrcmp(modname,"VW"))

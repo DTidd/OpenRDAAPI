@@ -190,8 +190,8 @@ static void print_browse_header(RDA_PFILE *fp,int *lines,int *pages,
 }
 char *make_definelist_string(RDArsrc *definelist,short length,char **seperator)
 {
-	short x=0,z=0,cur=1,lcount=0,w=0;
-	RDArmem *len_member,*pos_member;
+	short x=0,z=0,cur=1,lcount=0,w=0,total_widgets;
+	RDArmem *len_member,*pos_member,*mem=NULL;
 	char *hold=NULL,*s=NULL,*label=NULL;
 	char *temp=NULL,*temp1=NULL;
 	RDAwdgt *wdgt=NULL;
@@ -202,9 +202,13 @@ char *make_definelist_string(RDArsrc *definelist,short length,char **seperator)
 	memset(temp,0,length+1);
 	lcount=0;
 	cur=0;
-	while(cur<(definelist->numrscs-6))
+	for(w=0,mem=definelist->rscs;w<definelist->numrscs;++w,++mem)
 	{
-		for(x=1;x<(definelist->numrscs-6);x+=2)
+		if(mem->field_type==SHORTV && (!RDAstrstr(mem->rscrname," POSITION") || !RDAstrstr(mem->rscrname," LENGTH"))) ++total_widgets;
+	}
+	while(cur<(total_widgets))
+	{
+		for(x=1;x<(total_widgets);x+=2)
 		{
 			pos_member=definelist->rscs+x;
 			len_member=definelist->rscs+(x+1);
@@ -463,7 +467,8 @@ static void MakeBrowseListTotalTemp(RDArsrc *r,short fileno,RDArsrc *d)
 static void printbrowselist(RDArsrc *prsrc,MakeBrowseList *b)
 {
 	RDA_PFILE *fp=NULL;
-	int x=0;
+	int x=0,w=0,total_widgets=0;
+	RDArmem *mem=NULL;
 	char *outdevice=NULL,*message=NULL;
 /*
 	char *temp=NULL,*temp_head=NULL;
@@ -574,6 +579,10 @@ static void printbrowselist(RDArsrc *prsrc,MakeBrowseList *b)
 			SelectPrintType(outdevice,print_style,fp);
 			mainrsrc=b->mainrsrc;
 			definelist=b->definelist;
+			for(w=0,mem=definelist->rscs;w<definelist->numrscs;++w,++mem)
+			{
+				if(mem->field_type==SHORTV && (!RDAstrstr(mem->rscrname," POSITION") || !RDAstrstr(mem->rscrname," LENGTH"))) ++total_widgets;
+			}
 			readwidget(prsrc,"SUB-TITLE");
 			FINDRSCGETSTRING(prsrc,"SUB-TITLE",&sub_title);
 			readwidget(prsrc,"COLUMNS");
@@ -584,7 +593,7 @@ static void printbrowselist(RDArsrc *prsrc,MakeBrowseList *b)
 			FINDRSCGETINT(prsrc,"LINES",&max_lines);
 			if(max_lines<=0) max_lines=60;
 /* determining the maximum length of the viewable browse line */
-			for(x=1,length=0;x<(definelist->numrscs-6);x+=2)
+			for(x=1,length=0;x<(total_widgets);x+=2)
 			{
 				pos_member=definelist->rscs+x;
 				len_member=definelist->rscs+(x+1);
@@ -780,18 +789,22 @@ void printbrowse(RDArsrc *parent,MakeBrowseList *b)
 void browselistcsv(RDArsrc *r,MakeBrowseList *m)
 {
 	FILE *fp=NULL;
-	int x=0,cur=0,k=0,count=0,z=0;
+	int x=0,cur=0,k=0,count=0,z=0,w=0,total_widgets=0;
 	RDArsrc *definelist=NULL;
 	RDArsrc *mainrsrc=NULL;
 	char *temp=NULL,tempx[1024];
 	char *s=NULL;
-	RDArmem *len_member,*pos_member;
+	RDArmem *len_member,*pos_member,*mem=NULL;
 	NRDfield *field=NULL;
 	RDAvirtual *v=NULL;
 
 	memset(tempx,0,1024);
 	sprintf(tempx,"%s/%d.csv",CURRENTDIRECTORY,RGETPID());
 	unlink(tempx);
+	for(w=0,mem=definelist->rscs;w<definelist->numrscs;++w,++mem)
+	{
+		if(mem->field_type==SHORTV && (!RDAstrstr(mem->rscrname," POSITION") || !RDAstrstr(mem->rscrname," LENGTH"))) ++total_widgets;
+	}
 	fp=fopen(tempx,"w");
 	if(fp!=NULL)
 	{
@@ -799,9 +812,9 @@ void browselistcsv(RDArsrc *r,MakeBrowseList *m)
 		definelist=m->definelist;
 		cur=0;
 		count=0;
-		while(cur<(definelist->numrscs-6))
+		while(cur<(total_widgets))
 		{
-			for(x=1;x<(definelist->numrscs-6);x+=2)
+			for(x=1;x<(total_widgets);x+=2)
 			{
 				pos_member=definelist->rscs+x;
 				len_member=definelist->rscs+(x+1);
@@ -832,9 +845,9 @@ void browselistcsv(RDArsrc *r,MakeBrowseList *m)
 			SetRDArsrcFiles(m->fileno,m->definelist);
 			cur=0;
 			count=0;
-			while(cur<(definelist->numrscs-6))
+			while(cur<(total_widgets))
 			{
-				for(x=1;x<(definelist->numrscs-6);x+=2)
+				for(x=1;x<(total_widgets);x+=2)
 				{
 					pos_member=definelist->rscs+x;
 					len_member=definelist->rscs+(x+1);

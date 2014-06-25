@@ -766,7 +766,6 @@ DB *OPNNRDberkeley(NRDbuffer *NRDtmp)
 	}
 	min_c=(block/(((len+lenx))));
 	if(min_c<2) min_c=2;
-	prterr("block [%d] min_c [%d] key len [%d] data len [%d] ",block,min_c,lenx,len);TRACE;
 	NRDtmp->dbp->set_pagesize(NRDtmp->dbp,block);
 	NRDtmp->dbp->set_bt_minkey(NRDtmp->dbp,min_c);
 #endif /* USE_SETPAGESIZE */
@@ -909,7 +908,6 @@ short CRTNRDberkeley(NRDbuffer *NRDtmp)
 	}
 	min_c=(block/(((len+lenx))));
 	if(min_c<2) min_c=2;
-	prterr("block [%d] min_c [%d] key len [%d] data len [%d] ",block,min_c,lenx,len);TRACE;
 	NRDtmp->dbp->set_pagesize(NRDtmp->dbp,block);
 	NRDtmp->dbp->set_bt_minkey(NRDtmp->dbp,min_c);
 #endif /* USE_SETPAGESIZE */
@@ -1006,7 +1004,6 @@ void EXITNRDberkeley()
 		BerkeleyENV=NULL;
 		return;
 	} else {
-		TRACE;
 #ifdef USE_DIRECTORY
 		temp=Rmalloc(RDAstrlen(CURRENTDIRECTORY)+25);
 #ifndef WIN32
@@ -1036,7 +1033,6 @@ short INITNRDberkeley()
 		BerkeleyENV=NULL;
 		return(-1);
 	} else {
-		TRACE;
 #ifdef USE_DIRECTORY
 		temp=Rmalloc(RDAstrlen(CURRENTDIRECTORY)+25);
 #ifndef WIN32
@@ -1053,7 +1049,6 @@ short INITNRDberkeley()
 		BerkeleyENV->set_errfile(BerkeleyENV,RDA_STDERR);
 		BerkeleyENV->set_errpfx(BerkeleyENV,PROGRAM_NAME);
 #endif /* USE_ERRFILE */
-		TRACE;
 #ifdef USE_SETCACHE
 		if(BerkeleyENV->set_cachesize(BerkeleyENV,0,5*1024*1024,0))
 		{
@@ -1062,31 +1057,22 @@ short INITNRDberkeley()
 			BerkeleyENV=NULL;
 			return(-1);
 		}
-		TRACE;
 #endif /* USE_SETCACHE */
 #ifdef USE_RDA_ALLOC
 		BerkeleyENV->set_alloc(BerkeleyENV,Bmalloc,Brealloc,Bfree);
 #endif /* USE_RDA_ALLOC */
 #ifndef USE_LOCKING
-		TRACE;
 /*
 		BerkeleyENV->set_flags(BerkeleyENV,DB_NOLOCKING,TRUE);
 */
-		TRACE;
 #endif
 #ifdef USE_LOCKING
-		TRACE;
 		BerkeleyENV->set_lk_detect(BerkeleyENV,DB_LOCK_DEFAULT);
-		TRACE;
 #ifdef USE_NOMMAP
 		BerkeleyENV->set_flags(BerkeleyENV,DB_NOMMAP,TRUE);
 #endif /* USE_NOMMAP */
-		TRACE;
 #endif
-		TRACE;
 		e=BerkeleyENV->open(BerkeleyENV,NULL,DB_JOINENV,0664);
-		TRACE;
-		prterr("ENV->open [%d] ",e);TRACE;
 		if(e!=0)
 		{
 #ifndef USE_LOCKING
@@ -1102,7 +1088,6 @@ short INITNRDberkeley()
 #endif
 		}
 		if(temp!=NULL) Rfree(temp);
-		prterr("ENV->open [%d] ",e);TRACE;
 		switch(e)
 		{
 			default:

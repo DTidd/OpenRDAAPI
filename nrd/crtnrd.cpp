@@ -68,7 +68,7 @@ short xCRTNRD(char *module,short dbengine,char *name,short nofields,NRDfield *fi
 			x=CRTNRDmyisam(NRDtmp);
 			if(x<0)
 			{
-				prterr("Error can't create Actual Data File [%s] [%s] using MySQL Embeded Database at line [%d] program [%s].",module,name,line,file);
+				prterr("Error can't create Actual Data File [%s] [%s] using MyISAM Database at line [%d] program [%s].",module,name,line,file);
 				freenrd(NRDtmp);
 				return(-1);
 			}
